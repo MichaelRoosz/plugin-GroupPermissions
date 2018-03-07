@@ -1,0 +1,28 @@
+{
+    "GroupPermissions": {
+        "MenuGroupPermissions": "Gruppen Rechte",
+        "GroupPermissions": "Gruppen Rechte",
+        "Group": "Gruppe",
+        "DescriptionAccessTab": "Hier kann der Zugriff auf bestimmte Webseiten erteilt werden. Es ist auch m\u00f6glich, Zugriff auf alle Webseiten zu erlauben, in dem Sie \"F\u00fcr alle Webseiten anwenden\" im Webseitenselektor ausw\u00e4hlen.",
+        "DescriptionGroupsTab": "Hier koennen die Mitglieder der Gruppen eingesehen werden. Hauptadministratoren k\u00f6nnen die Mitglieder verwalten.",
+        "ExceptionGroupDoesNotExist": "Gruppe existiert nicht",
+        "ExceptionGroupDoesExist": "Gruppe existiert bereits",
+        "ManageAccess": "Rechte verwalten",
+        "ManageGroups": "Gruppen verwalten",
+        "Overview": "Uebersicht",
+        "CreateNewGroup": "Neue Gruppe erstellen",
+        "CreateNewGroupButton": "Gruppe erstellen",
+        "ManageGroup": "Gruppe verwalten",
+        "ManageGroupMembers": "Mitglieder verwalten",
+        "RemoveFromGroup": "Entfernen",
+        "AddUserToGroup": "Neues Mitglied zu dieser Gruppe hinzuf\u00fcgen",
+        "AddUserToGroupButton": "Mitglied hinzuf\u00fcgen",
+        "RenameGroup": "Diese Gruppe umbenennen",
+        "RenameGroupButton": "Gruppe umbenennen",
+        "DeleteGroup": "Diese Gruppe l\u00f6schen",
+        "DeleteGroupButton": "Gruppe l\u00f6schen",
+        "RemoveFromGroupConfirm": "Sind Sie sicher, dass Sie den Benutzer '%s' aus der Gruppe '%s entfernen wollen'?",
+        "RenameGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe '%s' in '%s' umbenennen wollen?",
+        "DeleteGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe '%s' l\u00f6schen wollen?"
+    }
+}

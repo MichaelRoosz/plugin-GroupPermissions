@@ -1,0 +1,84 @@
+<p>{{ 'GroupPermissions_DescriptionAccessTab'|translate }}</p>
+
+<div class="card">
+    <div class="card-content">
+    
+        <div id="sites" class="groupPermissions">
+            <section class="sites_selector_container">
+                {% set applyAllSitesText %}
+                    <strong>{{ 'UsersManager_ApplyToAllWebsites'|translate }}</strong>
+                {% endset %}
+        
+                <div piwik-siteselector
+                     show-selected-site="true"
+                     only-sites-with-admin-access="true"
+                     class="sites_autocomplete"
+                     siteid="{{ idSiteSelected }}"
+                     sitename="{{ defaultReportSiteName }}"
+                     all-sites-text="{{ applyAllSitesText|raw }}"
+                     all-sites-location="top"
+                     id="groupPermissionsSiteSelect"
+                     switch-site-on-select="false"></div>
+            </section>
+        </div>
+        
+        {% block websiteGroupsAccessTable %}
+        
+        {% import 'ajaxMacros.twig' as ajax %}
+        {{ ajax.errorDiv('ajaxErrorGroupPermissions') }}
+        {{ ajax.loadingDiv('ajaxLoadingGroupPermissions') }}
+            
+        <div class="entityContainer" style="width:600px;margin-top:16px;">
+            <table class="entityTable dataTable" id="groupPermissions" style="display:inline-table;width:550px;">
+                <thead>
+                <tr>
+                    <th class='first'>{{ 'GroupPermissions_Group'|translate }}</th>
+                    <th>{{ 'UsersManager_PrivNone'|translate }}</th>
+                    <th>{{ 'UsersManager_PrivView'|translate }}</th>
+                    <th>{{ 'UsersManager_PrivAdmin'|translate }}</th>
+                </tr>
+                </thead>
+        
+                <tbody>
+                {% set accesValid %}<img src='plugins/UsersManager/images/ok.png' class='accessGranted' />{% endset %}
+                {% set accesInvalid %}<img src='plugins/UsersManager/images/no-access.png' class='updateAccess' />{% endset %}
+                
+                {% for group,access in groupAccessByWebsite %}
+                    <tr>
+                        <td id='group'>{{ group }}</td>
+                        <td id='noaccess'>
+                            {% if access=='noaccess' and idSiteSelected != 'all' %}
+                                {{ accesValid }}
+                            {% else %}
+                                {{ accesInvalid }}
+                            {% endif %}&nbsp;</td>
+                        <td id='view'>
+                            {% if access == 'view' and idSiteSelected != 'all' %}
+                                {{ accesValid }}
+                            {% else %}
+                                {{ accesInvalid }}
+                            {% endif %}&nbsp;</td>
+                        <td id='admin'>
+                            {% if access == 'admin' and idSiteSelected != 'all' %}
+                                {{ accesValid }}
+                            {% else %}
+                                {{ accesInvalid }}{% endif %}&nbsp;
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div id="accessUpdated" style="vertical-align:top;"></div>
+        </div>
+        
+        <div class="ui-confirm" id="confirmGroupPermissions">
+            <h2>{{ 'UsersManager_ChangeAllConfirm'|translate("<span id='group'></span>")|raw }}</h2>
+            <input role="yes" type="button" value="{{ 'General_Yes'|translate }}"/>
+            <input role="no" type="button" value="{{ 'General_No'|translate }}"/>
+        </div>
+        
+        
+        {% endblock %}
+        
+    </div>
+</div>

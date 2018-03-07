@@ -1,0 +1,28 @@
+{
+    "GroupPermissions": {
+        "MenuGroupPermissions": "Group Permissions",
+        "GroupPermissions": "Group Permissions",
+        "Group": "Group",
+        "DescriptionAccessTab": "Decide which groups have access to your websites. You can also give access to all the websites at once by choosing \"Apply to all websites\" in the website selector.",
+        "DescriptionGroupsTab": "Here you can take a look at the members of each group. Superusers may edit the groups.",
+        "ExceptionGroupDoesNotExist": "Group does not exists",
+        "ExceptionGroupDoesExist": "Group already exists",
+        "ManageAccess": "Manage Access",
+        "ManageGroups": "Manage Groups",
+        "Overview": "Overview",
+        "CreateNewGroup": "Create a new group",
+        "CreateNewGroupButton": "Create Group",
+        "ManageGroup": "Manage group",
+        "ManageGroupMembers": "Manage group members",
+        "RemoveFromGroup": "Remove",
+        "AddUserToGroup": "Add a new member to this group",
+        "AddUserToGroupButton": "Add Member",
+        "RenameGroup": "Rename this group",
+        "RenameGroupButton": "Rename Group",
+        "DeleteGroup": "Delete this group",
+        "DeleteGroupButton": "Delete Group",
+        "RemoveFromGroupConfirm": "Are you sure you want to remove user '%s' from group '%s'?",
+        "RenameGroupConfirm": "Are you sure you want to rename the group '%s' to '%s'?",
+        "DeleteGroupConfirm": "Are you sure you want to delete the group '%s'?"
+    }
+}

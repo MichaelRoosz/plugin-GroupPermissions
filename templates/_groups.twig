@@ -1,0 +1,124 @@
+
+<p>{{ 'GroupPermissions_DescriptionGroupsTab'|translate }}</p>
+
+<div class="card">
+    <div class="card-content">
+        <div>
+            <h2>{{ 'GroupPermissions_CreateNewGroup'|translate }}</h2>
+            <div>
+                <input id="groupPermissionsGroupCreateGroup" type="text" />
+                <input id="groupPermissionsGroupCreateGroupButton" type="button" value="{{ 'GroupPermissions_CreateNewGroupButton'|translate }}" style="padding: 8px;"/>
+            </div>
+        </div>
+
+        <div style="padding: 10px 0 0 0;">
+            {% import 'ajaxMacros.twig' as ajax %}
+            {{ ajax.errorDiv('ajaxErrorCreateGroup') }}
+            {{ ajax.loadingDiv('ajaxLoadingCreateGroup') }}
+        </div>
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-content">
+            <h2>{{ 'GroupPermissions_ManageGroup'|translate }}</h2>
+            
+            <select name="idGroup" id="groupPermissionsGroupSelect">
+                  {% for idgroup,name in groups %}
+                      <option value="{{ idgroup }}" {% if selectedIdGroup==idgroup %}selected{% endif %}>{{ name }}</option>
+                  {% endfor %}
+            </select>
+
+
+        <h3>{{ 'GroupPermissions_ManageGroupMembers'|translate }}</h3>
+        
+        <div class="entityContainer" style="width:600px;margin-top:16px;">
+        
+            <input type="hidden" id="groupPermissionsCurrentIdGroup" value="{{ selectedIdGroup }}" />
+            <input type="hidden" id="groupPermissionsCurrentGroupName" value="{{ selectedGroupName }}" />
+            
+            <table class="entityTable dataTable" id="groupPermissionsGroup" style="display:inline-table;width:550px;">
+                <thead>
+                <tr>
+                    <th>{{ 'General_Username'|translate }}</th>
+                    <th>{{ 'GroupPermissions_RemoveFromGroup'|translate }}</th>
+                </tr>
+                </thead>
+        
+                <tbody>
+                {% for login in groupUsers %}
+                    <tr>
+                        <td class='login'>{{ login }}</td>
+                        <td class="text-center">
+                            <button class="groupPermissionsRemoveUser btn btn-flat" title="{{ 'GroupPermissions_RemoveFromGroup'|translate }}" data-login="{{ login }}">
+                                <span class="icon-delete"></span>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div id="accessUpdated" style="vertical-align:top;"></div>
+        </div>
+        
+        <div class="ui-confirm" id="confirmRemoveUserFromGroup">
+            <h2>{{ 'GroupPermissions_RemoveFromGroupConfirm'|translate("<span id='login'></span>", "<span id='group'></span>")|raw }}</h2>
+            <input role="yes" type="button" value="{{ 'General_Yes'|translate }}"/>
+            <input role="no" type="button" value="{{ 'General_No'|translate }}"/>
+        </div>
+        
+        <div style="margin-top: 70px;">
+            <h3>{{ 'GroupPermissions_AddUserToGroup'|translate }}</h3>
+            <div>
+                <input id="groupPermissionsGroupAddUser" type="text" />
+                <input id="groupPermissionsGroupAddUserButton" type="button" value="{{ 'GroupPermissions_AddUserToGroupButton'|translate }}" style="padding: 8px;"/>
+            </div>
+        </div>
+        
+       <div style="padding: 10px 0 0 0;">
+            {% import 'ajaxMacros.twig' as ajax %}
+            {{ ajax.errorDiv('ajaxErrorManageGroupMember') }}
+            {{ ajax.loadingDiv('ajaxLoadingManageGroupMember') }}
+       </div>
+        
+        <div class="ui-confirm" id="confirmRenameGroup">
+            <h2>{{ 'GroupPermissions_RenameGroupConfirm'|translate("<span id='confirmOldGroupName'></span>", "<span id='confirmNewGroupName'></span>")|raw }}</h2>
+            <input role="yes" type="button" value="{{ 'General_Yes'|translate }}"/>
+            <input role="no" type="button" value="{{ 'General_No'|translate }}"/>
+        </div>
+        
+        <div style="margin-top: 70px;">
+            <h3>{{ 'GroupPermissions_RenameGroup'|translate }}</h3>
+            <div>
+                <input id="groupPermissionsGroupRenameGroup" type="text" />
+                <input id="groupPermissionsGroupRenameGroupButton" type="button" value="{{ 'GroupPermissions_RenameGroupButton'|translate }}" style="padding: 8px;"/>
+            </div>
+        </div>
+
+        <div style="padding: 10px 0 0 0;">
+            {% import 'ajaxMacros.twig' as ajax %}
+            {{ ajax.errorDiv('ajaxErrorManageGroupRename') }}
+            {{ ajax.loadingDiv('ajaxLoadingManageGroupRename') }}
+        </div>
+
+        <div class="ui-confirm" id="confirmDeleteGroup">
+            <h2>{{ 'GroupPermissions_DeleteGroupConfirm'|translate("<span id='confirmDeleteGroupName'></span>")|raw }}</h2>
+            <input role="yes" type="button" value="{{ 'General_Yes'|translate }}"/>
+            <input role="no" type="button" value="{{ 'General_No'|translate }}"/>
+        </div>
+                   
+        <div style="margin-top: 70px;">
+            <h3>{{ 'GroupPermissions_DeleteGroup'|translate }}</h3>
+            <input id="groupPermissionsGroupDeleteGroupButton" type="button" value="{{ 'GroupPermissions_DeleteGroupButton'|translate }}" style="padding: 8px;"/>
+        </div>       
+
+        <div style="padding: 10px 0 0 0;">
+            {% import 'ajaxMacros.twig' as ajax %}
+            {{ ajax.errorDiv('ajaxErrorManageGroupDelete') }}
+            {{ ajax.loadingDiv('ajaxLoadingManageGroupDelete') }}
+        </div>
+        
+    </div>
+</div>
+

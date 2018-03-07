@@ -1,0 +1,33 @@
+{% extends 'admin.twig' %}
+
+{% set title %}{{ 'GroupPermissions_GroupPermissions'|translate }}{% endset %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+
+{% if hasSuperUserAccess %}
+    <ul class="nav nav-pills">
+        <li {% if activeTab=='access' %}class="active"{% endif %}>
+            <a href="{{ linkTo({'show': 'access'}) }}">{{ 'GroupPermissions_ManageAccess'|translate }}</a>
+        </li>
+        <li {% if activeTab=='groups' %}class="active"{% endif %}>
+            <a href="{{ linkTo({'show': 'groups'}) }}">{{ 'GroupPermissions_ManageGroups'|translate }}</a>
+        </li>
+        <!-- <li {% if activeTab=='overview' %}class="active"{% endif %}>
+            <a href="{{ linkTo({'show': 'overview'}) }}">{{ 'GroupPermissions_Overview'|translate }}</a>
+        </li> -->
+    </ul>
+    
+    {% if activeTab=='access' %}
+        {% include '@GroupPermissions/_access.twig' %}
+    {% elseif activeTab=='groups' %}
+        {% include '@GroupPermissions/_groups.twig' %}
+    {% elseif activeTab=='overview' %}
+        {% include '@GroupPermissions/_overview.twig' %}
+    {% endif %}
+{% else %}
+    {% include '@GroupPermissions/_access.twig' %}
+{% endif %}
+
+{% endblock %}
