@@ -12,7 +12,10 @@ Copy it into the plugins folder.
 
 GPL v3 or later
 
-## Beta 
+## Changelog
 
-This plugin is not stable yet - use with caution
+3.0.2: First stable release
 
+## Support
+
+Feel free to file an issue at https://github.com/MichaelHeerklotz/plugin-GroupPermissions/issues .
