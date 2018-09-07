@@ -10,7 +10,7 @@
         }
     ],
     "description": "Manage user permissions with groups.",
-    "version": "3.6.0",
+    "version": "3.6.1",
     "theme": false,
     "require": {
         "piwik": ">=3.6.0,<4.0.0-b1"

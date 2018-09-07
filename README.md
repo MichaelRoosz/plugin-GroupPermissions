@@ -13,10 +13,15 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
-3.6.0: Added support for 'write' access
-       Compatibility with Matomo 3.6.0
+- 3.6.1
+  - Fixed Issue #1 reported by EmTeedee
+
+- 3.6.0
+  - Added support for 'write' access
+  - Compatibility with Matomo 3.6.0
   
-3.0.2: First stable release
+- 3.0.2
+  - First stable release
 
 ## Support
 

@@ -34,7 +34,7 @@ class API extends \Piwik\Plugin\API
     public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->roleProvider = $roleProvider ?: StaticContainer::get(RolesProvider::class);
+        $this->roleProvider = StaticContainer::get(RolesProvider::class);
     }
 
     public static function getInstance()
