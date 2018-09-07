@@ -10,6 +10,7 @@ namespace Piwik\Plugins\GroupPermissions;
 
 use Exception;
 use Piwik\Access;
+use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
 use Piwik\Piwik;
 use Piwik\Site;
@@ -23,11 +24,17 @@ class API extends \Piwik\Plugin\API
      */
     private $model;
 
+    /**
+     * @var Access\RolesProvider
+     */
+    private $roleProvider;
+    
     private static $instance = null;
 
     public function __construct(Model $model)
     {
         $this->model = $model;
+        $this->roleProvider = $roleProvider ?: StaticContainer::get(RolesProvider::class);
     }
 
     public static function getInstance()
@@ -168,13 +175,10 @@ class API extends \Piwik\Plugin\API
     
     private function checkAccessType($access)
     {
-        $accessList = Access::getListAccess();
-
-        // do not allow to set the superUser access
-        unset($accessList[array_search("superuser", $accessList)]);
-
-        if (!in_array($access, $accessList)) {
-            throw new Exception(Piwik::translate("UsersManager_ExceptionAccessValues", implode(", ", $accessList)));
+        $roles = $this->roleProvider->getAllRoleIds();
+        
+        if (!in_array($access, $roles, true)) {
+            throw new Exception(Piwik::translate("UsersManager_ExceptionAccessValues", implode(", ", $roles), $access));
         }
     }
     

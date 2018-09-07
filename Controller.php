@@ -47,7 +47,7 @@ class Controller extends ControllerAdmin
         $view = new View('@GroupPermissions/index');
 
         $view->activeTab = Common::getRequestVar('show', 'access');
-        $validTabs = array('access', 'groups', 'overview');
+        $validTabs = array('access', 'groups');
         if (!in_array($view->activeTab, $validTabs)) {
            $view->activeTab = 'access'; 
         }
@@ -61,9 +61,6 @@ class Controller extends ControllerAdmin
             
             if ($view->activeTab === 'groups') {
                 $this->tabGroups($view);   
-            }
-            else if ($view->activeTab === 'overview') {
-                $this->tabOverview($view);   
             }
         }
 
@@ -156,10 +153,5 @@ class Controller extends ControllerAdmin
         
         $view->selectedIdGroup = $idGroup;
         $view->selectedGroupName = isset($groups[$idGroup]) ? $groups[$idGroup] : '';
-    }
-    
-    private function tabOverview(&$view)
-    {
-        
     }
 }

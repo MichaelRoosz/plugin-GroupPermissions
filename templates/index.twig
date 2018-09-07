@@ -14,17 +14,12 @@
         <li {% if activeTab=='groups' %}class="active"{% endif %}>
             <a href="{{ linkTo({'show': 'groups'}) }}">{{ 'GroupPermissions_ManageGroups'|translate }}</a>
         </li>
-        <!-- <li {% if activeTab=='overview' %}class="active"{% endif %}>
-            <a href="{{ linkTo({'show': 'overview'}) }}">{{ 'GroupPermissions_Overview'|translate }}</a>
-        </li> -->
     </ul>
     
     {% if activeTab=='access' %}
         {% include '@GroupPermissions/_access.twig' %}
     {% elseif activeTab=='groups' %}
         {% include '@GroupPermissions/_groups.twig' %}
-    {% elseif activeTab=='overview' %}
-        {% include '@GroupPermissions/_overview.twig' %}
     {% endif %}
 {% else %}
     {% include '@GroupPermissions/_access.twig' %}

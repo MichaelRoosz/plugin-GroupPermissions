@@ -60,10 +60,13 @@ class Access extends \Piwik\Access
     public function getHigherPermission($permission1, $permission2) {
         
         if ($permission1 === 'admin' || $permission2 === 'admin') {
-            return 'admin';   
+            return 'admin';
+        }
+        else if ($permission1 === 'write' || $permission2 === 'write') {
+            return 'write';
         }
         else if ($permission1 === 'view' || $permission2 === 'view') {
-            return 'view';   
+            return 'view';
         }
         else {
             return '';

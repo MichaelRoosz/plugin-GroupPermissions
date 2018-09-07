@@ -7,7 +7,6 @@
 
 $(document).ready(function () {
     
-    // TODO: move back above read() but move into own scope
     function getIdSites() {
         return $('#groupPermissionsSiteSelect').attr('siteid');
     }
@@ -31,7 +30,7 @@ $(document).ready(function () {
         ajaxHandler.send(true);
     }
     
-    function launchAjaxRequest(self, successCallback) {
+    function callSendUpdateGroupPermissionAccess(self, successCallback) {
         sendUpdateGroupPermissionAccess(
             $(self).parent().parent().find('#group').html(), //if changed change also the modal
             $(self).parent().attr('id'),
@@ -73,16 +72,16 @@ $(document).ready(function () {
     
             //ask confirmation
             var group = $(this).parent().parent().find('#group').text();
-            $('#confirmGroupPermissions').find('#group').text(group); // if changed here change also the launchAjaxRequest
+            $('#confirmGroupPermissions').find('#group').text(group);
     
             function onValidate() {
-                launchAjaxRequest(target, successCallback);
+                callSendUpdateGroupPermissionAccess(target, successCallback);
             }
     
             piwikHelper.modalConfirm('#confirmGroupPermissions', {yes: onValidate})
         }
         else {
-            launchAjaxRequest(this, successCallback);
+            callSendUpdateGroupPermissionAccess(this, successCallback);
         }
     }
     

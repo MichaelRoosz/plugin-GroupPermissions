@@ -31,7 +31,6 @@ class GroupPermissions extends Plugin
     {
         return array(
             'AssetManager.getJavaScriptFiles'        => 'getJsFiles',
-            'AssetManager.getStylesheetFiles'        => 'getStylesheetFiles',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             'UsersManager.deleteUser'                => 'deleteUser',
         );
@@ -46,15 +45,7 @@ class GroupPermissions extends Plugin
     {
         $jsFiles[] = "plugins/GroupPermissions/javascripts/groupPermissions.js";
     }
-
-    /**
-     * Get CSS files
-     */
-    public function getStylesheetFiles(&$stylesheets)
-    {
-        $stylesheets[] = "plugins/GroupPermissions/stylesheets/groupPermissions.less";
-    }
-
+    
     /**
      * Delete group preferences associated with a particular site
      */

@@ -35,6 +35,7 @@
                     <th class='first'>{{ 'GroupPermissions_Group'|translate }}</th>
                     <th>{{ 'UsersManager_PrivNone'|translate }}</th>
                     <th>{{ 'UsersManager_PrivView'|translate }}</th>
+                    <th>{{ 'UsersManager_PrivWrite'|translate }}</th>
                     <th>{{ 'UsersManager_PrivAdmin'|translate }}</th>
                 </tr>
                 </thead>
@@ -54,6 +55,12 @@
                             {% endif %}&nbsp;</td>
                         <td id='view'>
                             {% if access == 'view' and idSiteSelected != 'all' %}
+                                {{ accesValid }}
+                            {% else %}
+                                {{ accesInvalid }}
+                            {% endif %}&nbsp;</td>
+                        <td id='write'>
+                            {% if access == 'write' and idSiteSelected != 'all' %}
                                 {{ accesValid }}
                             {% else %}
                                 {{ accesInvalid }}
