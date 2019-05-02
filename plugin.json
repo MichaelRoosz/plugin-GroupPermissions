@@ -2,15 +2,13 @@
     "name": "GroupPermissions",
     "license": "GPL v3+",
     "homepage": "https:\/\/github.com\/MichaelHeerklotz\/plugin-GroupPermissions",
-    "authors": [
-        {
-            "name": "Michael Heerklotz",
-            "email": "michael.heerklotz@web.de",
-            "homepage": "https:\/\/www.5hd.de"
-        }
-    ],
+    "authors": [{
+        "name": "Michael Heerklotz",
+        "email": "michael.heerklotz@web.de",
+        "homepage": "https:\/\/www.5hd.de"
+    }],
     "description": "Manage user permissions with groups.",
-    "version": "3.6.1",
+    "version": "3.9.1",
     "theme": false,
     "require": {
         "piwik": ">=3.6.0,<4.0.0-b1"

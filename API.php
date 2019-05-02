@@ -133,7 +133,9 @@ class API extends \Piwik\Plugin\API
     
     public function setGroupAccess($name, $access, $idSites)
     {
-        $this->checkAccessType($access);
+        if ($access != 'noaccess') {
+            $this->checkAccessType($access);
+        }
         
         $idGroup = $this->model->getGroupWithName($name);
         if (empty($idGroup['idgroup'])) {

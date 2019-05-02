@@ -13,6 +13,9 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
+- 3.9.1
+  - Fixed "noaccess" check for newer Matomo versions
+
 - 3.6.1
   - Fixed Issue #1 reported by EmTeedee
 
