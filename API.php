@@ -1,8 +1,8 @@
 <?php
 /**
- * Piwik - free/libre analytics platform
+ * Matomo - free/libre analytics platform
  *
- * @link http://piwik.org
+ * @link http://matomo.org
  * @license http://www.gnu.org/licenses/gpl-3.0.html GPL v3 or later
  *
  */
@@ -46,7 +46,6 @@ class API extends \Piwik\Plugin\API
                 throw new Exception('GroupPermissions_API must inherit API');
             }
             self::$instance = $instance;
-            
         } catch (Exception $e) {
             self::$instance = StaticContainer::get('Piwik\Plugins\GroupPermissions\API');
             StaticContainer::getContainer()->set('GroupPermissions_API', self::$instance);
@@ -224,5 +223,4 @@ class API extends \Piwik\Plugin\API
         
         return $this->model->deleteGroup($idGroup);
     }
-
 }
