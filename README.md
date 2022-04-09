@@ -13,6 +13,10 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
+- 4.0.1
+  - Compatibility with Matomo 4
+  - Fix SQL Exception when updating permissions
+
 - 3.9.1
   - Fixed "noaccess" check for newer Matomo versions
 
@@ -28,4 +32,4 @@ GPL v3 or later
 
 ## Support
 
-Feel free to file an issue at https://github.com/MichaelHeerklotz/plugin-GroupPermissions/issues .
+Feel free to file an issue at https://github.com/MichaelRoosz/plugin-GroupPermissions/issues .
