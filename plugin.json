@@ -1,14 +1,13 @@
 {
     "name": "GroupPermissions",
     "license": "GPL v3+",
-    "homepage": "https:\/\/github.com\/MichaelHeerklotz\/plugin-GroupPermissions",
+    "homepage": "https:\/\/github.com\/MichaelRoosz\/plugin-GroupPermissions",
     "authors": [{
-        "name": "Michael Heerklotz",
-        "email": "michael.heerklotz@web.de",
-        "homepage": "https:\/\/www.5hd.de"
+        "name": "Michael Roosz",
+        "email": "michael.roosz@web.de"
     }],
     "description": "Manage user permissions with groups.",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "theme": false,
     "require": {
         "matomo": ">=4.0.0-b1,<5.0.0-b1"
@@ -20,6 +19,6 @@
         "group"
     ],
     "donate": {
-        "paypal": "michael.heerklotz@web.de"
+        "paypal": "michael.roosz@web.de"
     }
 }
