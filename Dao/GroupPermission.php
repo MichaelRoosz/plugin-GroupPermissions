@@ -44,10 +44,16 @@ class GroupPermission
     public function createPermission($idGroup, $idSite, $access)
     {
         $db = $this->getDb();
-        $db->insert($this->tablePrefixed, array(
-            'idgroup' => $idGroup,
-            'idsite' => $idSite,
-            'access' => $access
+
+        $query = 'INSERT INTO ' . $this->tablePrefixed
+                . ' (idgroup,idsite,access) VALUES (?,?,?)'
+                . ' ON DUPLICATE KEY UPDATE access=?';
+
+        $db->query($query, array(
+            $idGroup,
+            $idSite,
+            $access,
+            $access
         ));
     }
     
@@ -56,7 +62,7 @@ class GroupPermission
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
         return $this->getDb()->fetchAll("SELECT idsite, access FROM $table WHERE idgroup = ?", array($idGroup));
-    }    
+    }
 
     public function getPermissionsOfSite($idSite)
     {
@@ -70,22 +76,22 @@ class GroupPermission
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ? AND idSite = ?";
         $bind = array(intval($idGroup), intval($idSite));
-        $this->getDb()->query($query, $bind);   
-    }    
+        $this->getDb()->query($query, $bind);
+    }
 
     public function removeAllPermissionsOfGroup($idGroup)
     {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ?";
         $bind = array(intval($idGroup));
-        $this->getDb()->query($query, $bind);   
-    }  
+        $this->getDb()->query($query, $bind);
+    }
 
     public function removeAllPermissionsForSite($idSite)
     {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idSite = ?";
         $bind = array(intval($idSite));
-        $this->getDb()->query($query, $bind);   
+        $this->getDb()->query($query, $bind);
     }
 }
