@@ -13,6 +13,9 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
+- 4.0.2
+  - Fix config page getting endlessly reloaded on Matomo 4.5.0
+
 - 4.0.1
   - Compatibility with Matomo 4
   - Fix SQL Exception when updating permissions

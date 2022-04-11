@@ -252,7 +252,7 @@ $(document).ready(function () {
 
     // when a site is selected, reload the page w/o showing the ajax loading element
     $('#groupPermissionsSiteSelect').bind('change', function (e, site) {
-        if (site.id != piwik.idSite) {
+        if (piwik.idSite && site.id != piwik.idSite) {
             piwik.broadcast.propagateNewPage('segment=&idSite=' + site.id, false);
         }
     });
