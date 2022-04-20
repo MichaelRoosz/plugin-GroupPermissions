@@ -13,6 +13,9 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
+- 4.0.5
+  - Fix js crash
+
 - 4.0.4
   - Show all users in "add-to-group" user selection in "Manage groups"
 

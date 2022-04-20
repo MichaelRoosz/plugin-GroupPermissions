@@ -305,5 +305,7 @@ $(document).ready(function () {
     
     $('#groupPermissionsGroupCreateGroupButton').click(bindCreateGroup);
 
-    initializeUserSelect();
+    if ($('#groupPermissionsGroupAddUserSelect').length) {
+        initializeUserSelect();
+    }
 });
