@@ -245,7 +245,8 @@ $(document).ready(function () {
         ajaxHandler.addParams({
             module: 'API',
             format: 'json',
-            method: 'UsersManager.getUsersLogin'
+            method: 'UsersManager.getUsersLogin',
+            filter_limit: '-1'
         }, 'GET');
         ajaxHandler.setCallback(function(response) {
 

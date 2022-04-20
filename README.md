@@ -13,6 +13,9 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
+- 4.0.4
+  - Show all users in "add-to-group" user selection in "Manage groups"
+
 - 4.0.3
   - Fix site selection in "Manage access"
   - Add dropdown for "add-to-group" user selection in "Manage groups"
