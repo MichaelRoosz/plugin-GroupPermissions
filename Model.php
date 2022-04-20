@@ -87,30 +87,36 @@ class Model
     {
         $user = new GroupUser();
         return $user->getMembersOfGroup($idGroup);
-    }    
+    }
+    
+    public function isUserInGroup($login, $idGroup)
+    {
+        $user = new GroupUser();
+        return $user->isUserInGroup($login, $idGroup);
+    }
 
     public function getGroupsOfUser($login)
     {
         $user = new GroupUser();
         return $user->getGroupsOfUser($login);
-    }    
+    }
     
     public function removeUserFromGroup($idGroup, $login)
     {
         $user = new GroupUser();
         return $user->removeUserFromGroup($idGroup, $login);
-    }    
+    }
 
     public function removeAllUsersOfGroup($idGroup)
     {
         $user = new GroupUser();
         return $user->removeAllUsersOfGroup($idGroup);
-    }  
+    }
 
     public function removeUserFromAllGroups($login)
     {
         $user = new GroupUser();
-        return $user->removeUserFromAllGroups($login);   
+        return $user->removeUserFromAllGroups($login);
     }
     
     // GroupPermission
@@ -124,7 +130,7 @@ class Model
     {
         $permission = new GroupPermission();
         return $permission->getPermissionsOfGroup($idGroup);
-    }    
+    }
 
     public function getPermissionsOfSite($idSite)
     {
@@ -136,13 +142,13 @@ class Model
     {
         $permission = new GroupPermission();
         return $permission->removePermission($idGroup, $idSite);
-    }    
+    }
 
     public function removeAllPermissionsOfGroup($idGroup)
     {
         $permission = new GroupPermission();
         return $permission->removeAllPermissionsOfGroup($idGroup);
-    }  
+    }
 
     public function removeAllPermissionsForSite($idSite)
     {
@@ -150,12 +156,10 @@ class Model
         return $permission->removeAllPermissionsForSite($idSite);
     }
     
-    // MultiTable    
+    // MultiTable
     public function getPermissionsOfUser($login)
     {
         $multiTable = new MultiTable();
         return $multiTable->getPermissionsOfUser($login);
     }
-    
 }
-

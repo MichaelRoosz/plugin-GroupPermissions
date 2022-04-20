@@ -70,8 +70,10 @@
         
         <div style="margin-top: 70px;">
             <h3>{{ 'GroupPermissions_AddUserToGroup'|translate }}</h3>
-            <div>
-                <input id="groupPermissionsGroupAddUser" type="text" />
+            <div class="groupPermissionsGroupAddUserWrapper">
+                <select id="groupPermissionsGroupAddUserSelect">
+                    <option value="">Select a new member</option>
+                </select>
                 <input id="groupPermissionsGroupAddUserButton" type="button" value="{{ 'GroupPermissions_AddUserToGroupButton'|translate }}" style="padding: 8px;"/>
             </div>
         </div>

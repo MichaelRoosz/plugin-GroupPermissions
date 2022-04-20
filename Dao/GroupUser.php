@@ -41,7 +41,7 @@ class GroupUser
     }
 
     public function addUserToGroup($idGroup, $login)
-    {     
+    {
         $db = $this->getDb();
         $db->insert($this->tablePrefixed, array(
             'idgroup' => $idGroup,
@@ -54,35 +54,42 @@ class GroupUser
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
         return $this->getDb()->fetchAll("SELECT login FROM $table WHERE idgroup = ?", array($idGroup));
-    }    
+    }
+
+    public function isUserInGroup($login, $idGroup)
+    {
+        $idGroup = intval($idGroup);
+        $table = $this->tablePrefixed;
+        return $this->getDb()->fetchAll("SELECT login FROM $table WHERE login = ? AND idgroup = ?", array($login, $idGroup));
+    }
 
     public function getGroupsOfUser($login)
     {
         $table = $this->tablePrefixed;
         return $this->getDb()->fetchAll("SELECT idgroup FROM $table WHERE login = ?", array($login));
-    }    
+    }
     
     public function removeUserFromGroup($idGroup, $login)
     {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ? AND login = ?";
         $bind = array(intval($idGroup), $login);
-        $this->getDb()->query($query, $bind);   
-    }    
+        $this->getDb()->query($query, $bind);
+    }
 
     public function removeAllUsersOfGroup($idGroup)
     {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ?";
         $bind = array(intval($idGroup));
-        $this->getDb()->query($query, $bind);   
-    }  
+        $this->getDb()->query($query, $bind);
+    }
 
     public function removeUserFromAllGroups($login)
     {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE login = ?";
         $bind = array($login);
-        $this->getDb()->query($query, $bind);   
+        $this->getDb()->query($query, $bind);
     }
 }

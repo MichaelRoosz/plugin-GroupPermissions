@@ -7,6 +7,7 @@
         "DescriptionGroupsTab": "Here you can take a look at the members of each group. Superusers may edit the groups.",
         "ExceptionGroupDoesNotExist": "Group does not exists",
         "ExceptionGroupDoesExist": "Group already exists",
+        "ExceptionUserAlreadyInGroup": "User is already in group",
         "ManageAccess": "Manage Access",
         "ManageGroups": "Manage Groups",
         "CreateNewGroup": "Create a new group",

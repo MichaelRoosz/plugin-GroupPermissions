@@ -13,6 +13,13 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
+- 4.0.3
+  - Fix site selection in "Manage access"
+  - Add dropdown for "add-to-group" user selection in "Manage groups"
+  - Fix "Apply to all websites" text
+  - Do not allow multiple groups with the same name
+  - Check if a user is already in a group
+
 - 4.0.2
   - Fix config page getting endlessly reloaded on Matomo 4.5.0
 

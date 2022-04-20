@@ -7,6 +7,7 @@
         "DescriptionGroupsTab": "Hier koennen die Mitglieder der Gruppen eingesehen werden. Hauptadministratoren k\u00f6nnen die Mitglieder verwalten.",
         "ExceptionGroupDoesNotExist": "Gruppe existiert nicht",
         "ExceptionGroupDoesExist": "Gruppe existiert bereits",
+        "ExceptionUserAlreadyInGroup": "Der Nutzer ist bereits in der Gruppe",
         "ManageAccess": "Rechte verwalten",
         "ManageGroups": "Gruppen verwalten",
         "CreateNewGroup": "Neue Gruppe erstellen",

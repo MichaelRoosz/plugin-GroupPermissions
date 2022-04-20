@@ -5,9 +5,7 @@
     
         <div id="sites" class="groupPermissions">
             <section class="sites_selector_container">
-                {% set applyAllSitesText %}
-                    <strong>{{ 'UsersManager_ApplyToAllWebsites'|translate }}</strong>
-                {% endset %}
+                {% set applyAllSitesText %}{{ 'UsersManager_ApplyToAllWebsites'|translate }}{% endset %}
         
                 <div piwik-siteselector
                      show-selected-site="true"
@@ -15,10 +13,11 @@
                      class="sites_autocomplete"
                      siteid="{{ idSiteSelected }}"
                      sitename="{{ defaultReportSiteName }}"
-                     all-sites-text="{{ applyAllSitesText|raw }}"
-                     all-sites-location="top"
+                     all-sites-text="{{ applyAllSitesText }}"
+                     all-sites-location="bottom"
                      id="groupPermissionsSiteSelect"
-                     switch-site-on-select="false"></div>
+                     switch-site-on-select="false"
+                     data-siteid="{{ idSiteSelected }}"></div>
             </section>
         </div>
         

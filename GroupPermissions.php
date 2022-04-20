@@ -31,6 +31,7 @@ class GroupPermissions extends Plugin
     {
         return array(
             'AssetManager.getJavaScriptFiles'        => 'getJsFiles',
+            'AssetManager.getStylesheetFiles'        => 'getStylesheetFiles',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             'UsersManager.deleteUser'                => 'deleteUser',
         );
@@ -44,8 +45,20 @@ class GroupPermissions extends Plugin
     public function getJsFiles(&$jsFiles)
     {
         $jsFiles[] = "plugins/GroupPermissions/javascripts/groupPermissions.js";
+        $jsFiles[] = "plugins/GroupPermissions/javascripts/choices.min.js";
     }
     
+    /**
+     * Return list of plug-in specific Stylesheet files to be imported by the asset manager
+     *
+     * @see Piwik\AssetManager
+     */
+    public function getStylesheetFiles(&$stylesheetFiles)
+    {
+        $stylesheetFiles[] = "plugins/GroupPermissions/stylesheets/groupPermissions.less";
+        $stylesheetFiles[] = "plugins/GroupPermissions/stylesheets/choices.less";
+    }
+
     /**
      * Delete group preferences associated with a particular site
      */
@@ -64,4 +77,3 @@ class GroupPermissions extends Plugin
         $model->removeUserFromAllGroups($login);
     }
 }
-

@@ -7,7 +7,7 @@
 
 $(document).ready(function () {
     
-    function getIdSites() {
+    function getSelectedIdSite() {
         return $('#groupPermissionsSiteSelect').attr('siteid');
     }
     
@@ -15,7 +15,7 @@ $(document).ready(function () {
         var parameters = {};
         parameters.name = name;
         parameters.access = access;
-        parameters.idSites = getIdSites();
+        parameters.idSites = getSelectedIdSite();
     
         var ajaxHandler = new ajaxHelper();
         ajaxHandler.addParams({
@@ -66,7 +66,7 @@ $(document).ready(function () {
             });
         }
     
-        var idSite = getIdSites();
+        var idSite = getSelectedIdSite();
         if (idSite == 'all') {
             var target = this;
     
@@ -101,22 +101,6 @@ $(document).ready(function () {
         ajaxHandler.setLoadingElement('#ajaxLoadingManageGroupMember');
         ajaxHandler.setErrorElement('#ajaxErrorManageGroupMember');
         ajaxHandler.send(true);
-    }
-    
-    function bindAddGroupMember() {
-        var idGroup = $('#groupPermissionsCurrentIdGroup').val();
-        var login = $('#groupPermissionsGroupAddUser').val();
-      
-        function successCallback(response) {
-            var tableBody = $('#groupPermissionsGroup tbody');
-            tableBody.append('<tr><td class="login">'+login+'</td><td class="text-center">'
-                             +'<button class="groupPermissionsRemoveUser btn btn-flat" data-login="'+login+'"><span class="icon-delete"></span></button>'
-                             +'</td></tr>');
-                             
-            $('#groupPermissionsGroupAddUser').val('')
-        }
-        
-        sendAddGroupMember(idGroup, login, successCallback); 
     }
     
     function sendRemoveGroupMember(idGroup, login, successCallback) {
@@ -250,21 +234,67 @@ $(document).ready(function () {
         }});
     }
 
+    function initializeUserSelect() {
+        
+        var userSelect = new Choices('#groupPermissionsGroupAddUserSelect', {
+            allowHTML: false,
+            searchPlaceholderValue: 'Search for a user',
+        });
+
+        var ajaxHandler = new ajaxHelper();
+        ajaxHandler.addParams({
+            module: 'API',
+            format: 'json',
+            method: 'UsersManager.getUsersLogin'
+        }, 'GET');
+        ajaxHandler.setCallback(function(response) {
+
+            if (!response) {
+                return;
+            }
+
+            var users = response.map(function(login) {
+                return {label: login, value: login};
+            });
+
+            userSelect.setChoices(users);
+        });
+        ajaxHandler.setLoadingElement('#ajaxLoadingManageGroupMember');
+        ajaxHandler.setErrorElement('#ajaxErrorManageGroupMember');
+        ajaxHandler.send(true);
+
+        function bindAddGroupMember() {
+            var idGroup = $('#groupPermissionsCurrentIdGroup').val();
+            var login = userSelect.getValue(true);
+
+            function successCallback(response) {
+                var tableBody = $('#groupPermissionsGroup tbody');
+                tableBody.append('<tr><td class="login">'+login+'</td><td class="text-center">'
+                                 +'<button class="groupPermissionsRemoveUser btn btn-flat" data-login="'+login+'"><span class="icon-delete"></span></button>'
+                                 +'</td></tr>');
+                                 
+               userSelect.setChoiceByValue('');
+            }
+            
+            sendAddGroupMember(idGroup, login, successCallback); 
+        }
+
+        $('#groupPermissionsGroupAddUserButton').click(bindAddGroupMember);
+    }
+
     // when a site is selected, reload the page w/o showing the ajax loading element
     $('#groupPermissionsSiteSelect').bind('change', function (e, site) {
-        if (piwik.idSite && site.id != piwik.idSite) {
-            piwik.broadcast.propagateNewPage('segment=&idSite=' + site.id, false);
+        if (site.id != $(this).data('siteid')) {
+            piwik.broadcast.propagateNewPage('idSite=' + encodeURIComponent(site.id), false);
         }
     });
 
     // when a group is selected, reload the page w/o showing the ajax loading element
     $('#groupPermissionsGroupSelect').bind('change', function (e) {
-        piwik.broadcast.propagateNewPage('segment=&idGroup=' + $('#groupPermissionsGroupSelect').val(), false);
+        piwik.broadcast.propagateNewPage('idGroup=' + encodeURIComponent($('#groupPermissionsGroupSelect').val()), false);
     }); 
     
     $('#groupPermissions .updateAccess').click(bindUpdateGroupPermissions);
-    
-    $('#groupPermissionsGroupAddUserButton').click(bindAddGroupMember);
     
     $('#groupPermissionsGroup').on("click", ".groupPermissionsRemoveUser", bindRemoveGroupMember);
     
@@ -273,4 +303,6 @@ $(document).ready(function () {
     $('#groupPermissionsGroupDeleteGroupButton').click(bindDeleteGroup);
     
     $('#groupPermissionsGroupCreateGroupButton').click(bindCreateGroup);
+
+    initializeUserSelect();
 });

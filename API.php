@@ -106,6 +106,10 @@ class API extends \Piwik\Plugin\API
         if (!$usersManagerApi->userExists($login)) {
             throw new Exception(Piwik::translate("UsersManager_ExceptionUserDoesNotExist", $login));
         }
+
+        if ($this->model->isUserInGroup($login, $idGroup)) {
+            throw new Exception(Piwik::translate("GroupPermissions_ExceptionUserAlreadyInGroup", $login));
+        }
         
         $this->model->removeUserFromGroup($idGroup, $login);
         
@@ -205,6 +209,10 @@ class API extends \Piwik\Plugin\API
         }
         $idGroup = $idGroup['idgroup'];
         
+        if ($this->model->getGroupWithName($newName)) {
+            throw new Exception(Piwik::translate("GroupPermissions_ExceptionGroupDoesExist", $idGroup));
+        }
+
         return $this->model->renameGroup($idGroup, $newName);
     }
 
