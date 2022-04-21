@@ -1,0 +1,26 @@
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Добавете нов член към тази група",
+        "AddUserToGroupButton": "Добавяне на член",
+        "CreateNewGroup": "Създайте нова група",
+        "CreateNewGroupButton": "Създайте група",
+        "DeleteGroup": "Изтрийте тази група",
+        "DeleteGroupButton": "Изтриване на група",
+        "DeleteGroupConfirm": "Наистина ли искате да изтриете групата „%s“?",
+        "DescriptionAccessTab": "Решете кои групи имат достъп до Вашите уебсайтове. Можете също така да дадете достъп до всички уебсайтове наведнъж, като изберете „Прилагане към всички уебсайтове“ в селектора на уебсайтове.",
+        "DescriptionGroupsTab": "Тук можете да разгледате членовете на всяка група. Супер потребителите могат да редактират групите.",
+        "ExceptionGroupDoesExist": "Групата вече съществува",
+        "ExceptionGroupDoesNotExist": "Групата не съществува",
+        "ExceptionUserAlreadyInGroup": "Потребителят вече е в групата",
+        "Group": "Група",
+        "GroupPermissions": "Групови разрешения",
+        "ManageAccess": "Управление на достъпа",
+        "ManageGroup": "Управление на група",
+        "ManageGroupMembers": "Управлявайте членовете на групата",
+        "ManageGroups": "Управление на групи",
+        "MenuGroupPermissions": "Групови разрешения",
+        "RemoveFromGroup": "Премахване",
+        "RemoveFromGroupConfirm": "Наистина ли искате да премахнете потребителя „%1$s“ от групата „%2$s“?",
+        "RenameGroup": "Преименувайте тази група"
+    }
+}
