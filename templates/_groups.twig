@@ -22,61 +22,21 @@
 
 <div class="card">
     <div class="card-content">
-            <h2>{{ 'GroupPermissions_ManageGroup'|translate }}</h2>
-            
-            <select name="idGroup" id="groupPermissionsGroupSelect">
-                  {% for idgroup,name in groups %}
-                      <option value="{{ idgroup }}" {% if selectedIdGroup==idgroup %}selected{% endif %}>{{ name }}</option>
-                  {% endfor %}
-            </select>
+        <h2>{{ 'GroupPermissions_ManageGroup'|translate }}</h2>
 
+        <select name="idGroup" id="groupPermissionsGroupSelect">
+            {% for idgroup,name in groups %}
+                <option value="{{ idgroup }}" {% if selectedIdGroup==idgroup %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
 
-        <h3>{{ 'GroupPermissions_ManageGroupMembers'|translate }}</h3>
-        
-        <div class="entityContainer" style="width:600px;margin-top:16px;">
-        
-            <input type="hidden" id="groupPermissionsCurrentIdGroup" value="{{ selectedIdGroup }}" />
-            <input type="hidden" id="groupPermissionsCurrentGroupName" value="{{ selectedGroupName }}" />
-            
-            <table class="entityTable dataTable" id="groupPermissionsGroup" style="display:inline-table;width:550px;">
-                <thead>
-                <tr>
-                    <th>{{ 'General_Username'|translate }}</th>
-                    <th>{{ 'GroupPermissions_RemoveFromGroup'|translate }}</th>
-                </tr>
-                </thead>
-        
-                <tbody>
-                {% for login in groupUsers %}
-                    <tr>
-                        <td class='login'>{{ login }}</td>
-                        <td class="text-center">
-                            <button class="groupPermissionsRemoveUser btn btn-flat" title="{{ 'GroupPermissions_RemoveFromGroup'|translate }}" data-login="{{ login }}">
-                                <span class="icon-delete"></span>
-                            </button>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <div id="accessUpdated" style="vertical-align:top;"></div>
-        </div>
-        
-        <div class="ui-confirm" id="confirmRemoveUserFromGroup">
-            <h2>{{ 'GroupPermissions_RemoveFromGroupConfirm'|translate("<span id='login'></span>", "<span id='group'></span>")|raw }}</h2>
-            <input role="yes" type="button" value="{{ 'General_Yes'|translate }}"/>
-            <input role="no" type="button" value="{{ 'General_No'|translate }}"/>
-        </div>
-        
-        <div style="margin-top: 70px;">
-            <h3>{{ 'GroupPermissions_AddUserToGroup'|translate }}</h3>
-            <div class="groupPermissionsGroupAddUserWrapper">
-                <select id="groupPermissionsGroupAddUserSelect">
-                    <option value="">Select a new member</option>
-                </select>
-                <input id="groupPermissionsGroupAddUserButton" type="button" value="{{ 'GroupPermissions_AddUserToGroupButton'|translate }}" style="padding: 8px;"/>
-            </div>
-        </div>
+        <div
+            vue-entry="GroupPermissions.ManageGroupMembers"
+            selected-id-group="{{ selectedIdGroup }}"
+            selected-group-name="{{ selectedGroupName }}"
+            users="{{ users|json_encode }}"
+            group-users="{{ groupUsers|json_encode }}"
+        ></div>
         
        <div style="padding: 10px 0 0 0;">
             {% import 'ajaxMacros.twig' as ajax %}

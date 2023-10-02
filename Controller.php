@@ -8,7 +8,6 @@
  */
 namespace Piwik\Plugins\GroupPermissions;
 
-use Exception;
 use Piwik\API\Request;
 use Piwik\Common;
 use Piwik\Piwik;
@@ -150,6 +149,11 @@ class Controller extends ControllerAdmin
         else {
             $view->groupUsers = array();
         }
+
+        $allUsers = Request::processRequest('UsersManager.getUsersLogin', ['filter_limit' => '-1']);
+        // Create a named array using the user login as the key as well as the value
+        $allUsers = array_combine($allUsers, $allUsers);
+        $view->users = $allUsers;
         
         $view->selectedIdGroup = $idGroup;
         $view->selectedGroupName = isset($groups[$idGroup]) ? $groups[$idGroup] : '';
