@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Tambahkan anggota baru ke grup ini",
+        "AddUserToGroupButton": "Tambah Anggota",
+        "CreateNewGroup": "Buat grup baru",
+        "CreateNewGroupButton": "Buat Grup",
+        "DeleteGroup": "Hapus grup ini",
+        "DeleteGroupButton": "Hapus Grup",
+        "DeleteGroupConfirm": "Apakah Anda yakin ingin menghapus grup '%s'?",
+        "DescriptionAccessTab": "Tentukan grup mana yang memiliki akses ke situs web Anda. Selain itu, Anda juga bisa memberikan akses ke semua situs web sekaligus dengan memilih \"Terapkan ke seluruh situs web\" dalam pemilih situs web.",
+        "DescriptionGroupsTab": "Di sini Anda dapat melihat anggota dari setiap grup. Pengguna super dapat mengedit grup.",
+        "ExceptionGroupDoesExist": "Grup sudah ada",
+        "ExceptionGroupDoesNotExist": "Grup tidak ada",
+        "ExceptionUserAlreadyInGroup": "Pengguna sudah berada di dalam grup",
+        "Group": "Grup",
+        "GroupPermissions": "Izin Grup",
+        "ManageAccess": "Mengelola Akses",
+        "ManageGroup": "Mengelola grup",
+        "ManageGroupMembers": "Mengelola anggota grup",
+        "ManageGroups": "Mengelola Grup",
+        "MenuGroupPermissions": "Izin Grup",
+        "RemoveFromGroup": "Hapus",
+        "RemoveFromGroupConfirm": "Apakah Anda yakin ingin menghapus pengguna '%1$s' dari grup '%2$s'?",
+        "RenameGroup": "Mengganti nama grup ini",
+        "RenameGroupButton": "Ganti Nama Grup",
+        "RenameGroupConfirm": "Apakah Anda yakin ingin mengganti nama grup '%1$s' menjadi '%2$s'?"
+    }
+}
