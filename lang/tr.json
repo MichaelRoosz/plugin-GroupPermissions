@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Bu gruba yeni bir üye ekler",
+        "AddUserToGroupButton": "Üye ekle",
+        "CreateNewGroup": "Yeni bir grup ekler",
+        "CreateNewGroupButton": "Grup ekle",
+        "DeleteGroup": "Bu grubu siler",
+        "DeleteGroupButton": "Grubu sil",
+        "DeleteGroupConfirm": "'%s' grubunu silmek istediğinize emin misiniz?",
+        "DescriptionAccessTab": "Sitelerinize erişebilecek grupları seçin. Site seçicide \"Tüm sitelere uygulansın\" seçeneği ile tüm sitelere aynı anda erişim verebilirsiniz.",
+        "DescriptionGroupsTab": "Grupların üyelerine bu bölümden bakabilirsiniz. Süper kullanıcılar grupları düzenleyebilir.",
+        "ExceptionGroupDoesExist": "Grup zaten var",
+        "ExceptionGroupDoesNotExist": "Grup bulunamadı",
+        "ExceptionUserAlreadyInGroup": "Kullanıcı zaten grupta",
+        "Group": "Grup",
+        "GroupPermissions": "Grup izinleri",
+        "ManageAccess": "Erişim yönetimi",
+        "ManageGroup": "Grup yönetimi",
+        "ManageGroupMembers": "Grup üyeleri yönetimi",
+        "ManageGroups": "Grup yönetimi",
+        "MenuGroupPermissions": "Grup izinleri",
+        "RemoveFromGroup": "Sil",
+        "RemoveFromGroupConfirm": "'%1$s' kullanıcısını '%2$s' grubundan silmek istediğinize emin misiniz?",
+        "RenameGroup": "Bu grubu yeniden adlandırır",
+        "RenameGroupButton": "Grubu yeniden adlandır",
+        "RenameGroupConfirm": "'%1$s' grubunun adını '%2$s' olarak değiştirmek istediğinize emin misiniz?"
+    }
+}
