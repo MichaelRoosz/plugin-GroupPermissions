@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Προσθήκη νέου μέλους σε αυτή την ομάδα",
+        "AddUserToGroupButton": "Προσθήκη Μέλους",
+        "CreateNewGroup": "Δημιουργία νέας ομάδας",
+        "CreateNewGroupButton": "Δημιουργία Ομάδας",
+        "DeleteGroup": "Διαγραφή της ομάδας",
+        "DeleteGroupButton": "Διαγραφή Ομάδας",
+        "DeleteGroupConfirm": "Είστε σίγουροι για την διαγραφή της ομάδας '%s';",
+        "DescriptionAccessTab": "Καθορίστε ποιες ομάδες θα έχουν πρόσβαση στους ιστοτόπους σας. Μπορείτε επίσης να δώσετε πρόσβασης σε όλους τους ιστοτόπους επιλέγοντας το \"Εφαρμογή σε όλους τους ιστοτόπους\" στην επιλογή ιστοτόπου.",
+        "DescriptionGroupsTab": "Εδώ μπορείτε να δείτε τα μέλη της κάθε ομάδας. Οι υπερδιαχειριστές μπορούν να τροποποιήσουν τις ομάδες.",
+        "ExceptionGroupDoesExist": "Η ομάδα υπάρχει ήδη",
+        "ExceptionGroupDoesNotExist": "Η ομάδα δεν υπάρχει",
+        "ExceptionUserAlreadyInGroup": "Ο χρήστης ανήκει ήδη στην ομάδα",
+        "Group": "Ομάδα",
+        "GroupPermissions": "Άδειες Ομάδας",
+        "ManageAccess": "Διαχείριση Πρόσβασης",
+        "ManageGroup": "Διαχείριση ομάδας",
+        "ManageGroupMembers": "Διαχείριση μελών ομάδας",
+        "ManageGroups": "Διαχείριση Ομάδων",
+        "MenuGroupPermissions": "Άδειες Ομάδας",
+        "RemoveFromGroup": "Αφαίρεση",
+        "RemoveFromGroupConfirm": "Είστε σίγουροι ότι θέλετε να αφαιρέσετε το χρήστη '%1$s' από την ομάδα '%2$s';",
+        "RenameGroup": "Μετονομασία της ομάδας",
+        "RenameGroupButton": "Μετονομασία Ομάδας",
+        "RenameGroupConfirm": "Είστε σίγουροι ότι θέλετε να μετονομάσετε την ομάδα '%1$s' σε '%2$s';"
+    }
+}
