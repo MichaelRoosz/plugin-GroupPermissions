@@ -34,6 +34,7 @@ class GroupPermissions extends Plugin
             'AssetManager.getStylesheetFiles'        => 'getStylesheetFiles',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             'UsersManager.deleteUser'                => 'deleteUser',
+            'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
         );
     }
     
@@ -57,6 +58,16 @@ class GroupPermissions extends Plugin
     {
         $stylesheetFiles[] = "plugins/GroupPermissions/stylesheets/groupPermissions.less";
         $stylesheetFiles[] = "plugins/GroupPermissions/stylesheets/choices.less";
+    }
+
+    public function getClientSideTranslationKeys(&$translations)
+    {
+        $translations[] = 'GroupPermissions_AddUserToGroup';
+        $translations[] = 'GroupPermissions_AddUserToGroupButton';
+        $translations[] = 'GroupPermissions_ManageGroupMembers';
+        $translations[] = 'GroupPermissions_RemoveFromGroup';
+        $translations[] = 'GroupPermissions_RemoveFromGroupConfirm';
+        $translations[] = 'GroupPermissions_SelectNewUser';
     }
 
     /**
