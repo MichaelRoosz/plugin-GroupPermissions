@@ -6,12 +6,12 @@
         "CreateNewGroupButton": "Create Group",
         "DeleteGroup": "Delete this group",
         "DeleteGroupButton": "Delete Group",
-        "DeleteGroupConfirm": "Are you sure you want to delete the group '%s'?",
-        "DescriptionAccessTab": "Decide which groups have access to your websites. You can also give access to all the websites at once by choosing \"Apply to all websites\" in the website selector.",
-        "DescriptionGroupsTab": "Here you can take a look at the members of each group. Superusers may edit the groups.",
-        "ExceptionGroupDoesExist": "Group already exists",
-        "ExceptionGroupDoesNotExist": "Group does not exists",
-        "ExceptionUserAlreadyInGroup": "User is already in group",
+        "DeleteGroupConfirm": "Delete the '%s' group?",
+        "DescriptionAccessTab": "Decide which groups can access your websites. Use \"Apply to all websites\" in the website selector to grant access to all websites at once.",
+        "DescriptionGroupsTab": "Here you can browse individual members of each group. Superusers may edit the groups.",
+        "ExceptionGroupDoesExist": "The group already exists",
+        "ExceptionGroupDoesNotExist": "The group does not exist",
+        "ExceptionUserAlreadyInGroup": "The user is already in this group",
         "Group": "Group",
         "GroupPermissions": "Group Permissions",
         "ManageAccess": "Manage Access",
@@ -20,9 +20,9 @@
         "ManageGroups": "Manage Groups",
         "MenuGroupPermissions": "Group Permissions",
         "RemoveFromGroup": "Remove",
-        "RemoveFromGroupConfirm": "Are you sure you want to remove user '%1$s' from group '%2$s'?",
+        "RemoveFromGroupConfirm": "Remove the user '%1$s' from the '%2$s' group?",
         "RenameGroup": "Rename this group",
         "RenameGroupButton": "Rename Group",
-        "RenameGroupConfirm": "Are you sure you want to rename the group '%1$s' to '%2$s'?"
+        "RenameGroupConfirm": "Rename the '%1$s' group to '%2$s'?"
     }
 }
