@@ -6,9 +6,9 @@
         "CreateNewGroupButton": "Gruppe erstellen",
         "DeleteGroup": "Diese Gruppe löschen",
         "DeleteGroupButton": "Gruppe löschen",
-        "DeleteGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe '%s' löschen wollen?",
-        "DescriptionAccessTab": "Hier kann der Zugriff auf bestimmte Webseiten erteilt werden. Es ist auch möglich, Zugriff auf alle Webseiten zu erlauben, in dem Sie \"Für alle Webseiten anwenden\" im Webseitenselektor auswählen.",
-        "DescriptionGroupsTab": "Hier koennen die Mitglieder der Gruppen eingesehen werden. Hauptadministratoren können die Mitglieder verwalten.",
+        "DeleteGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe „%s“ löschen wollen?",
+        "DescriptionAccessTab": "Hier kann der Zugriff auf bestimmte Webseiten erteilt werden. Es ist auch möglich, Zugriff auf alle Webseiten zu erlauben, in dem Sie „Für alle Webseiten anwenden“ im Webseitenselektor auswählen.",
+        "DescriptionGroupsTab": "Hier können die Mitglieder der Gruppen eingesehen werden. Hauptadministratoren können die Mitglieder verwalten.",
         "ExceptionGroupDoesExist": "Gruppe existiert bereits",
         "ExceptionGroupDoesNotExist": "Gruppe existiert nicht",
         "ExceptionUserAlreadyInGroup": "Der Nutzer ist bereits in der Gruppe",
@@ -20,9 +20,9 @@
         "ManageGroups": "Gruppen verwalten",
         "MenuGroupPermissions": "Gruppen Rechte",
         "RemoveFromGroup": "Entfernen",
-        "RemoveFromGroupConfirm": "Sind Sie sicher, dass Sie den Benutzer '%1$s' aus der Gruppe '%2$s' entfernen wollen?",
+        "RemoveFromGroupConfirm": "Sind Sie sicher, dass Sie den Benutzer „%1$s“ aus der Gruppe „%2$s“ entfernen wollen?",
         "RenameGroup": "Diese Gruppe umbenennen",
         "RenameGroupButton": "Gruppe umbenennen",
-        "RenameGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe '%1$s' in '%2$s' umbenennen wollen?"
+        "RenameGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe „%1$s“ in „%2$s“ umbenennen wollen?"
     }
 }

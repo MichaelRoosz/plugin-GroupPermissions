@@ -1,0 +1,28 @@
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "આ જૂથમાં એક નવો સભ્ય ઉમેરો",
+        "AddUserToGroupButton": "સભ્ય ઉમેરો",
+        "CreateNewGroup": "નવું જૂથ બનાવો",
+        "CreateNewGroupButton": "જૂથ બનાવો",
+        "DeleteGroup": "આ જૂથ કાઢી નાખો",
+        "DeleteGroupButton": "જૂથ કાઢી નાખો",
+        "DeleteGroupConfirm": "શું તમે ખરેખર '%s' જૂથને કાઢી નાખવા માંગો છો?",
+        "DescriptionAccessTab": "નક્કી કરો કે કયા જૂથોને તમારી વેબસાઇટ્સની ઍક્સેસ છે. તમે વેબસાઈટ સિલેક્ટરમાં \"Apply to all websites\" પસંદ કરીને એક જ સમયે બધી વેબસાઈટનો એક્સેસ પણ આપી શકો છો.",
+        "DescriptionGroupsTab": "અહીં તમે દરેક જૂથના સભ્યો પર એક નજર કરી શકો છો. સુપરયુઝર્સ જૂથોમાં ફેરફાર કરી શકે છે.",
+        "ExceptionGroupDoesExist": "જૂથ પહેલેથી અસ્તિત્વમાં છે",
+        "ExceptionGroupDoesNotExist": "જૂથ અસ્તિત્વમાં નથી",
+        "ExceptionUserAlreadyInGroup": "વપરાશકર્તા પહેલેથી જ જૂથમાં છે",
+        "Group": "જૂથ",
+        "GroupPermissions": "જૂથ પરવાનગીઓ",
+        "ManageAccess": "ઍક્સેસ મેનેજ કરો",
+        "ManageGroup": "જૂથ મેનેજ કરો",
+        "ManageGroupMembers": "જૂથના સભ્યોને મેનેજ કરો",
+        "ManageGroups": "જૂથોને મેનેજ કરો",
+        "MenuGroupPermissions": "જૂથ પરવાનગીઓ",
+        "RemoveFromGroup": "દૂર કરો",
+        "RemoveFromGroupConfirm": "શું તમે ખરેખર '%2$s' જૂથમાંથી વપરાશકર્તા '%1$s' ને દૂર કરવા માંગો છો?",
+        "RenameGroup": "આ જૂથનું નામ બદલો",
+        "RenameGroupButton": "જૂથનું નામ બદલો",
+        "RenameGroupConfirm": "શું તમે ખરેખર '%1$s' જૂથનું નામ બદલીને '%2$s' કરવા માંગો છો?"
+    }
+}

@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Afegiu un nou membre a aquest grup",
+        "AddUserToGroupButton": "Afegir un membre",
+        "CreateNewGroup": "Crear un nou grup",
+        "CreateNewGroupButton": "Crear grup",
+        "DeleteGroup": "Esborrar aquest grup",
+        "DeleteGroupButton": "Esborrar grup",
+        "DeleteGroupConfirm": "Esteu segur que voleu esborrar el grup '%s'?",
+        "DescriptionAccessTab": "Decidiu quins grups tenen accés als vostres llocs web. També podeu donar accés a tots els llocs web alhora escollint \"Aplica a tots els llocs web\" al selector de llocs web.",
+        "DescriptionGroupsTab": "Aquí podeu fer una ullada als membres de cada grup. Els superusuaris poden editar els grups.",
+        "ExceptionGroupDoesExist": "El grup ja existeix",
+        "ExceptionGroupDoesNotExist": "El grup no existeix",
+        "ExceptionUserAlreadyInGroup": "L'usuari ja és al grup",
+        "Group": "Grup",
+        "GroupPermissions": "Permisos del grup",
+        "ManageAccess": "Gestionar l'accés",
+        "ManageGroup": "Gestiona el grup",
+        "ManageGroupMembers": "Gestionar els membres del grup",
+        "ManageGroups": "Gestionar els grups",
+        "MenuGroupPermissions": "Permisos dels grups",
+        "RemoveFromGroup": "Eliminar",
+        "RemoveFromGroupConfirm": "Esteu segur que voleu eliminar l'usuari \"%1$s\" del grup \"%2$s\"?",
+        "RenameGroup": "Canvieu el nom d'aquest grup",
+        "RenameGroupButton": "Canvia el nom del grup",
+        "RenameGroupConfirm": "Esteu segur que voleu canviar el nom del grup \"%1$s\" a \"%2$s\"?"
+    }
+}

@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Lägg till ny medlem i denna grupp",
+        "AddUserToGroupButton": "Lägg till medlem",
+        "CreateNewGroup": "Skapa ny grupp",
+        "CreateNewGroupButton": "Skapa grupp",
+        "DeleteGroup": "Radera denna grupp",
+        "DeleteGroupButton": "Radera grupp",
+        "DeleteGroupConfirm": "Är du säker på att du vill radera gruppen '%s'?",
+        "DescriptionAccessTab": "Bestäm vilka grupper som har åtkomst till dina webbplatser. Du kan också ge åtkomst till alla webbplatserna på en gång genom att välja \"Lägg till på alla webbplatser\" i webbplatsväljaren.",
+        "DescriptionGroupsTab": "Här kan du se medlemmarna i respektive grupp. Superanvändare kan redigera grupper.",
+        "ExceptionGroupDoesExist": "Grupp finns redan",
+        "ExceptionGroupDoesNotExist": "Gruppen finns inte",
+        "ExceptionUserAlreadyInGroup": "Användaren är redan med i gruppen",
+        "Group": "Grupp",
+        "GroupPermissions": "Gruppens behörigheter",
+        "ManageAccess": "Hantera åtkomst",
+        "ManageGroup": "Hantera grupp",
+        "ManageGroupMembers": "Hantera gruppmedlemmar",
+        "ManageGroups": "Hantera grupper",
+        "MenuGroupPermissions": "Gruppbehörigheter",
+        "RemoveFromGroup": "Ta bort",
+        "RemoveFromGroupConfirm": "Är du säker på att du vill ta bort användaren '%1$s' från gruppen '%2$s'?",
+        "RenameGroup": "Döp om denna grupp",
+        "RenameGroupButton": "Döp om grupp",
+        "RenameGroupConfirm": "Är du säker på att du vill döpa om gruppen '%1$s' till '%2$s'?"
+    }
+}
