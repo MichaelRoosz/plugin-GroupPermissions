@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "このグループに新しいメンバーを追加する",
+        "AddUserToGroupButton": "メンバーを追加",
+        "CreateNewGroup": "新しいグループを作成する",
+        "CreateNewGroupButton": "グループを作成します",
+        "DeleteGroup": "このグループを削除",
+        "DeleteGroupButton": "グループを削除",
+        "DeleteGroupConfirm": "グループ '%s' を削除してもよろしいですか?",
+        "DescriptionAccessTab": "Web サイトにアクセスできるグループを決定します。 また、Web サイト セレクターで [すべての Web サイトに適用] を選択して、一度にすべての Web サイトへのアクセスを許可することもできます。",
+        "DescriptionGroupsTab": "ここでは、各グループのメンバーを確認できます。 スーパーユーザーはグループを編集できます。",
+        "ExceptionGroupDoesExist": "グループは既に存在します",
+        "ExceptionGroupDoesNotExist": "グループが存在しません",
+        "ExceptionUserAlreadyInGroup": "ユーザーはすでにグループに所属しています",
+        "Group": "グループ",
+        "GroupPermissions": "グループ権限",
+        "ManageAccess": "アクセスの管理",
+        "ManageGroup": "グループの管理",
+        "ManageGroupMembers": "グループ メンバーの管理",
+        "ManageGroups": "グループの管理",
+        "MenuGroupPermissions": "グループ権限",
+        "RemoveFromGroup": "削除する",
+        "RemoveFromGroupConfirm": "グループ '%2$s' からユーザー '%1$s' を削除してもよろしいですか?",
+        "RenameGroup": "このグループの名前を変更",
+        "RenameGroupButton": "グループの名前を変更",
+        "RenameGroupConfirm": "グループ '%1$s' の名前を '%2$s' に変更してもよろしいですか?"
+    }
+}
