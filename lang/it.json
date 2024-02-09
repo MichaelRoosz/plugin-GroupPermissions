@@ -1,1 +1,17 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Aggiungi un nuovo membro a questo gruppo",
+        "AddUserToGroupButton": "Aggiungi membro",
+        "CreateNewGroup": "Crea un nuovo gruppo",
+        "CreateNewGroupButton": "Crea un gruppo",
+        "DeleteGroup": "Elimina questo gruppo",
+        "DeleteGroupButton": "Elimina gruppo",
+        "DeleteGroupConfirm": "Sei sicuro di voler eliminare il gruppo '%s'?",
+        "DescriptionAccessTab": "Decidi quali gruppi hanno accesso ai tuoi siti web. Puoi anche consentire l'accesso a tutti i siti Web contemporaneamente selezionando \"Applica a tutti i siti web\" nel selettore dei siti web.",
+        "DescriptionGroupsTab": "Qui puoi dare un'occhiata ai membri di ogni gruppo. Gli amministratori possono modificare i gruppi.",
+        "ExceptionGroupDoesExist": "Il gruppo esiste già",
+        "ExceptionGroupDoesNotExist": "Il gruppo non esiste",
+        "ExceptionUserAlreadyInGroup": "L'utente è già nel gruppo",
+        "Group": "Gruppo"
+    }
+}

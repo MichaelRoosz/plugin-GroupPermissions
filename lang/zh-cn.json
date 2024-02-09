@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "添加一个新成员至该用户组",
+        "AddUserToGroupButton": "添加成员",
+        "CreateNewGroup": "创建一个新用户组",
+        "CreateNewGroupButton": "创建用户组",
+        "DeleteGroup": "删除该用户组",
+        "DeleteGroupButton": "删除用户组",
+        "DeleteGroupConfirm": "你确定要删除用户组 '%s' 吗？",
+        "DescriptionAccessTab": "决定哪些用户组可以访问您的网站。您还可以通过在网站选择器中选择“应用于所有网站”，一次性应用于所有网站。",
+        "DescriptionGroupsTab": "在这里你可以查看每个用户组的成员。超级用户可以编辑这些组。",
+        "ExceptionGroupDoesExist": "用户组已存在",
+        "ExceptionGroupDoesNotExist": "用户组不存在",
+        "ExceptionUserAlreadyInGroup": "用户已在该用户组中",
+        "Group": "用户组",
+        "GroupPermissions": "用户组权限",
+        "ManageAccess": "管理许可",
+        "ManageGroup": "管理用户组",
+        "ManageGroupMembers": "管理用户组成员",
+        "ManageGroups": "管理用户组",
+        "MenuGroupPermissions": "用户组权限",
+        "RemoveFromGroup": "移除",
+        "RemoveFromGroupConfirm": "你确定要将用户 '%1$s' 从用户组 '%2$s' 中移除？",
+        "RenameGroup": "重命名该用户组",
+        "RenameGroupButton": "重命名用户组",
+        "RenameGroupConfirm": "你确定要将用户组 '%1$s' 重命名为 '%2$s' ？"
+    }
+}

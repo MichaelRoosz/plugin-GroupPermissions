@@ -21,6 +21,8 @@
         "MenuGroupPermissions": "Групови разрешения",
         "RemoveFromGroup": "Премахване",
         "RemoveFromGroupConfirm": "Наистина ли искате да премахнете потребителя „%1$s“ от групата „%2$s“?",
-        "RenameGroup": "Преименувайте тази група"
+        "RenameGroup": "Преименувайте тази група",
+        "RenameGroupButton": "Преименуване на група",
+        "RenameGroupConfirm": "Наистина ли искате да преименувате групата „%1$s“ на „%2$s“?"
     }
 }

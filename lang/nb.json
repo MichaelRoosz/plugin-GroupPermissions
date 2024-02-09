@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Legg til et nytt medlem i denne gruppen",
+        "AddUserToGroupButton": "Legg til medlem",
+        "CreateNewGroup": "Opprett en ny gruppe",
+        "CreateNewGroupButton": "Opprett gruppe",
+        "DeleteGroup": "Slett denne gruppen",
+        "DeleteGroupButton": "Slett gruppe",
+        "DeleteGroupConfirm": "Slett «%s»-gruppen?",
+        "DescriptionAccessTab": "Bestem hvilke grupper som har tilgang til nettsidene dine. Du kan også invilge tilgang til alle nettsidene samtidig ved å velge «Bruk for alle nettsider» i nettsidevelgeren.",
+        "DescriptionGroupsTab": "Her kan du sjekke ut medlemmene av hver gruppe. Superbrukere kan redigere gruppene.",
+        "ExceptionGroupDoesExist": "Gruppen finnes allerede",
+        "ExceptionGroupDoesNotExist": "Gruppen finnes ikke",
+        "ExceptionUserAlreadyInGroup": "Brukeren er allerede i gruppen",
+        "Group": "Gruppe",
+        "GroupPermissions": "Gruppetilganger",
+        "ManageAccess": "Håndter tilgang",
+        "ManageGroup": "Håndter gruppe",
+        "ManageGroupMembers": "Håndter gruppemedlemmer",
+        "ManageGroups": "Håndter grupper",
+        "MenuGroupPermissions": "Gruppetilganger",
+        "RemoveFromGroup": "Fjern",
+        "RemoveFromGroupConfirm": "Fjern «%1$s»-brukeren fra «%2$s»-gruppen?",
+        "RenameGroup": "Gi denne gruppen et nytt navn",
+        "RenameGroupButton": "Gi gruppen et nytt navn",
+        "RenameGroupConfirm": "Endre navn på gruppen fra «%1$s» til «%2$s»?"
+    }
+}
