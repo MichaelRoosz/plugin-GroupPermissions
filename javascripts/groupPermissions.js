@@ -6,17 +6,17 @@
  */
 
 $(document).ready(function () {
-    
+
     function getSelectedIdSite() {
         return $('#groupPermissionsSiteSelect').attr('siteid');
     }
-    
+
     function sendUpdateGroupPermissionAccess(name, access, successCallback) {
         var parameters = {};
         parameters.name = name;
         parameters.access = access;
         parameters.idSites = getSelectedIdSite();
-    
+
         var ajaxHandler = new ajaxHelper();
         ajaxHandler.addParams({
             module: 'API',
@@ -29,7 +29,7 @@ $(document).ready(function () {
         ajaxHandler.setErrorElement('#ajaxErrorGroupPermissions');
         ajaxHandler.send(true);
     }
-    
+
     function callSendUpdateGroupPermissionAccess(self, successCallback) {
         sendUpdateGroupPermissionAccess(
             $(self).parent().parent().find('#group').html(), //if changed change also the modal
@@ -37,7 +37,7 @@ $(document).ready(function () {
             successCallback
         );
     }
-    
+
     function bindUpdateGroupPermissions() {
         var self = this;
         // callback called when the ajax request Update the group permissions is successful
@@ -53,7 +53,7 @@ $(document).ready(function () {
                 .attr('src', "plugins/UsersManager/images/ok.png")
                 .attr('class', "accessGranted")
             ;
-    
+
             var UI = require('piwik/UI');
             var notification = new UI.Notification();
             notification.show(_pk_translate('General_Done'), {
@@ -65,26 +65,26 @@ $(document).ready(function () {
                 id: 'groupPermissionsAccessUpdated'
             });
         }
-    
+
         var idSite = getSelectedIdSite();
         if (idSite == 'all') {
             var target = this;
-    
+
             //ask confirmation
             var group = $(this).parent().parent().find('#group').text();
             $('#confirmGroupPermissions').find('#group').text(group);
-    
+
             function onValidate() {
                 callSendUpdateGroupPermissionAccess(target, successCallback);
             }
-    
+
             piwikHelper.modalConfirm('#confirmGroupPermissions', {yes: onValidate})
         }
         else {
             callSendUpdateGroupPermissionAccess(this, successCallback);
         }
     }
-    
+
     function sendAddGroupMember(idGroup, login, successCallback) {
         var parameters = {};
         parameters.idGroup = idGroup;
@@ -102,7 +102,7 @@ $(document).ready(function () {
         ajaxHandler.setErrorElement('#ajaxErrorManageGroupMember');
         ajaxHandler.send(true);
     }
-    
+
     function sendRemoveGroupMember(idGroup, login, successCallback) {
         var parameters = {};
         parameters.idGroup = idGroup;
@@ -120,7 +120,7 @@ $(document).ready(function () {
         ajaxHandler.setErrorElement('#ajaxErrorManageGroupMember');
         ajaxHandler.send(true);
     }
-    
+
     function bindRemoveGroupMember() {
         var idGroup = $('#groupPermissionsCurrentIdGroup').val();
         var name = $('#groupPermissionsCurrentGroupName').val();
@@ -130,15 +130,15 @@ $(document).ready(function () {
         function successCallback(response) {
             line.remove();
         }
-        
+
         $('#confirmRemoveUserFromGroup').find('#login').text(login);
-        $('#confirmRemoveUserFromGroup').find('#group').text(name); 
-        
+        $('#confirmRemoveUserFromGroup').find('#group').text(name);
+
         piwikHelper.modalConfirm('#confirmRemoveUserFromGroup', {yes: function() {
             sendRemoveGroupMember(idGroup, login, successCallback);
         }});
     }
-    
+
     function sendCreateGroup(groupName, successCallback) {
         var parameters = {};
         parameters.groupName = groupName;
@@ -155,15 +155,15 @@ $(document).ready(function () {
         ajaxHandler.setErrorElement('#ajaxErrorCreateGroup');
         ajaxHandler.send(true);
     }
-    
+
     function bindCreateGroup() {
         var groupName = $('#groupPermissionsGroupCreateGroup').val();
 
         function successCallback(response) {
             location.reload();
         }
-        
-        sendCreateGroup(groupName, successCallback); 
+
+        sendCreateGroup(groupName, successCallback);
     }
 
 
@@ -184,7 +184,7 @@ $(document).ready(function () {
         ajaxHandler.setErrorElement('#ajaxErrorManageGroupRename');
         ajaxHandler.send(true);
     }
-    
+
     function bindRenameGroup() {
         var idGroup = $('#groupPermissionsCurrentIdGroup').val();
         var name = $('#groupPermissionsCurrentGroupName').val();
@@ -193,10 +193,10 @@ $(document).ready(function () {
         function successCallback(response) {
             location.reload();
         }
-        
+
         $('#confirmRenameGroup').find('#confirmOldGroupName').text(name);
-        $('#confirmRenameGroup').find('#confirmNewGroupName').text(newName); 
-        
+        $('#confirmRenameGroup').find('#confirmNewGroupName').text(newName);
+
         piwikHelper.modalConfirm('#confirmRenameGroup', {yes: function() {
             sendRenameGroup(idGroup, newName, successCallback);
         }});
@@ -218,24 +218,24 @@ $(document).ready(function () {
         ajaxHandler.setErrorElement('#ajaxErrorManageGroupDelete');
         ajaxHandler.send(true);
     }
-    
+
     function bindDeleteGroup() {
         var idGroup = $('#groupPermissionsCurrentIdGroup').val();
         var name = $('#groupPermissionsCurrentGroupName').val();
-        
+
         function successCallback(response) {
             location.reload();
         }
-        
+
         $('#confirmDeleteGroup').find('#confirmDeleteGroupName').text(name);
-        
+
         piwikHelper.modalConfirm('#confirmDeleteGroup', {yes: function() {
             sendDeleteGroup(idGroup, successCallback);
         }});
     }
 
     function initializeUserSelect() {
-        
+
         var userSelect = new Choices('#groupPermissionsGroupAddUserSelect', {
             allowHTML: false,
             searchPlaceholderValue: 'Search for a user',
@@ -273,11 +273,11 @@ $(document).ready(function () {
                 tableBody.append('<tr><td class="login">'+login+'</td><td class="text-center">'
                                  +'<button class="groupPermissionsRemoveUser btn btn-flat" data-login="'+login+'"><span class="icon-delete"></span></button>'
                                  +'</td></tr>');
-                                 
+
                userSelect.setChoiceByValue('');
             }
-            
-            sendAddGroupMember(idGroup, login, successCallback); 
+
+            sendAddGroupMember(idGroup, login, successCallback);
         }
 
         $('#groupPermissionsGroupAddUserButton').click(bindAddGroupMember);
@@ -293,19 +293,19 @@ $(document).ready(function () {
     // when a group is selected, reload the page w/o showing the ajax loading element
     $('#groupPermissionsGroupSelect').bind('change', function (e) {
         piwik.broadcast.propagateNewPage('idGroup=' + encodeURIComponent($('#groupPermissionsGroupSelect').val()), false);
-    }); 
-    
+    });
+
     $('#groupPermissions .updateAccess').click(bindUpdateGroupPermissions);
-    
-    $('#groupPermissionsGroup').on("click", ".groupPermissionsRemoveUser", bindRemoveGroupMember);
-    
+
+    // $('#groupPermissionsGroup').on("click", ".groupPermissionsRemoveUser", bindRemoveGroupMember);
+
     $('#groupPermissionsGroupRenameGroupButton').click(bindRenameGroup);
-    
+
     $('#groupPermissionsGroupDeleteGroupButton').click(bindDeleteGroup);
-    
+
     $('#groupPermissionsGroupCreateGroupButton').click(bindCreateGroup);
 
     if ($('#groupPermissionsGroupAddUserSelect').length) {
-        initializeUserSelect();
+        // initializeUserSelect();
     }
 });

@@ -13,6 +13,9 @@ Copy it into the plugins folder.
 GPL v3 or later
 
 ## Changelog
+- 5.0.0
+  - Compatibility with Matomo 5
+
 - 4.0.5
   - Fix js crash
 
