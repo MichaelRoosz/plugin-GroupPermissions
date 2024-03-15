@@ -1,1 +1,29 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Gehitu kide berria talde honetara",
+        "AddUserToGroupButton": "Gehitu kidea",
+        "CreateNewGroup": "Sortu talde berria",
+        "CreateNewGroupButton": "Sortu taldea",
+        "DeleteGroup": "Ezabatu talde hau",
+        "DeleteGroupButton": "Ezabatu taldea",
+        "DeleteGroupConfirm": "Ziur zaude '%s' taldea ezabatu nahi duzula?",
+        "DescriptionAccessTab": "Erabaki zein taldek izan behar duten sarbidea zure webguneetara. Webgune guztietarako sarbidea ere eman daiteke, webgune hautatzailean \"Aplikatu webgune guztiei\" aukeratuta.",
+        "DescriptionGroupsTab": "Hemen ikus dezakezu zein diren talde bakoitzeko kideak. Super-erabiltzaileek taldeak editatu ditzakete.",
+        "ExceptionGroupDoesExist": "Taldea existitzen da dagoeneko",
+        "ExceptionGroupDoesNotExist": "Taldea ez da existitzen",
+        "ExceptionUserAlreadyInGroup": "Erabiltzailea talde honetako kide da dagoeneko",
+        "Group": "Taldea",
+        "GroupPermissions": "Talde-baimenak",
+        "ManageAccess": "Kudeatu sarbidea",
+        "ManageGroup": "Kudeatu taldea",
+        "ManageGroupMembers": "Kudeatu taldeko kideak",
+        "ManageGroups": "Kudeatu taldeak",
+        "MenuGroupPermissions": "Talde-baimenak",
+        "RemoveFromGroup": "Kendu",
+        "RemoveFromGroupConfirm": "Ziur zaude '%1$s' erabiltzailea kendu nahi duzula '%2$s' taldetik?",
+        "RenameGroup": "Berrizendatu talde hau",
+        "RenameGroupButton": "Berrizendatu taldea",
+        "RenameGroupConfirm": "Ziur zaude '%1$s' taldea '%2$s' bezala berrizendatu nahi duzula?",
+        "SelectNewUser": "Hautatu erabiltzaile berri bat"
+    }
+}
