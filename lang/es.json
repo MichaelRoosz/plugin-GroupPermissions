@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Agregar un nuevo miembro a este grupo",
+        "AddUserToGroupButton": "Añadir miembro",
+        "CreateNewGroup": "Crear un nuevo grupo",
+        "CreateNewGroupButton": "Crea un grupo",
+        "DeleteGroup": "Eliminar este grupo",
+        "DeleteGroupButton": "Eliminar grupo",
+        "DeleteGroupConfirm": "¿Está seguro de que desea eliminar el grupo '%s'?",
+        "DescriptionAccessTab": "Decida qué grupos tienen acceso a sus sitios web. También puede otorgar acceso a todos los sitios web a la vez eligiendo \"Aplicar a todos los sitios web\" en el selector de sitios web.",
+        "DescriptionGroupsTab": "Aquí puedes echar un vistazo a los miembros de cada grupo. Los superusuarios pueden editar los grupos.",
+        "ExceptionGroupDoesExist": "El grupo ya existe",
+        "ExceptionGroupDoesNotExist": "El grupo no existe",
+        "ExceptionUserAlreadyInGroup": "El usuario ya está en grupo",
+        "Group": "Grupo",
+        "GroupPermissions": "Permisos del grupo",
+        "ManageAccess": "Administrar acceso",
+        "ManageGroup": "Administrar grupo",
+        "ManageGroupMembers": "Administrar miembros del grupo",
+        "ManageGroups": "Administrar grupos",
+        "MenuGroupPermissions": "Permisos del grupo",
+        "RemoveFromGroup": "Quitar",
+        "RemoveFromGroupConfirm": "¿Está seguro de que desea eliminar al usuario '%1$s' del grupo '%2$s'?",
+        "RenameGroup": "Cambiar el nombre de este grupo",
+        "RenameGroupButton": "Cambiar nombre del grupo",
+        "RenameGroupConfirm": "¿Está seguro de que desea cambiar el nombre del grupo '%1$s' a '%2$s'?"
+    }
+}
