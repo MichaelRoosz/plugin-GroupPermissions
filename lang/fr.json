@@ -1,1 +1,28 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Ajouter un nouveau membre au groupe",
+        "AddUserToGroupButton": "Ajouter un membre",
+        "CreateNewGroup": "Créer un nouveau groupe",
+        "CreateNewGroupButton": "Créer le groupe",
+        "DeleteGroup": "Supprimer ce groupe",
+        "DeleteGroupButton": "Supprimer groupe",
+        "DeleteGroupConfirm": "Êtes-vous sûr(e) de vouloir supprimer le groupe « %s » ?",
+        "DescriptionAccessTab": "Cette fonctionnalité vous permet de décider les groupes qui ont accès à vos sites. Vous pouvez aussi donner accès à tous vos sites d'un coup en choisissant l'option « Tous les sites » dans la sélection de sites.",
+        "DescriptionGroupsTab": "Ici, vous pouvez consulter l'ensemble des membres qui appartiennent au groupe. Les super utilisateurs peuvent modifier les groupes.",
+        "ExceptionGroupDoesExist": "Ce groupe existe déjà",
+        "ExceptionGroupDoesNotExist": "Ce groupe n'existe pas",
+        "ExceptionUserAlreadyInGroup": "Cet utilisateur est déjà dans ce groupe",
+        "Group": "Groupe",
+        "GroupPermissions": "Permissions du groupe",
+        "ManageAccess": "Gestion des accès",
+        "ManageGroup": "Gestion du groupe",
+        "ManageGroupMembers": "Gestion des membres du groupe",
+        "ManageGroups": "Gestion des groupes",
+        "MenuGroupPermissions": "Permissions des groupes",
+        "RemoveFromGroup": "Retirer",
+        "RemoveFromGroupConfirm": "Êtes-vous sûr(e) de vouloir retirer l'utilisateur « %1$s » du groupe «%2$s » ?",
+        "RenameGroup": "Renommer ce groupe",
+        "RenameGroupButton": "Renommer le groupe",
+        "RenameGroupConfirm": "Êtes-vous sûr(e) de vouloir renommer le groupe « %1$s » en«%2$s » ?"
+    }
+}
