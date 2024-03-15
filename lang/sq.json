@@ -1,1 +1,29 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Shtoni te ky grup një anëtar të ri",
+        "AddUserToGroupButton": "Shtoni Anëtar",
+        "CreateNewGroup": "Krijoni grup të ri",
+        "CreateNewGroupButton": "Krijoni Grup",
+        "DeleteGroup": "Fshije këtë grup",
+        "DeleteGroupButton": "Fshije Grupin",
+        "DeleteGroupConfirm": "Jeni i sigurt se doni të fshihet grupi “%s”?",
+        "DescriptionAccessTab": "Vendosni cilët grupi kanë hyrje te sajtet tuaj. Mundeni edhe të jepni hyrje te krejt sajtet njëherësh, duke zgjedhur “Aplikoje mbi krejt sajtet”, te përzgjedhësi i sajteve.",
+        "DescriptionGroupsTab": "Këtu mund të hidhni një sy te krejt anëtarët e çdo grupi. Grupet mund t’i përpunojnë superpërdoruesit.",
+        "ExceptionGroupDoesExist": "Grupi ekziston tashmë",
+        "ExceptionGroupDoesNotExist": "Grupi s’ekziston",
+        "ExceptionUserAlreadyInGroup": "Përdoruesi gjendet tashmë në grup",
+        "Group": "Grup",
+        "GroupPermissions": "Leje Grupi",
+        "ManageAccess": "Administroni Hyrje",
+        "ManageGroup": "Administroni grup",
+        "ManageGroupMembers": "Administroni anëtarë grupi",
+        "ManageGroups": "Administroni Grupe",
+        "MenuGroupPermissions": "Leje Grupi",
+        "RemoveFromGroup": "Hiqe",
+        "RemoveFromGroupConfirm": "Jeni i sigurt se doni të hiqet përdoruesi “%1$s” nga grupi “%2$s”?",
+        "RenameGroup": "Riemërtojeni këtë grup",
+        "RenameGroupButton": "Riemërtoje Grupin",
+        "RenameGroupConfirm": "Jeni i sigurt se doni të riemërtoni grupin “%1$s” si “%2$s”?",
+        "SelectNewUser": "Përzgjidhni përdorues të ri"
+    }
+}
