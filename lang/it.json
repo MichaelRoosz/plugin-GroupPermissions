@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Aggiungi un nuovo membro a questo gruppo",
         "AddUserToGroupButton": "Aggiungi membro",
+        "ChangeAccessToAllSitesConfirm": "Sei sicuro che vuoi dare a '%s' accesso al gruppo '%s' per tutti i siti web?",
         "CreateNewGroup": "Crea un nuovo gruppo",
         "CreateNewGroupButton": "Crea un gruppo",
         "DeleteGroup": "Elimina questo gruppo",
