@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Προσθήκη νέου μέλους σε αυτή την ομάδα",
         "AddUserToGroupButton": "Προσθήκη Μέλους",
+        "ChangeAccessToAllSitesConfirm": "Είστε σίγουροι ότι θέλετε να δώσετε πρόσβαση '%s' στην ομάδα '%s' σε όλους τους ιστοτόπους;",
         "CreateNewGroup": "Δημιουργία νέας ομάδας",
         "CreateNewGroupButton": "Δημιουργία Ομάδας",
         "DeleteGroup": "Διαγραφή της ομάδας",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "Είστε σίγουροι ότι θέλετε να αφαιρέσετε το χρήστη '%1$s' από την ομάδα '%2$s';",
         "RenameGroup": "Μετονομασία της ομάδας",
         "RenameGroupButton": "Μετονομασία Ομάδας",
-        "RenameGroupConfirm": "Είστε σίγουροι ότι θέλετε να μετονομάσετε την ομάδα '%1$s' σε '%2$s';"
+        "RenameGroupConfirm": "Είστε σίγουροι ότι θέλετε να μετονομάσετε την ομάδα '%1$s' σε '%2$s';",
+        "SelectNewUser": "Επιλέξτε ένα νέο χρήστη"
     }
 }
