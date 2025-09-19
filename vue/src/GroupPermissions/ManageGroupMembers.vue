@@ -123,6 +123,7 @@ export default defineComponent({
         method: 'GroupPermissions.getMembersOfGroup',
       }, {
         idGroup: this.group.idGroup,
+        filter_limit: -1,
       },
       {
         errorElement: '#ajaxErrorLoadMembers',
@@ -172,6 +173,7 @@ export default defineComponent({
       }).then(() => {
         this.members.push(loginToAdd);
         this.members.sort();
+        this.selectedLoginToAdd = '';
       }).finally(() => {
         this.isAddingMember = false;
       });

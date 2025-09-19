@@ -140,72 +140,55 @@ if (typeof window !== 'undefined') {
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=d0716bc0
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--13-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=0d3bb2e8
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-
-var _hoisted_1 = {
+const _hoisted_1 = {
   id: "ajaxErrorAccessGroupMember",
   ref: "errorContainer"
 };
-var _hoisted_2 = {
+const _hoisted_2 = {
   class: "card"
 };
-var _hoisted_3 = {
+const _hoisted_3 = {
   class: "card-content"
 };
-var _hoisted_4 = {
+const _hoisted_4 = {
   class: "sites_autocomplete"
 };
-var _hoisted_5 = {
+const _hoisted_5 = {
   class: "entityContainer",
   style: {
     "width": "600px",
     "margin-top": "16px"
   }
 };
-var _hoisted_6 = {
+const _hoisted_6 = {
   class: "entityTable dataTable",
   style: {
     "display": "inline-table",
     "width": "550px"
   }
 };
-var _hoisted_7 = {
+const _hoisted_7 = {
   class: "first"
 };
-var _hoisted_8 = {
+const _hoisted_8 = {
   key: 0,
   src: "plugins/UsersManager/images/ok.png",
   class: "accessGranted"
 };
-var _hoisted_9 = ["onClick"];
-
-var _hoisted_10 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("   ");
-
-var _hoisted_11 = {
+const _hoisted_9 = ["onClick"];
+const _hoisted_10 = {
   class: "ui-confirm",
   id: "confirmUpdateAccessToAllSites",
   ref: "confirmUpdateAccessToAllSites"
 };
-var _hoisted_12 = ["textContent"];
-var _hoisted_13 = ["value"];
-var _hoisted_14 = ["value"];
+const _hoisted_11 = ["textContent"];
+const _hoisted_12 = ["value"];
+const _hoisted_13 = ["value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_SiteSelector = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("SiteSelector");
-
-  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
-
+  const _component_SiteSelector = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("SiteSelector");
+  const _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
   return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_DescriptionAccessTab')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_1, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_3, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_SiteSelector, {
     "default-to-first-site": true,
     "show-selected-site": true,
@@ -214,53 +197,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "only-sites-with-admin-access": true,
     "all-sites-text": _ctx.translate('UsersManager_ApplyToAllWebsites'),
     "model-value": _ctx.site,
-    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => {
       _ctx.site = $event;
-
       _ctx.updateGroupAccessList();
     })
-  }, null, 8, ["show-all-sites-item", "all-sites-text", "model-value"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_5, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", _hoisted_6, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", _hoisted_7, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_Group')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivNone')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivView')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivWrite')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivAdmin')), 1)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tbody", null, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.groupAccess, function (_ref) {
-    var _ref2 = _slicedToArray(_ref, 2),
-        groupName = _ref2[0],
-        groupAccess = _ref2[1];
-
+  }, null, 8, ["show-all-sites-item", "all-sites-text", "model-value"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_5, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", _hoisted_6, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", _hoisted_7, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_Group')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivNone')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivView')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivWrite')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('UsersManager_PrivAdmin')), 1)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tbody", null, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.groupAccess, ([groupName, groupAccess]) => {
     return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", {
       key: groupName
-    }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(groupName), 1), (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(['noaccess', 'view', 'write', 'admin'], function (access) {
+    }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(groupName), 1), (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(['noaccess', 'view', 'write', 'admin'], access => {
       return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", {
         key: access
       }, [groupAccess == access ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("img", _hoisted_8)) : (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("img", {
         key: 1,
         src: "plugins/UsersManager/images/no-access.png",
         class: "updateAccess",
-        onClick: function onClick($event) {
-          return _ctx.onSetAccessClicked($event, groupName, access);
-        }
-      }, null, 8, _hoisted_9)), _hoisted_10]);
+        onClick: $event => _ctx.onSetAccessClicked($event, groupName, access)
+      }, null, 8, _hoisted_9)), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("   ")]);
     }), 64))]);
   }), 128))])])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
     loading: _ctx.isLoading,
     style: {
       "padding-top": "10px"
     }
-  }, null, 8, ["loading"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_11, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", {
+  }, null, 8, ["loading"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_10, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", {
     textContent: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmUpdateAccessToAllSitesText)
-  }, null, 8, _hoisted_12), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+  }, null, 8, _hoisted_11), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "yes",
     type: "button",
     value: _ctx.translate('General_Yes')
-  }, null, 8, _hoisted_13), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+  }, null, 8, _hoisted_12), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "no",
     type: "button",
     value: _ctx.translate('General_No')
-  }, null, 8, _hoisted_14)], 512)])])], 64);
+  }, null, 8, _hoisted_13)], 512)])])], 64);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=d0716bc0
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=0d3bb2e8
 
 // EXTERNAL MODULE: external "CoreHome"
 var external_CoreHome_ = __webpack_require__("19dc");
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=script&lang=ts
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--15-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--15-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=script&lang=ts
 
 
 /* harmony default export */ var TabManageGroupAccessvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
@@ -268,7 +244,7 @@ var external_CoreHome_ = __webpack_require__("19dc");
     ActivityIndicator: external_CoreHome_["ActivityIndicator"],
     SiteSelector: external_CoreHome_["SiteSelector"]
   },
-  data: function data() {
+  data() {
     return {
       site: {
         id: external_CoreHome_["Matomo"].idSite,
@@ -280,25 +256,18 @@ var external_CoreHome_ = __webpack_require__("19dc");
     };
   },
   methods: {
-    onSetAccessClicked: function onSetAccessClicked(event, groupName, access) {
-      var _this = this;
-
-      var idSite = this.site.id;
-
+    onSetAccessClicked(event, groupName, access) {
+      const idSite = this.site.id;
       if (idSite === 'all') {
         this.confirmUpdateAccessToAllSitesText = Object(external_CoreHome_["translate"])('GroupPermissions_ChangeAccessToAllSitesConfirm', access, groupName);
         external_CoreHome_["Matomo"].helper.modalConfirm('#confirmUpdateAccessToAllSites', {
-          yes: function yes() {
-            return _this.updateGroupAccess(idSite, groupName, access);
-          }
+          yes: () => this.updateGroupAccess(idSite, groupName, access)
         });
       } else {
         this.updateGroupAccess(idSite, groupName, access);
       }
     },
-    updateGroupAccess: function updateGroupAccess(idSite, groupName, access) {
-      var _this2 = this;
-
+    updateGroupAccess(idSite, groupName, access) {
       this.isLoading = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
@@ -307,40 +276,38 @@ var external_CoreHome_ = __webpack_require__("19dc");
       }, {
         idSites: idSite,
         name: groupName,
-        access: access
+        access
       }, {
         errorElement: '#ajaxErrorAccessGroupMember'
-      }).then(function () {
-        _this2.groupAccess.set(groupName, access);
-      }).finally(function () {
-        _this2.isLoading = false;
+      }).then(() => {
+        this.groupAccess.set(groupName, access);
+      }).finally(() => {
+        this.isLoading = false;
       });
     },
-    updateGroupAccessList: function updateGroupAccessList() {
-      var _this3 = this;
-
+    updateGroupAccessList() {
       this.isLoading = true;
-      var idSite = this.site.id;
-
+      const idSite = this.site.id;
       if (idSite === 'all') {
         external_CoreHome_["AjaxHelper"].post({
           module: 'API',
           format: 'json',
           method: 'GroupPermissions.getAllGroups'
-        }, {}, {
+        }, {
+          filter_limit: -1
+        }, {
           errorElement: '#ajaxErrorAccessGroupMember'
-        }).then(function (response) {
-          _this3.groupAccess.clear();
-
-          var groupAccessTmp = [];
-          response.forEach(function (group) {
+        }).then(response => {
+          this.groupAccess.clear();
+          const groupAccessTmp = [];
+          response.forEach(group => {
             groupAccessTmp.push(group.name);
           });
-          groupAccessTmp.sort().forEach(function (group) {
-            _this3.groupAccess.set(group, 'noaccess');
+          groupAccessTmp.sort().forEach(group => {
+            this.groupAccess.set(group, 'noaccess');
           });
-        }).finally(function () {
-          _this3.isLoading = false;
+        }).finally(() => {
+          this.isLoading = false;
         });
       } else {
         external_CoreHome_["AjaxHelper"].post({
@@ -348,23 +315,23 @@ var external_CoreHome_ = __webpack_require__("19dc");
           format: 'json',
           method: 'GroupPermissions.getGroupAccessFromSite'
         }, {
-          idSite: this.site.id
+          idSite: this.site.id,
+          filter_limit: -1
         }, {
           errorElement: '#ajaxErrorAccessGroupMember'
-        }).then(function (response) {
-          _this3.groupAccess.clear();
-
-          Object.keys(response).sort().forEach(function (group) {
-            _this3.groupAccess.set(group, response[group]);
+        }).then(response => {
+          this.groupAccess.clear();
+          Object.keys(response).sort().forEach(group => {
+            this.groupAccess.set(group, response[group]);
           });
-        }).finally(function () {
-          _this3.isLoading = false;
+        }).finally(() => {
+          this.isLoading = false;
         });
       }
     }
   },
   computed: {
-    hasSuperUserAccess: function hasSuperUserAccess() {
+    hasSuperUserAccess() {
       return !!external_CoreHome_["Matomo"].hasSuperUserAccess;
     }
   }
@@ -378,59 +345,47 @@ var external_CoreHome_ = __webpack_require__("19dc");
 TabManageGroupAccessvue_type_script_lang_ts.render = render
 
 /* harmony default export */ var TabManageGroupAccess = (TabManageGroupAccessvue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=dbd59572
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--13-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=409769a8
 
-var TabManageGroupsvue_type_template_id_dbd59572_hoisted_1 = {
+const TabManageGroupsvue_type_template_id_409769a8_hoisted_1 = {
   class: "card"
 };
-var TabManageGroupsvue_type_template_id_dbd59572_hoisted_2 = {
+const TabManageGroupsvue_type_template_id_409769a8_hoisted_2 = {
   class: "card-content",
   style: {
     "width": "600px"
   }
 };
-var TabManageGroupsvue_type_template_id_dbd59572_hoisted_3 = {
+const TabManageGroupsvue_type_template_id_409769a8_hoisted_3 = {
   id: "ajaxErrorManageGroups",
   ref: "errorContainer"
 };
-function TabManageGroupsvue_type_template_id_dbd59572_render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_CreateGroup = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("CreateGroup");
-
-  var _component_multiselect = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("multiselect");
-
-  var _component_ManageGroup = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ManageGroup");
-
-  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
-
+function TabManageGroupsvue_type_template_id_409769a8_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_CreateGroup = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("CreateGroup");
+  const _component_multiselect = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("multiselect");
+  const _component_ManageGroup = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ManageGroup");
+  const _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
   return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_DescriptionGroupsTab')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_CreateGroup, {
-    onGroupCreated: _cache[0] || (_cache[0] = function ($event) {
-      return _ctx.onGroupCreated($event);
-    })
-  }), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_dbd59572_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_dbd59572_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ManageGroup')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_multiselect, {
+    onGroupCreated: _cache[0] || (_cache[0] = $event => _ctx.onGroupCreated($event))
+  }), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_409769a8_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_409769a8_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ManageGroup')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_multiselect, {
     options: _ctx.groups,
     "track-by": "idGroup",
     label: "name",
     modelValue: _ctx.selectedGroup,
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-      return _ctx.selectedGroup = $event;
-    })
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => _ctx.selectedGroup = $event)
   }, null, 8, ["options", "modelValue"]), _ctx.selectedGroup ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_ManageGroup, {
     key: 0,
     group: _ctx.selectedGroup,
-    onGroupRenamed: _cache[2] || (_cache[2] = function ($event) {
-      return _ctx.onGroupRenamed($event);
-    }),
-    onGroupDeleted: _cache[3] || (_cache[3] = function ($event) {
-      return _ctx.onGroupDeleted($event);
-    })
-  }, null, 8, ["group"])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_dbd59572_hoisted_3, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
+    onGroupRenamed: _cache[2] || (_cache[2] = $event => _ctx.onGroupRenamed($event)),
+    onGroupDeleted: _cache[3] || (_cache[3] = $event => _ctx.onGroupDeleted($event))
+  }, null, 8, ["group"])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_409769a8_hoisted_3, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
     loading: _ctx.isLoadingGroups || _ctx.isLoadingDefaultGroup,
     style: {
       "padding-top": "10px"
     }
   }, null, 8, ["loading"])], 64);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=dbd59572
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=409769a8
 
 // CONCATENATED MODULE: ./plugins/GroupPermissions/node_modules/vue-multiselect/dist/vue-multiselect.esm.js
 
@@ -454,12 +409,6 @@ function includes (str, query) {
   return text.indexOf(query.trim()) !== -1
 }
 
-function filterOptions (options, search, label, customLabel) {
-  return search ? options
-    .filter((option) => includes(customLabel(option, label), search))
-    .sort((a, b) => customLabel(a, label).length - customLabel(b, label).length) : options
-}
-
 function stripGroups (options) {
   return options.filter((option) => !option.$isLabel)
 }
@@ -477,25 +426,6 @@ function flattenOptions (values, label) {
       }
       return prev
     }, [])
-}
-
-function filterGroups (search, label, values, groupLabel, customLabel) {
-  return (groups) =>
-    groups.map((group) => {
-      /* istanbul ignore else */
-      if (!group[values]) {
-        console.warn(`Options passed to vue-multiselect do not contain groups, despite the config.`);
-        return []
-      }
-      const groupOptions = filterOptions(group[values], search, label, customLabel);
-
-      return groupOptions.length
-        ? {
-          [groupLabel]: group[groupLabel],
-          [values]: groupOptions
-        }
-        : []
-    })
 }
 
 const flow = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
@@ -749,10 +679,19 @@ var multiselectMixin = {
      * Prevent autofocus
      * @default false
      * @type {Boolean}
-    */
+     */
     preventAutofocus: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Allows a custom function for sorting search/filtered results.
+     * @default null
+     * @type {Function}
+     */
+    filteringSortFunc: {
+      type: Function,
+      default: null
     }
   },
   mounted () {
@@ -784,7 +723,7 @@ var multiselectMixin = {
       if (this.internalSearch) {
         options = this.groupValues
           ? this.filterAndFlat(options, normalizedSearch, this.label)
-          : filterOptions(options, normalizedSearch, this.label, this.customLabel);
+          : this.filterOptions(options, normalizedSearch, this.label, this.customLabel);
       } else {
         options = this.groupValues ? flattenOptions(this.groupValues, this.groupLabel)(options) : options;
       }
@@ -796,9 +735,9 @@ var multiselectMixin = {
       /* istanbul ignore else */
       if (this.taggable && normalizedSearch.length && !this.isExistingOption(normalizedSearch)) {
         if (this.tagPosition === 'bottom') {
-          options.push({isTag: true, label: search});
+          options.push({ isTag: true, label: search });
         } else {
-          options.unshift({isTag: true, label: search});
+          options.unshift({ isTag: true, label: search });
         }
       }
 
@@ -858,7 +797,7 @@ var multiselectMixin = {
      */
     filterAndFlat (options, search, label) {
       return flow(
-        filterGroups(search, label, this.groupValues, this.groupLabel, this.customLabel),
+        this.filterGroups(search, label, this.groupValues, this.groupLabel, this.customLabel),
         flattenOptions(this.groupValues, this.groupLabel)
       )(options)
     },
@@ -1003,7 +942,7 @@ var multiselectMixin = {
 
         this.$emit('update:modelValue', newValue);
       } else {
-        let optionsToAdd = group[this.groupValues].filter(
+        const optionsToAdd = group[this.groupValues].filter(
           option => !(this.isOptionDisabled(option) || this.isSelected(option))
         );
 
@@ -1158,6 +1097,51 @@ var multiselectMixin = {
         this.preferredOpenDirection = 'above';
         this.optimizedHeight = Math.min(spaceAbove - 40, this.maxHeight);
       }
+    },
+    /**
+     * Filters and sorts the options ready for selection
+     * @param {Array} options
+     * @param {String} search
+     * @param {String} label
+     * @param {Function} customLabel
+     * @returns {Array}
+     */
+    filterOptions (options, search, label, customLabel) {
+      return search
+        ? options
+          .filter((option) => includes(customLabel(option, label), search))
+          .sort((a, b) => {
+            if (typeof this.filteringSortFunc === 'function') {
+              return this.filteringSortFunc(a, b)
+            }
+            return customLabel(a, label).length - customLabel(b, label).length
+          })
+        : options
+    },
+    /**
+     *
+     * @param {String} search
+     * @param {String} label
+     * @param {String} values
+     * @param {String} groupLabel
+     * @param {function} customLabel
+     * @returns {function(*): *}
+     */
+    filterGroups (search, label, values, groupLabel, customLabel) {
+      return (groups) => groups.map((group) => {
+        /* istanbul ignore else */
+        if (!group[values]) {
+          console.warn('Options passed to vue-multiselect do not contain groups, despite the config.');
+          return []
+        }
+        const groupOptions = this.filterOptions(group[values], search, label, customLabel);
+
+        return groupOptions.length
+          ? {
+              [groupLabel]: group[groupLabel], [values]: groupOptions
+            }
+          : []
+      })
     }
   }
 };
@@ -1214,7 +1198,7 @@ var pointerMixin = {
       if (!this.groupSelect) {
         return [
           'multiselect__option--disabled',
-          {'multiselect__option--group': selectedGroup.$isLabel}
+          { 'multiselect__option--group': selectedGroup.$isLabel }
         ]
       }
 
@@ -1222,13 +1206,15 @@ var pointerMixin = {
         return option[this.groupLabel] === selectedGroup.$groupLabel
       });
 
-      return group && !this.wholeGroupDisabled(group) ? [
-        'multiselect__option--group',
-        {'multiselect__option--highlight': index === this.pointer && this.showPointer},
-        {'multiselect__option--group-selected': this.wholeGroupSelected(group)}
-      ] : 'multiselect__option--disabled'
+      return group && !this.wholeGroupDisabled(group)
+        ? [
+            'multiselect__option--group',
+            { 'multiselect__option--highlight': index === this.pointer && this.showPointer },
+            { 'multiselect__option--group-selected': this.wholeGroupSelected(group) }
+          ]
+        : 'multiselect__option--disabled'
     },
-    addPointerElement ({key} = 'Enter') {
+    addPointerElement ({ key } = 'Enter') {
       /* istanbul ignore else */
       if (this.filteredOptions.length > 0) {
         this.select(this.filteredOptions[this.pointer], key);
@@ -1240,7 +1226,7 @@ var pointerMixin = {
       if (this.pointer < this.filteredOptions.length - 1) {
         this.pointer++;
         /* istanbul ignore next */
-        if (this.$refs.list.scrollTop <= this.pointerPosition - (this.visibleElements - 1) * this.optionHeight) {
+        if (this.$refs.list && this.$refs.list.scrollTop <= this.pointerPosition - (this.visibleElements - 1) * this.optionHeight) {
           this.$refs.list.scrollTop = this.pointerPosition - (this.visibleElements - 1) * this.optionHeight;
         }
         /* istanbul ignore else */
@@ -1256,7 +1242,7 @@ var pointerMixin = {
       if (this.pointer > 0) {
         this.pointer--;
         /* istanbul ignore else */
-        if (this.$refs.list.scrollTop >= this.pointerPosition) {
+        if (this.$refs.list && this.$refs.list.scrollTop >= this.pointerPosition) {
           this.$refs.list.scrollTop = this.pointerPosition;
         }
         /* istanbul ignore else */
@@ -1469,9 +1455,29 @@ var script = {
       type: Number,
       default: 0
     },
+    /**
+     * Adds Required attribute to the input element when there is no value selected
+     * @default false
+     * @type {Boolean}
+     */
     required: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Uses Vue Teleport's feature. Teleports the open dropdown to the bottom of the body element
+     * @default false
+     * @type {Boolean}
+     */
+    useTeleport: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data () {
+    return {
+      dropdownStyles: {},
+      ready: false
     }
   },
   computed: {
@@ -1516,15 +1522,15 @@ var script = {
       ) {
         // Hide input by setting the width to 0 allowing it to receive focus
         return this.isOpen
-          ? {width: '100%'}
-          : {width: '0', position: 'absolute', padding: '0'}
+          ? { width: '100%' }
+          : { width: '0', position: 'absolute', padding: '0' }
       }
       return ''
     },
     contentStyle () {
       return this.options.length
-        ? {display: 'inline-block'}
-        : {display: 'block'}
+        ? { display: 'inline-block' }
+        : { display: 'block' }
     },
     isAbove () {
       if (this.openDirection === 'above' || this.openDirection === 'top') {
@@ -1546,27 +1552,64 @@ var script = {
             ? this.isOpen
             : true)
       )
+    },
+    isRequired () {
+      if (this.required === false) {
+        return false
+      }
+      // if we have a value, any value, then this isn't required
+      return this.internalValue.length <= 0
+    }
+  },
+  watch: {
+    isOpen (val) {
+      if (val) {
+        if (this.useTeleport) {
+          this.ready = false;
+          // This helps with the positioning of the open dropdown when teleport is being used
+          this.$nextTick(() => {
+            const rect = this.$el.getBoundingClientRect();
+            this.dropdownStyles = {
+              position: 'absolute',
+              top: `${rect.bottom + window.scrollY}px`,
+              left: `${rect.left + window.scrollX}px`,
+              width: `${rect.width}px`,
+              zIndex: 9999
+            };
+            this.ready = true;
+          });
+        } else {
+          this.ready = true;
+        }
+      }
     }
   }
 };
 
-const vue_multiselect_esm_hoisted_1 = {
+const vue_multiselect_esm_hoisted_1 = ["tabindex", "aria-expanded", "aria-owns", "aria-activedescendant"];
+const vue_multiselect_esm_hoisted_2 = {
   ref: "tags",
   class: "multiselect__tags"
 };
-const vue_multiselect_esm_hoisted_2 = { class: "multiselect__tags-wrap" };
-const vue_multiselect_esm_hoisted_3 = { class: "multiselect__spinner" };
-const vue_multiselect_esm_hoisted_4 = { key: 0 };
-const vue_multiselect_esm_hoisted_5 = { class: "multiselect__option" };
-const vue_multiselect_esm_hoisted_6 = { class: "multiselect__option" };
-const vue_multiselect_esm_hoisted_7 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("No elements found. Consider changing the search query.");
-const vue_multiselect_esm_hoisted_8 = { class: "multiselect__option" };
-const vue_multiselect_esm_hoisted_9 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("List is empty.");
+const vue_multiselect_esm_hoisted_3 = { class: "multiselect__tags-wrap" };
+const vue_multiselect_esm_hoisted_4 = ["textContent"];
+const vue_multiselect_esm_hoisted_5 = ["onKeypress", "onMousedown"];
+const vue_multiselect_esm_hoisted_6 = ["textContent"];
+const vue_multiselect_esm_hoisted_7 = { class: "multiselect__spinner" };
+const vue_multiselect_esm_hoisted_8 = ["name", "id", "spellcheck", "placeholder", "required", "value", "disabled", "tabindex", "aria-label", "aria-controls"];
+const vue_multiselect_esm_hoisted_9 = ["id", "aria-multiselectable"];
+const vue_multiselect_esm_hoisted_10 = { key: 0 };
+const vue_multiselect_esm_hoisted_11 = { class: "multiselect__option" };
+const vue_multiselect_esm_hoisted_12 = ["aria-selected", "id", "role"];
+const vue_multiselect_esm_hoisted_13 = ["onClick", "onMouseenter", "data-select", "data-selected", "data-deselect"];
+const _hoisted_14 = ["data-select", "data-deselect", "onMouseenter", "onMousedown"];
+const _hoisted_15 = { class: "multiselect__option" };
+const _hoisted_16 = { class: "multiselect__option" };
 
 function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("div", {
+  return (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", {
     tabindex: _ctx.searchable ? -1 : $props.tabindex,
-    class: [{ 'multiselect--active': _ctx.isOpen, 'multiselect--disabled': $props.disabled, 'multiselect--above': $options.isAbove, 'multiselect--has-options-group': $options.hasOptionGroup }, "multiselect"],
+    class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])([{ 'multiselect--active': _ctx.isOpen, 'multiselect--disabled': $props.disabled, 'multiselect--above': $options.isAbove, 'multiselect--has-options-group': $options.hasOptionGroup }, "multiselect"]),
     onFocus: _cache[14] || (_cache[14] = $event => (_ctx.activate())),
     onBlur: _cache[15] || (_cache[15] = $event => (_ctx.searchable ? false : _ctx.deactivate())),
     onKeydown: [
@@ -1576,43 +1619,46 @@ function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $option
     onKeypress: _cache[18] || (_cache[18] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withKeys"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.addPointerElement($event)), ["stop","self"]), ["enter","tab"])),
     onKeyup: _cache[19] || (_cache[19] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withKeys"])($event => (_ctx.deactivate()), ["esc"])),
     role: "combobox",
-    "aria-owns": 'listbox-'+_ctx.id
+    "aria-expanded": _ctx.isOpen,
+    "aria-owns": 'listbox-'+_ctx.id,
+    "aria-activedescendant": _ctx.isOpen && _ctx.pointer !== null ? _ctx.id + '-' + _ctx.pointer : null
   }, [
     Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "caret", { toggle: _ctx.toggle }, () => [
-      Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("div", {
-        onMousedown: _cache[1] || (_cache[1] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.toggle()), ["prevent","stop"])),
+      Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
+        onMousedown: _cache[0] || (_cache[0] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.toggle()), ["prevent","stop"])),
         class: "multiselect__select"
-      }, null, 32 /* HYDRATE_EVENTS */)
+      }, null, 32 /* NEED_HYDRATION */)
     ]),
     Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "clear", { search: _ctx.search }),
-    Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("div", vue_multiselect_esm_hoisted_1, [
+    Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", vue_multiselect_esm_hoisted_2, [
       Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "selection", {
         search: _ctx.search,
         remove: _ctx.removeElement,
         values: $options.visibleValues,
         isOpen: _ctx.isOpen
       }, () => [
-        Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("div", vue_multiselect_esm_hoisted_2, [
-          (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])($options.visibleValues, (option, index) => {
+        Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", vue_multiselect_esm_hoisted_3, [
+          (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])($options.visibleValues, (option, index) => {
             return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "tag", {
               option: option,
               search: _ctx.search,
               remove: _ctx.removeElement
             }, () => [
-              (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("span", {
+              (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("span", {
                 class: "multiselect__tag",
-                key: index
+                key: index,
+                onMousedown: _cache[1] || (_cache[1] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(() => {}, ["prevent"]))
               }, [
-                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("span", {
+                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
                   textContent: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.getOptionLabel(option))
-                }, null, 8 /* PROPS */, ["textContent"]),
-                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("i", {
+                }, null, 8 /* PROPS */, vue_multiselect_esm_hoisted_4),
+                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("i", {
                   tabindex: "1",
                   onKeypress: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withKeys"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.removeElement(option)), ["prevent"]), ["enter"]),
                   onMousedown: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.removeElement(option)), ["prevent"]),
                   class: "multiselect__tag-icon"
-                }, null, 40 /* PROPS, HYDRATE_EVENTS */, ["onKeypress", "onMousedown"])
-              ]))
+                }, null, 40 /* PROPS, NEED_HYDRATION */, vue_multiselect_esm_hoisted_5)
+              ], 32 /* NEED_HYDRATION */))
             ])
           }), 256 /* UNKEYED_FRAGMENT */))
         ], 512 /* NEED_PATCH */), [
@@ -1620,17 +1666,17 @@ function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $option
         ]),
         (_ctx.internalValue && _ctx.internalValue.length > $props.limit)
           ? Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "limit", { key: 0 }, () => [
-              Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("strong", {
+              Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("strong", {
                 class: "multiselect__strong",
                 textContent: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])($props.limitText(_ctx.internalValue.length - $props.limit))
-              }, null, 8 /* PROPS */, ["textContent"])
+              }, null, 8 /* PROPS */, vue_multiselect_esm_hoisted_6)
             ])
           : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true)
       ]),
       Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Transition"], { name: "multiselect__loading" }, {
         default: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withCtx"])(() => [
           Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "loading", {}, () => [
-            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("div", vue_multiselect_esm_hoisted_3, null, 512 /* NEED_PATCH */), [
+            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", vue_multiselect_esm_hoisted_7, null, 512 /* NEED_PATCH */), [
               [external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], $props.loading]
             ])
           ])
@@ -1638,7 +1684,7 @@ function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $option
         _: 3 /* FORWARDED */
       }),
       (_ctx.searchable)
-        ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("input", {
+        ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("input", {
             key: 0,
             ref: "search",
             name: $props.name,
@@ -1647,11 +1693,12 @@ function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $option
             autocomplete: "off",
             spellcheck: $props.spellcheck,
             placeholder: _ctx.placeholder,
-            required: $props.required,
-            style: $options.inputStyle,
+            required: $options.isRequired,
+            style: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeStyle"])($options.inputStyle),
             value: _ctx.search,
             disabled: $props.disabled,
             tabindex: $props.tabindex,
+            "aria-label": $props.name + '-searchbox',
             onInput: _cache[2] || (_cache[2] = $event => (_ctx.updateSearch($event.target.value))),
             onFocus: _cache[3] || (_cache[3] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.activate()), ["prevent"])),
             onBlur: _cache[4] || (_cache[4] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.deactivate()), ["prevent"])),
@@ -1664,10 +1711,10 @@ function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $option
             onKeypress: _cache[8] || (_cache[8] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withKeys"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.addPointerElement($event)), ["prevent","stop","self"]), ["enter"])),
             class: "multiselect__input",
             "aria-controls": 'listbox-'+_ctx.id
-          }, null, 44 /* STYLE, PROPS, HYDRATE_EVENTS */, ["name", "id", "spellcheck", "placeholder", "required", "value", "disabled", "tabindex", "aria-controls"]))
+          }, null, 44 /* STYLE, PROPS, NEED_HYDRATION */, vue_multiselect_esm_hoisted_8))
         : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
       ($options.isSingleLabelVisible)
-        ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("span", {
+        ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("span", {
             key: 1,
             class: "multiselect__single",
             onMousedown: _cache[10] || (_cache[10] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])((...args) => (_ctx.toggle && _ctx.toggle(...args)), ["prevent"]))
@@ -1675,10 +1722,10 @@ function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $option
             Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "singleLabel", { option: $options.singleValue }, () => [
               Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.currentOptionLabel), 1 /* TEXT */)
             ])
-          ], 32 /* HYDRATE_EVENTS */))
+          ], 32 /* NEED_HYDRATION */))
         : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
       ($options.isPlaceholderVisible)
-        ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("span", {
+        ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("span", {
             key: 2,
             class: "multiselect__placeholder",
             onMousedown: _cache[11] || (_cache[11] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])((...args) => (_ctx.toggle && _ctx.toggle(...args)), ["prevent"]))
@@ -1686,169 +1733,169 @@ function vue_multiselect_esm_render(_ctx, _cache, $props, $setup, $data, $option
             Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "placeholder", {}, () => [
               Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.placeholder), 1 /* TEXT */)
             ])
-          ], 32 /* HYDRATE_EVENTS */))
+          ], 32 /* NEED_HYDRATION */))
         : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true)
     ], 512 /* NEED_PATCH */),
-    Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Transition"], { name: "multiselect" }, {
-      default: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withCtx"])(() => [
-        Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("div", {
-          class: "multiselect__content-wrapper",
-          onFocus: _cache[12] || (_cache[12] = (...args) => (_ctx.activate && _ctx.activate(...args))),
-          tabindex: "-1",
-          onMousedown: _cache[13] || (_cache[13] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(() => {}, ["prevent"])),
-          style: { maxHeight: _ctx.optimizedHeight + 'px' },
-          ref: "list"
-        }, [
-          Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("ul", {
-            class: "multiselect__content",
-            style: $options.contentStyle,
-            role: "listbox",
-            id: 'listbox-'+_ctx.id,
-            "aria-multiselectable": _ctx.multiple
-          }, [
-            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "beforeList"),
-            (_ctx.multiple && _ctx.max === _ctx.internalValue.length)
-              ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("li", vue_multiselect_esm_hoisted_4, [
-                  Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("span", vue_multiselect_esm_hoisted_5, [
-                    Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "maxElements", {}, () => [
-                      Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("Maximum of " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.max) + " options selected. First remove a selected option to select another.", 1 /* TEXT */)
+    (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Teleport"], {
+      to: "body",
+      disabled: !$props.useTeleport
+    }, [
+      Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Transition"], { name: "multiselect" }, {
+        default: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withCtx"])(() => [
+          (_ctx.isOpen && $data.ready)
+            ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", {
+                key: 0,
+                class: "multiselect__content-wrapper",
+                onFocus: _cache[12] || (_cache[12] = (...args) => (_ctx.activate && _ctx.activate(...args))),
+                tabindex: "-1",
+                onMousedown: _cache[13] || (_cache[13] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(() => {}, ["prevent"])),
+                style: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeStyle"])([$data.dropdownStyles, { maxHeight: _ctx.optimizedHeight + 'px' }]),
+                ref: "list"
+              }, [
+                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("ul", {
+                  class: "multiselect__content",
+                  style: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeStyle"])($options.contentStyle),
+                  role: "listbox",
+                  id: 'listbox-'+_ctx.id,
+                  "aria-multiselectable": _ctx.multiple
+                }, [
+                  Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "beforeList"),
+                  (_ctx.multiple && _ctx.max === _ctx.internalValue.length)
+                    ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("li", vue_multiselect_esm_hoisted_10, [
+                        Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", vue_multiselect_esm_hoisted_11, [
+                          Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "maxElements", {}, () => [
+                            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("Maximum of " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.max) + " options selected. First remove a selected option to select another.", 1 /* TEXT */)
+                          ])
+                        ])
+                      ]))
+                    : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
+                  (!_ctx.max || _ctx.internalValue.length < _ctx.max)
+                    ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], { key: 1 }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.filteredOptions, (option, index) => {
+                        return (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("li", {
+                          class: "multiselect__element",
+                          key: index,
+                          "aria-selected": _ctx.isSelected(option),
+                          id: _ctx.id + '-' + index,
+                          role: !(option && (option.$isLabel || option.$isDisabled)) ? 'option' : null
+                        }, [
+                          (!(option && (option.$isLabel || option.$isDisabled)))
+                            ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("span", {
+                                key: 0,
+                                class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])([_ctx.optionHighlight(index, option), "multiselect__option"]),
+                                onClick: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.select(option)), ["stop"]),
+                                onMouseenter: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.pointerSet(index)), ["self"]),
+                                "data-select": option && option.isTag ? _ctx.tagPlaceholder : $options.selectLabelText,
+                                "data-selected": $options.selectedLabelText,
+                                "data-deselect": $options.deselectLabelText
+                              }, [
+                                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "option", {
+                                  option: option,
+                                  search: _ctx.search,
+                                  index: index
+                                }, () => [
+                                  Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.getOptionLabel(option)), 1 /* TEXT */)
+                                ])
+                              ], 42 /* CLASS, PROPS, NEED_HYDRATION */, vue_multiselect_esm_hoisted_13))
+                            : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
+                          (option && (option.$isLabel || option.$isDisabled))
+                            ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("span", {
+                                key: 1,
+                                "data-select": _ctx.groupSelect && $options.selectGroupLabelText,
+                                "data-deselect": _ctx.groupSelect && $options.deselectGroupLabelText,
+                                class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])([_ctx.groupHighlight(index, option), "multiselect__option"]),
+                                onMouseenter: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.groupSelect && _ctx.pointerSet(index)), ["self"]),
+                                onMousedown: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.selectGroup(option)), ["prevent"])
+                              }, [
+                                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "option", {
+                                  option: option,
+                                  search: _ctx.search,
+                                  index: index
+                                }, () => [
+                                  Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.getOptionLabel(option)), 1 /* TEXT */)
+                                ])
+                              ], 42 /* CLASS, PROPS, NEED_HYDRATION */, _hoisted_14))
+                            : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true)
+                        ], 8 /* PROPS */, vue_multiselect_esm_hoisted_12))
+                      }), 128 /* KEYED_FRAGMENT */))
+                    : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
+                  Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("li", null, [
+                    Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", _hoisted_15, [
+                      Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "noResult", { search: _ctx.search }, () => [
+                        _cache[20] || (_cache[20] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("No elements found. Consider changing the search query."))
+                      ])
                     ])
-                  ])
-                ]))
-              : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
-            (!_ctx.max || _ctx.internalValue.length < _ctx.max)
-              ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], { key: 1 }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.filteredOptions, (option, index) => {
-                  return (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("li", {
-                    class: "multiselect__element",
-                    key: index,
-                    "aria-selected": _ctx.isSelected(option),
-                    id: _ctx.id + '-' + index,
-                    role: !(option && (option.$isLabel || option.$isDisabled)) ? 'option' : null
-                  }, [
-                    (!(option && (option.$isLabel || option.$isDisabled)))
-                      ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("span", {
-                          key: 0,
-                          class: [_ctx.optionHighlight(index, option), "multiselect__option"],
-                          onClick: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.select(option)), ["stop"]),
-                          onMouseenter: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.pointerSet(index)), ["self"]),
-                          "data-select": option && option.isTag ? _ctx.tagPlaceholder : $options.selectLabelText,
-                          "data-selected": $options.selectedLabelText,
-                          "data-deselect": $options.deselectLabelText
-                        }, [
-                          Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "option", {
-                            option: option,
-                            search: _ctx.search,
-                            index: index
-                          }, () => [
-                            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("span", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.getOptionLabel(option)), 1 /* TEXT */)
-                          ])
-                        ], 42 /* CLASS, PROPS, HYDRATE_EVENTS */, ["onClick", "onMouseenter", "data-select", "data-selected", "data-deselect"]))
-                      : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
-                    (option && (option.$isLabel || option.$isDisabled))
-                      ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("span", {
-                          key: 1,
-                          "data-select": _ctx.groupSelect && $options.selectGroupLabelText,
-                          "data-deselect": _ctx.groupSelect && $options.deselectGroupLabelText,
-                          class: [_ctx.groupHighlight(index, option), "multiselect__option"],
-                          onMouseenter: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.groupSelect && _ctx.pointerSet(index)), ["self"]),
-                          onMousedown: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])($event => (_ctx.selectGroup(option)), ["prevent"])
-                        }, [
-                          Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "option", {
-                            option: option,
-                            search: _ctx.search,
-                            index: index
-                          }, () => [
-                            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("span", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.getOptionLabel(option)), 1 /* TEXT */)
-                          ])
-                        ], 42 /* CLASS, PROPS, HYDRATE_EVENTS */, ["data-select", "data-deselect", "onMouseenter", "onMousedown"]))
-                      : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true)
-                  ], 8 /* PROPS */, ["aria-selected", "id", "role"]))
-                }), 128 /* KEYED_FRAGMENT */))
-              : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true),
-            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("li", null, [
-              Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("span", vue_multiselect_esm_hoisted_6, [
-                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "noResult", { search: _ctx.search }, () => [
-                  vue_multiselect_esm_hoisted_7
-                ])
-              ])
-            ], 512 /* NEED_PATCH */), [
-              [external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], $props.showNoResults && (_ctx.filteredOptions.length === 0 && _ctx.search && !$props.loading)]
-            ]),
-            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("li", null, [
-              Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])("span", vue_multiselect_esm_hoisted_8, [
-                Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "noOptions", {}, () => [
-                  vue_multiselect_esm_hoisted_9
-                ])
-              ])
-            ], 512 /* NEED_PATCH */), [
-              [external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], $props.showNoOptions && ((_ctx.options.length === 0 || ($options.hasOptionGroup === true && _ctx.filteredOptions.length === 0)) && !_ctx.search && !$props.loading)]
-            ]),
-            Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "afterList")
-          ], 12 /* STYLE, PROPS */, ["id", "aria-multiselectable"])
-        ], 36 /* STYLE, HYDRATE_EVENTS */), [
-          [external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], _ctx.isOpen]
-        ])
-      ]),
-      _: 3 /* FORWARDED */
-    })
-  ], 42 /* CLASS, PROPS, HYDRATE_EVENTS */, ["tabindex", "aria-owns"]))
+                  ], 512 /* NEED_PATCH */), [
+                    [external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], $props.showNoResults && (_ctx.filteredOptions.length === 0 && _ctx.search && !$props.loading)]
+                  ]),
+                  Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("li", null, [
+                    Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", _hoisted_16, [
+                      Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "noOptions", {}, () => [
+                        _cache[21] || (_cache[21] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])("List is empty."))
+                      ])
+                    ])
+                  ], 512 /* NEED_PATCH */), [
+                    [external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], $props.showNoOptions && ((_ctx.options.length === 0 || ($options.hasOptionGroup === true && _ctx.filteredOptions.length === 0)) && !_ctx.search && !$props.loading)]
+                  ]),
+                  Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderSlot"])(_ctx.$slots, "afterList")
+                ], 12 /* STYLE, PROPS */, vue_multiselect_esm_hoisted_9)
+              ], 36 /* STYLE, NEED_HYDRATION */))
+            : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("v-if", true)
+        ]),
+        _: 3 /* FORWARDED */
+      })
+    ], 8 /* PROPS */, ["disabled"]))
+  ], 42 /* CLASS, PROPS, NEED_HYDRATION */, vue_multiselect_esm_hoisted_1))
 }
 
 script.render = vue_multiselect_esm_render;
 
-/* harmony default export */ var vue_multiselect_esm = (script);
 
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/CreateGroup.vue?vue&type=template&id=015eb2af
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--13-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/CreateGroup.vue?vue&type=template&id=1b52b64a
 
-var CreateGroupvue_type_template_id_015eb2af_hoisted_1 = {
+const CreateGroupvue_type_template_id_1b52b64a_hoisted_1 = {
   class: "card"
 };
-var CreateGroupvue_type_template_id_015eb2af_hoisted_2 = {
+const CreateGroupvue_type_template_id_1b52b64a_hoisted_2 = {
   class: "card-content",
   style: {
     "width": "600px"
   }
 };
-var CreateGroupvue_type_template_id_015eb2af_hoisted_3 = ["value"];
-var CreateGroupvue_type_template_id_015eb2af_hoisted_4 = {
+const CreateGroupvue_type_template_id_1b52b64a_hoisted_3 = ["value"];
+const CreateGroupvue_type_template_id_1b52b64a_hoisted_4 = {
   id: "ajaxErrorCreateGroup",
   ref: "errorContainer"
 };
-function CreateGroupvue_type_template_id_015eb2af_render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
-
-  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", CreateGroupvue_type_template_id_015eb2af_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", CreateGroupvue_type_template_id_015eb2af_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_CreateNewGroup')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+function CreateGroupvue_type_template_id_1b52b64a_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
+  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", CreateGroupvue_type_template_id_1b52b64a_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", CreateGroupvue_type_template_id_1b52b64a_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_CreateNewGroup')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     type: "text",
-    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-      return _ctx.groupName = $event;
-    })
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => _ctx.groupName = $event)
   }, null, 512), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vModelText"], _ctx.groupName]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     type: "button",
     value: _ctx.translate('GroupPermissions_CreateNewGroupButton'),
     style: {
       "padding": "8px"
     },
-    onClick: _cache[1] || (_cache[1] = function ($event) {
-      return _ctx.createGroup(_ctx.groupName);
-    })
-  }, null, 8, CreateGroupvue_type_template_id_015eb2af_hoisted_3)]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", CreateGroupvue_type_template_id_015eb2af_hoisted_4, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
+    onClick: _cache[1] || (_cache[1] = $event => _ctx.createGroup(_ctx.groupName))
+  }, null, 8, CreateGroupvue_type_template_id_1b52b64a_hoisted_3)]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", CreateGroupvue_type_template_id_1b52b64a_hoisted_4, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
     loading: _ctx.isCreatingGroup,
     style: {
       "padding-top": "10px"
     }
   }, null, 8, ["loading"])])])]);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/CreateGroup.vue?vue&type=template&id=015eb2af
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/CreateGroup.vue?vue&type=template&id=1b52b64a
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/CreateGroup.vue?vue&type=script&lang=ts
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--15-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--15-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/CreateGroup.vue?vue&type=script&lang=ts
 
 
 /* harmony default export */ var CreateGroupvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
     ActivityIndicator: external_CoreHome_["ActivityIndicator"]
   },
-  data: function data() {
+  data() {
     return {
       groupName: '',
       isCreatingGroup: false
@@ -1856,22 +1903,21 @@ function CreateGroupvue_type_template_id_015eb2af_render(_ctx, _cache, $props, $
   },
   emits: ['group-created'],
   methods: {
-    createGroup: function createGroup(groupName) {
-      var _this = this;
-
+    createGroup(groupName) {
       this.isCreatingGroup = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
         format: 'json',
         method: 'GroupPermissions.createGroup'
       }, {
-        groupName: groupName
+        groupName
       }, {
         errorElement: '#ajaxErrorCreateGroup'
-      }).then(function (response) {
-        _this.$emit('group-created', response);
-      }).finally(function () {
-        _this.isCreatingGroup = false;
+      }).then(response => {
+        this.$emit('group-created', response);
+        this.groupName = '';
+      }).finally(() => {
+        this.isCreatingGroup = false;
       });
     }
   }
@@ -1882,66 +1928,58 @@ function CreateGroupvue_type_template_id_015eb2af_render(_ctx, _cache, $props, $
 
 
 
-CreateGroupvue_type_script_lang_ts.render = CreateGroupvue_type_template_id_015eb2af_render
+CreateGroupvue_type_script_lang_ts.render = CreateGroupvue_type_template_id_1b52b64a_render
 
 /* harmony default export */ var CreateGroup = (CreateGroupvue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroup.vue?vue&type=template&id=40328eec
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--13-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroup.vue?vue&type=template&id=40328eec
 
-var ManageGroupvue_type_template_id_40328eec_hoisted_1 = {
+const ManageGroupvue_type_template_id_40328eec_hoisted_1 = {
   style: {
     "margin-top": "70px"
   }
 };
-var ManageGroupvue_type_template_id_40328eec_hoisted_2 = ["value"];
-var ManageGroupvue_type_template_id_40328eec_hoisted_3 = {
+const ManageGroupvue_type_template_id_40328eec_hoisted_2 = ["value"];
+const ManageGroupvue_type_template_id_40328eec_hoisted_3 = {
   class: "ui-confirm",
   id: "confirmRenameGroup"
 };
-var ManageGroupvue_type_template_id_40328eec_hoisted_4 = ["value"];
-var ManageGroupvue_type_template_id_40328eec_hoisted_5 = ["value"];
-var ManageGroupvue_type_template_id_40328eec_hoisted_6 = {
+const ManageGroupvue_type_template_id_40328eec_hoisted_4 = ["value"];
+const ManageGroupvue_type_template_id_40328eec_hoisted_5 = ["value"];
+const ManageGroupvue_type_template_id_40328eec_hoisted_6 = {
   id: "ajaxErrorRenameGroup",
   ref: "errorContainer"
 };
-var ManageGroupvue_type_template_id_40328eec_hoisted_7 = {
+const ManageGroupvue_type_template_id_40328eec_hoisted_7 = {
   style: {
     "margin-top": "70px"
   }
 };
-var ManageGroupvue_type_template_id_40328eec_hoisted_8 = ["value"];
-var ManageGroupvue_type_template_id_40328eec_hoisted_9 = {
+const ManageGroupvue_type_template_id_40328eec_hoisted_8 = ["value"];
+const ManageGroupvue_type_template_id_40328eec_hoisted_9 = {
   class: "ui-confirm",
   id: "confirmDeleteGroup"
 };
-var ManageGroupvue_type_template_id_40328eec_hoisted_10 = ["value"];
-var ManageGroupvue_type_template_id_40328eec_hoisted_11 = ["value"];
-var ManageGroupvue_type_template_id_40328eec_hoisted_12 = {
+const ManageGroupvue_type_template_id_40328eec_hoisted_10 = ["value"];
+const ManageGroupvue_type_template_id_40328eec_hoisted_11 = ["value"];
+const ManageGroupvue_type_template_id_40328eec_hoisted_12 = {
   id: "ajaxErrorDeleteGroup",
   ref: "errorContainer"
 };
 function ManageGroupvue_type_template_id_40328eec_render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _this = this;
-
-  var _component_ManageGroupMembers = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ManageGroupMembers");
-
-  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
-
+  const _component_ManageGroupMembers = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ManageGroupMembers");
+  const _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
   return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ManageGroupMembers, {
     group: _ctx.group
   }, null, 8, ["group"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupvue_type_template_id_40328eec_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_RenameGroup')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     type: "text",
-    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-      return _this.newGroupName = $event;
-    })
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => this.newGroupName = $event)
   }, null, 512), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vModelText"], this.newGroupName]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     type: "button",
     value: _ctx.translate('GroupPermissions_RenameGroupButton'),
     style: {
       "padding": "8px"
     },
-    onClick: _cache[1] || (_cache[1] = function ($event) {
-      return _ctx.confirmRenameGroup();
-    })
+    onClick: _cache[1] || (_cache[1] = $event => _ctx.confirmRenameGroup())
   }, null, 8, ManageGroupvue_type_template_id_40328eec_hoisted_2)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupvue_type_template_id_40328eec_hoisted_3, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmRenameGroupText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "yes",
     type: "button",
@@ -1961,9 +1999,7 @@ function ManageGroupvue_type_template_id_40328eec_render(_ctx, _cache, $props, $
     style: {
       "padding": "8px"
     },
-    onClick: _cache[2] || (_cache[2] = function ($event) {
-      return _ctx.confirmDeleteGroup();
-    })
+    onClick: _cache[2] || (_cache[2] = $event => _ctx.confirmDeleteGroup())
   }, null, 8, ManageGroupvue_type_template_id_40328eec_hoisted_8)]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupvue_type_template_id_40328eec_hoisted_9, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmDeleteGroupText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "yes",
     type: "button",
@@ -1981,127 +2017,117 @@ function ManageGroupvue_type_template_id_40328eec_render(_ctx, _cache, $props, $
 }
 // CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroup.vue?vue&type=template&id=40328eec
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroupMembers.vue?vue&type=template&id=58ae5440
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--13-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroupMembers.vue?vue&type=template&id=f47bbfe4
 
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_1 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_1 = {
   class: "entityContainer",
   style: {
     "width": "600px",
     "margin-top": "16px"
   }
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_2 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_2 = {
   class: "entityTable dataTable",
   style: {
     "display": "inline-table",
     "width": "550px"
   }
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_3 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_3 = {
   class: "login"
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_4 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_4 = {
   class: "text-center"
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_5 = ["onClick", "title"];
-
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_6 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_5 = ["onClick", "title"];
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_6 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
   class: "icon-delete"
 }, null, -1);
-
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_7 = [ManageGroupMembersvue_type_template_id_58ae5440_hoisted_6];
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_8 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_7 = [ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_6];
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_8 = {
   id: "ajaxErrorLoadMembers",
   ref: "errorContainer"
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_9 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_9 = {
   style: {
     "margin-top": "70px"
   }
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_10 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_10 = {
   class: "groupPermissionsGroupAddMemberWrapper"
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_11 = ["value"];
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_12 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_11 = ["value"];
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_12 = {
   id: "ajaxErrorLoadLogins",
   ref: "errorContainer"
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_13 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_13 = {
   id: "ajaxErrorAddMember",
   ref: "errorContainer"
 };
-var ManageGroupMembersvue_type_template_id_58ae5440_hoisted_14 = {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_14 = {
   class: "ui-confirm",
   id: "confirmRemoveMember",
   ref: "confirmRemoveMember"
 };
-var _hoisted_15 = ["value"];
-var _hoisted_16 = ["value"];
-function ManageGroupMembersvue_type_template_id_58ae5440_render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
-
-  var _component_multiselect = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("multiselect");
-
-  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ManageGroupMembers')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Username')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_RemoveFromGroup')), 1)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tbody", null, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.members, function (login) {
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_15 = ["value"];
+const ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_16 = ["value"];
+function ManageGroupMembersvue_type_template_id_f47bbfe4_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
+  const _component_multiselect = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("multiselect");
+  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ManageGroupMembers')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Username')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_RemoveFromGroup')), 1)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tbody", null, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.members, login => {
     return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", {
       key: login
-    }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_3, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(login), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("button", {
+    }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_3, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(login), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("button", {
       class: "groupPermissionsRemoveMember btn btn-flat",
-      onClick: function onClick($event) {
-        return _ctx.confirmRemoveMember(login);
-      },
+      onClick: $event => _ctx.confirmRemoveMember(login),
       title: _ctx.translate('GroupPermissions_RemoveFromGroup')
-    }, ManageGroupMembersvue_type_template_id_58ae5440_hoisted_7, 8, ManageGroupMembersvue_type_template_id_58ae5440_hoisted_5)])]);
-  }), 128))])])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_8, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
+    }, ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_7, 8, ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_5)])]);
+  }), 128))])])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_8, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
     loading: _ctx.isLoadingMembers,
     style: {
       "padding-top": "10px"
     }
-  }, null, 8, ["loading"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_9, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_AddUserToGroup')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_10, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_multiselect, {
+  }, null, 8, ["loading"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_9, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_AddUserToGroup')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_10, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_multiselect, {
     options: _ctx.logins,
     placeholder: _ctx.translate('GroupPermissions_SelectNewUser'),
     modelValue: _ctx.selectedLoginToAdd,
-    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-      return _ctx.selectedLoginToAdd = $event;
-    })
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => _ctx.selectedLoginToAdd = $event)
   }, null, 8, ["options", "placeholder", "modelValue"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     type: "button",
-    onClick: _cache[1] || (_cache[1] = function ($event) {
-      return _ctx.addMember();
-    }),
+    onClick: _cache[1] || (_cache[1] = $event => _ctx.addMember()),
     value: _ctx.translate('GroupPermissions_AddUserToGroupButton'),
     style: {
       "padding": "8px",
       "margin-top": "8px"
     }
-  }, null, 8, ManageGroupMembersvue_type_template_id_58ae5440_hoisted_11)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_12, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_13, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
+  }, null, 8, ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_11)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_12, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_13, null, 512), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
     loading: _ctx.isLoadingLogins || _ctx.isAddingMember,
     style: {
       "padding-top": "10px"
     }
-  }, null, 8, ["loading"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_58ae5440_hoisted_14, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmRemoveMemberText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+  }, null, 8, ["loading"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_14, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmRemoveMemberText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "yes",
     type: "button",
     value: _ctx.translate('General_Yes')
-  }, null, 8, _hoisted_15), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+  }, null, 8, ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_15), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "no",
     type: "button",
     value: _ctx.translate('General_No')
-  }, null, 8, _hoisted_16)], 512)], 64);
+  }, null, 8, ManageGroupMembersvue_type_template_id_f47bbfe4_hoisted_16)], 512)], 64);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroupMembers.vue?vue&type=template&id=58ae5440
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroupMembers.vue?vue&type=template&id=f47bbfe4
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroupMembers.vue?vue&type=script&lang=ts
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--15-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--15-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroupMembers.vue?vue&type=script&lang=ts
 
 
 
 /* harmony default export */ var ManageGroupMembersvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
     ActivityIndicator: external_CoreHome_["ActivityIndicator"],
-    Multiselect: vue_multiselect_esm
+    Multiselect: script
   },
-  data: function data() {
+  data() {
     return {
       members: [],
       logins: [],
@@ -2119,37 +2145,33 @@ function ManageGroupMembersvue_type_template_id_58ae5440_render(_ctx, _cache, $p
       required: true
     }
   },
-  mounted: function mounted() {
+  mounted() {
     this.loadGroupMembers();
     this.loadLogins();
   },
   methods: {
-    loadGroupMembers: function loadGroupMembers() {
-      var _this = this;
-
+    loadGroupMembers() {
       this.isLoadingMembers = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
         format: 'json',
         method: 'GroupPermissions.getMembersOfGroup'
       }, {
-        idGroup: this.group.idGroup
+        idGroup: this.group.idGroup,
+        filter_limit: -1
       }, {
         errorElement: '#ajaxErrorLoadMembers'
-      }).then(function (response) {
-        _this.members = response.reduce(function (acc, member) {
+      }).then(response => {
+        this.members = response.reduce((acc, member) => {
           acc.push(member.login);
           return acc;
         }, []);
-
-        _this.members.sort();
-      }).finally(function () {
-        _this.isLoadingMembers = false;
+        this.members.sort();
+      }).finally(() => {
+        this.isLoadingMembers = false;
       });
     },
-    loadLogins: function loadLogins() {
-      var _this2 = this;
-
+    loadLogins() {
       this.isLoadingLogins = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
@@ -2159,19 +2181,16 @@ function ManageGroupMembersvue_type_template_id_58ae5440_render(_ctx, _cache, $p
         filter_limit: -1
       }, {
         errorElement: '#ajaxErrorLoadLogins'
-      }).then(function (response) {
-        _this2.logins = response;
-
-        _this2.logins.sort();
-      }).finally(function () {
-        _this2.isLoadingLogins = false;
+      }).then(response => {
+        this.logins = response;
+        this.logins.sort();
+      }).finally(() => {
+        this.isLoadingLogins = false;
       });
     },
-    addMember: function addMember() {
-      var _this3 = this;
-
+    addMember() {
       this.isAddingMember = true;
-      var loginToAdd = this.selectedLoginToAdd;
+      const loginToAdd = this.selectedLoginToAdd;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
         format: 'json',
@@ -2181,27 +2200,21 @@ function ManageGroupMembersvue_type_template_id_58ae5440_render(_ctx, _cache, $p
         login: loginToAdd
       }, {
         errorElement: '#ajaxErrorAddMember'
-      }).then(function () {
-        _this3.members.push(loginToAdd);
-
-        _this3.members.sort();
-      }).finally(function () {
-        _this3.isAddingMember = false;
+      }).then(() => {
+        this.members.push(loginToAdd);
+        this.members.sort();
+        this.selectedLoginToAdd = '';
+      }).finally(() => {
+        this.isAddingMember = false;
       });
     },
-    confirmRemoveMember: function confirmRemoveMember(member) {
-      var _this4 = this;
-
+    confirmRemoveMember(member) {
       this.confirmRemoveMemberText = Object(external_CoreHome_["translate"])('GroupPermissions_RemoveFromGroupConfirm', member, this.group.name);
       external_CoreHome_["Matomo"].helper.modalConfirm('#confirmRemoveMember', {
-        yes: function yes() {
-          return _this4.removeMember(member);
-        }
+        yes: () => this.removeMember(member)
       });
     },
-    removeMember: function removeMember(member) {
-      var _this5 = this;
-
+    removeMember(member) {
       this.isRemovingMember = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
@@ -2212,17 +2225,15 @@ function ManageGroupMembersvue_type_template_id_58ae5440_render(_ctx, _cache, $p
         login: member
       }, {
         errorElement: '#ajaxErrorManageGroupMembers'
-      }).then(function () {
-        _this5.members = _this5.members.filter(function (login) {
-          return login !== member;
-        });
-      }).finally(function () {
-        _this5.isRemovingMember = false;
+      }).then(() => {
+        this.members = this.members.filter(login => login !== member);
+      }).finally(() => {
+        this.isRemovingMember = false;
       });
     }
   },
   watch: {
-    group: function group() {
+    group() {
       this.loadGroupMembers();
     }
   }
@@ -2233,10 +2244,10 @@ function ManageGroupMembersvue_type_template_id_58ae5440_render(_ctx, _cache, $p
 
 
 
-ManageGroupMembersvue_type_script_lang_ts.render = ManageGroupMembersvue_type_template_id_58ae5440_render
+ManageGroupMembersvue_type_script_lang_ts.render = ManageGroupMembersvue_type_template_id_f47bbfe4_render
 
 /* harmony default export */ var ManageGroupMembers = (ManageGroupMembersvue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroup.vue?vue&type=script&lang=ts
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--15-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--15-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/ManageGroup.vue?vue&type=script&lang=ts
 
 
 
@@ -2245,7 +2256,7 @@ ManageGroupMembersvue_type_script_lang_ts.render = ManageGroupMembersvue_type_te
     ActivityIndicator: external_CoreHome_["ActivityIndicator"],
     ManageGroupMembers: ManageGroupMembers
   },
-  data: function data() {
+  data() {
     return {
       newGroupName: '',
       confirmRenameGroupText: '',
@@ -2261,29 +2272,23 @@ ManageGroupMembersvue_type_script_lang_ts.render = ManageGroupMembersvue_type_te
     }
   },
   emits: ['group-renamed', 'group-deleted'],
-  mounted: function mounted() {
+  mounted() {
     this.onGroupUpdated();
   },
   methods: {
-    onGroupUpdated: function onGroupUpdated() {
+    onGroupUpdated() {
       this.newGroupName = this.group.name;
       external_CoreHome_["MatomoUrl"].updateHash(Object.assign(Object.assign({}, external_CoreHome_["MatomoUrl"].hashParsed.value), {}, {
         idGroup: this.group.idGroup
       }));
     },
-    confirmRenameGroup: function confirmRenameGroup() {
-      var _this = this;
-
+    confirmRenameGroup() {
       this.confirmRenameGroupText = Object(external_CoreHome_["translate"])('GroupPermissions_RenameGroupConfirm', this.group.name, this.newGroupName);
       external_CoreHome_["Matomo"].helper.modalConfirm('#confirmRenameGroup', {
-        yes: function yes() {
-          return _this.renameGroup();
-        }
+        yes: () => this.renameGroup()
       });
     },
-    renameGroup: function renameGroup() {
-      var _this2 = this;
-
+    renameGroup() {
       this.isRenaming = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
@@ -2294,28 +2299,22 @@ ManageGroupMembersvue_type_script_lang_ts.render = ManageGroupMembersvue_type_te
         newName: this.newGroupName
       }, {
         errorElement: '#ajaxErrorRenameGroup'
-      }).then(function () {
-        _this2.$emit('group-renamed', {
-          idGroup: _this2.group.idGroup,
-          name: _this2.newGroupName
+      }).then(() => {
+        this.$emit('group-renamed', {
+          idGroup: this.group.idGroup,
+          name: this.newGroupName
         });
-      }).finally(function () {
-        _this2.isRenaming = false;
+      }).finally(() => {
+        this.isRenaming = false;
       });
     },
-    confirmDeleteGroup: function confirmDeleteGroup() {
-      var _this3 = this;
-
+    confirmDeleteGroup() {
       this.confirmDeleteGroupText = Object(external_CoreHome_["translate"])('GroupPermissions_DeleteGroupConfirm', this.group.name);
       external_CoreHome_["Matomo"].helper.modalConfirm('#confirmDeleteGroup', {
-        yes: function yes() {
-          return _this3.deleteGroup();
-        }
+        yes: () => this.deleteGroup()
       });
     },
-    deleteGroup: function deleteGroup() {
-      var _this4 = this;
-
+    deleteGroup() {
       this.isDeleting = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
@@ -2325,15 +2324,15 @@ ManageGroupMembersvue_type_script_lang_ts.render = ManageGroupMembersvue_type_te
         idGroup: this.group.idGroup
       }, {
         errorElement: '#ajaxErrorDeleteGroup'
-      }).then(function () {
-        _this4.$emit('group-deleted', _this4.group);
-      }).finally(function () {
-        _this4.isDeleting = false;
+      }).then(() => {
+        this.$emit('group-deleted', this.group);
+      }).finally(() => {
+        this.isDeleting = false;
       });
     }
   },
   watch: {
-    group: function group() {
+    group() {
       this.onGroupUpdated();
     }
   }
@@ -2347,7 +2346,7 @@ ManageGroupMembersvue_type_script_lang_ts.render = ManageGroupMembersvue_type_te
 ManageGroupvue_type_script_lang_ts.render = ManageGroupvue_type_template_id_40328eec_render
 
 /* harmony default export */ var ManageGroup = (ManageGroupvue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=script&lang=ts
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--15-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--15-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--1-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--1-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=script&lang=ts
 
 
 
@@ -2356,11 +2355,11 @@ ManageGroupvue_type_script_lang_ts.render = ManageGroupvue_type_template_id_4032
 /* harmony default export */ var TabManageGroupsvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
     ActivityIndicator: external_CoreHome_["ActivityIndicator"],
-    Multiselect: vue_multiselect_esm,
+    Multiselect: script,
     CreateGroup: CreateGroup,
     ManageGroup: ManageGroup
   },
-  data: function data() {
+  data() {
     return {
       groups: [],
       selectedGroup: undefined,
@@ -2368,75 +2367,68 @@ ManageGroupvue_type_script_lang_ts.render = ManageGroupvue_type_template_id_4032
       isLoadingDefaultGroup: false
     };
   },
-  mounted: function mounted() {
+  mounted() {
     this.loadGroupList();
-    this.loadDefaultGroup();
   },
   methods: {
-    loadGroupList: function loadGroupList() {
-      var _this = this;
-
+    loadGroupList() {
       this.isLoadingGroups = true;
       external_CoreHome_["AjaxHelper"].post({
         module: 'API',
         format: 'json',
         method: 'GroupPermissions.getAllGroups'
-      }, {}, {
+      }, {
+        filter_limit: -1
+      }, {
         errorElement: '#ajaxErrorManageGroups'
-      }).then(function (response) {
-        _this.groups = response;
-      }).finally(function () {
-        _this.isLoadingGroups = false;
+      }).then(response => {
+        this.groups = response;
+      }).finally(() => {
+        this.isLoadingGroups = false;
+        this.loadDefaultGroup();
       });
     },
-    loadDefaultGroup: function loadDefaultGroup() {
-      var _this2 = this;
-
-      this.isLoadingDefaultGroup = true;
-      var idGroup = external_CoreHome_["MatomoUrl"].getSearchParam('idGroup');
-
+    loadDefaultGroup() {
+      const idGroup = external_CoreHome_["MatomoUrl"].getSearchParam('idGroup');
       if (idGroup) {
+        this.isLoadingDefaultGroup = true;
         external_CoreHome_["AjaxHelper"].post({
           module: 'API',
           format: 'json',
           method: 'GroupPermissions.getGroupWithId'
         }, {
-          idGroup: idGroup
+          idGroup
         }, {
           errorElement: '#ajaxErrorManageGroups'
-        }).then(function (response) {
-          _this2.selectedGroup = {
+        }).then(response => {
+          this.selectedGroup = {
             idGroup: response.idGroup,
             name: response.name
           };
-        }).finally(function () {
-          _this2.isLoadingDefaultGroup = false;
+        }).finally(() => {
+          this.isLoadingDefaultGroup = false;
         });
+      } else if (this.groups.length > 0) {
+        [this.selectedGroup] = this.groups;
       }
     },
-    onGroupCreated: function onGroupCreated(group) {
+    onGroupCreated(group) {
       this.groups.push(group);
       this.sortGroups();
       this.selectedGroup = group;
     },
-    onGroupRenamed: function onGroupRenamed(group) {
-      var groupIndex = this.groups.findIndex(function (g) {
-        return g.idGroup === group.idGroup;
-      });
+    onGroupRenamed(group) {
+      const groupIndex = this.groups.findIndex(g => g.idGroup === group.idGroup);
       this.groups[groupIndex].name = group.name;
       this.sortGroups();
       this.selectedGroup = group;
     },
-    onGroupDeleted: function onGroupDeleted(group) {
-      this.groups = this.groups.filter(function (g) {
-        return g.idGroup !== group.idGroup;
-      });
+    onGroupDeleted(group) {
+      this.groups = this.groups.filter(g => g.idGroup !== group.idGroup);
       this.selectedGroup = this.groups.length > 0 ? this.groups[0] : undefined;
     },
-    sortGroups: function sortGroups() {
-      this.groups.sort(function (a, b) {
-        return a.name.localeCompare(b.name);
-      });
+    sortGroups() {
+      this.groups.sort((a, b) => a.name.localeCompare(b.name));
     }
   }
 }));
@@ -2446,7 +2438,7 @@ ManageGroupvue_type_script_lang_ts.render = ManageGroupvue_type_template_id_4032
 
 
 
-TabManageGroupsvue_type_script_lang_ts.render = TabManageGroupsvue_type_template_id_dbd59572_render
+TabManageGroupsvue_type_script_lang_ts.render = TabManageGroupsvue_type_template_id_409769a8_render
 
 /* harmony default export */ var TabManageGroups = (TabManageGroupsvue_type_script_lang_ts);
 // CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/index.ts

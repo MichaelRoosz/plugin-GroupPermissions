@@ -65,7 +65,6 @@ export default defineComponent({
   },
   mounted() {
     this.loadGroupList();
-    this.loadDefaultGroup();
   },
   methods: {
     loadGroupList() {
@@ -76,6 +75,7 @@ export default defineComponent({
         format: 'json',
         method: 'GroupPermissions.getAllGroups',
       }, {
+        filter_limit: -1,
       },
       {
         errorElement: '#ajaxErrorManageGroups',
@@ -83,13 +83,15 @@ export default defineComponent({
         this.groups = response;
       }).finally(() => {
         this.isLoadingGroups = false;
+        this.loadDefaultGroup();
       });
     },
     loadDefaultGroup() {
-      this.isLoadingDefaultGroup = true;
-
       const idGroup = MatomoUrl.getSearchParam('idGroup');
+
       if (idGroup) {
+        this.isLoadingDefaultGroup = true;
+
         AjaxHelper.post({
           module: 'API',
           format: 'json',
@@ -107,6 +109,8 @@ export default defineComponent({
         }).finally(() => {
           this.isLoadingDefaultGroup = false;
         });
+      } else if (this.groups.length > 0) {
+        [this.selectedGroup] = this.groups;
       }
     },
     onGroupCreated(group: Group) {

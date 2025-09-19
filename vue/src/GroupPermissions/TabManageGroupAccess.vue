@@ -160,6 +160,7 @@ export default defineComponent({
           format: 'json',
           method: 'GroupPermissions.getAllGroups',
         }, {
+          filter_limit: -1,
         },
         {
           errorElement: '#ajaxErrorAccessGroupMember',
@@ -185,6 +186,7 @@ export default defineComponent({
           method: 'GroupPermissions.getGroupAccessFromSite',
         }, {
           idSite: this.site.id,
+          filter_limit: -1,
         },
         {
           errorElement: '#ajaxErrorAccessGroupMember',
