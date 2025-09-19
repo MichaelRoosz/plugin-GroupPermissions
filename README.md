@@ -1,67 +1,117 @@
-# Matomo-GroupPermissions Plugin
+# Matomo GroupPermissions
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Matomo](https://img.shields.io/badge/Matomo-%E2%89%A55.0-blue)](https://matomo.org)
+[![Issues](https://img.shields.io/github/issues/MichaelRoosz/plugin-GroupPermissions)](https://github.com/MichaelRoosz/plugin-GroupPermissions/issues)
 
 ## Description
 
-This plugin allows to manage user permissions with groups.
+Manage user permissions using groups in Matomo. This plugin adds a dedicated admin screen to manage groups, assign users to groups, and set site access for each group.
+
+## Table of contents
+
+- [Matomo GroupPermissions](#matomo-grouppermissions)
+  - [Description](#description)
+  - [Table of contents](#table-of-contents)
+  - [Features](#features)
+  - [Compatibility](#compatibility)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Navigation](#navigation)
+    - [Manage Access tab](#manage-access-tab)
+    - [Manage Groups tab](#manage-groups-tab)
+  - [Permissions required](#permissions-required)
+  - [API](#api)
+  - [Development](#development)
+  - [Support](#support)
+  - [License](#license)
+
+## Features
+
+- Manage access by groups instead of per-user.
+- Assign users to one or more groups.
+- Grant or revoke site access for entire groups, including applying to all sites you administer.
+- Two clear tabs: Manage Access and Manage Groups.
+
+## Compatibility
+
+- Matomo: >= 5.0.0 (see `plugins/GroupPermissions/plugin.json`)
+- PHP: as required by your Matomo version
 
 ## Installation
 
-Copy it into the plugins folder.
+1. Copy the `GroupPermissions` directory into your Matomo `plugins/` folder so that it is available at `plugins/GroupPermissions`.
+2. Activate the plugin:
+   - Via Matomo UI: Go to Administration → System → Plugins and enable "GroupPermissions".
+   - Or via CLI, from your Matomo root:
+     ```bash
+     php console plugin:activate GroupPermissions
+     php console core:clear-caches
+     ```
 
-## License
+## Usage
 
-GPL v3 or later
+### Navigation
 
+- Go to Administration → System → Group Permissions.
+- The page shows two tabs: "Manage Access" and "Manage Groups".
 
-## Development:
+### Manage Access tab
 
-### Fix needed to compile vue assets
-Replace "if (this.$refs.list?.scrollTop" with "if (this.$refs.list && this.$refs.list.scrollTop"
-in "node_modules/vue-multiselect".
+- Select the target website(s). You can apply changes to a specific site ID or to all sites you administer.
+- For each group, choose one of the available roles for the selected site(s): `view`, `write`, or `admin`.
 
-## Changelog
-### 5.1.1
-  - Update readme file
+### Manage Groups tab
 
-### 5 1.0
-  - Fix Web UI for Matomo 5
+- Create, rename, and delete groups.
+- Add or remove users to/from a group. A user can be in multiple groups.
+- Duplicates are prevented; attempts to add an existing member will show an error.
 
-### 5.0.0
-  - Compatibility with Matomo 5
+## Permissions required
 
-### 4.0.5
-  - Fix js crash
+- Managing group membership (create/rename/delete groups, add/remove users) requires Super User access.
+- Changing site access for groups requires Admin access on the selected site(s).
 
-### 4.0.4
-  - Show all users in "add-to-group" user selection in "Manage groups"
+## API
 
-### 4.0.3
-  - Fix site selection in "Manage access"
-  - Add dropdown for "add-to-group" user selection in "Manage groups"
-  - Fix "Apply to all websites" text
-  - Do not allow multiple groups with the same name
-  - Check if a user is already in a group
+Matomo exposes plugin APIs via HTTP. The following methods are available in `Piwik\Plugins\GroupPermissions\API` and can be called using the `module=API&method=` pattern:
 
-### 4.0.2
-  - Fix config page getting endlessly reloaded on Matomo 4.5.0
+- Get all groups:
+  ```text
+  index.php?module=API&method=GroupPermissions.getAllGroups&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Get members of a group:
+  ```text
+  index.php?module=API&method=GroupPermissions.getMembersOfGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Set group access for site(s):
+  ```text
+  index.php?module=API&method=GroupPermissions.setGroupAccess&name=Marketing&access=view&idSites=all&format=JSON&token_auth=YOUR_TOKEN
+  ```
 
-### 4.0.1
-  - Compatibility with Matomo 4
-  - Fix SQL Exception when updating permissions
+Notes:
+- Use `idSites=all` to apply to all sites you administer, or `idSites=1,2,3` for a list.
+- Valid access roles are those returned by Matomo's role provider (commonly `view`, `write`, `admin`).
 
-### 3.9.1
-  - Fixed "noaccess" check for newer Matomo versions
+## Development
 
-### 3.6.1
-  - Fixed Issue #1 reported by EmTeedee
+- Frontend is built with Vue 3 and `vue-multiselect`.
+- If you build the Vue assets locally and encounter a TypeScript nullish chain issue, apply this temporary workaround in `node_modules/vue-multiselect`:
+  - Replace `if (this.$refs.list?.scrollTop` with `if (this.$refs.list && this.$refs.list.scrollTop`
 
-### 3.6.0
-  - Added support for 'write' access
-  - Compatibility with Matomo 3.6.0
-  
-### 3.0.2
-  - First stable release
+Typical steps:
+```bash
+cd plugins/GroupPermissions
+npm install
+# build steps depend on your environment; compiled assets are committed in vue/dist
+```
+
+Contributions are welcome via pull requests on the repository homepage.
 
 ## Support
 
-Feel free to file an issue at https://github.com/MichaelRoosz/plugin-GroupPermissions/issues .
+- Issues: `https://github.com/MichaelRoosz/plugin-GroupPermissions/issues`
+- Source: `https://github.com/MichaelRoosz/plugin-GroupPermissions`
+
+## License
+GPL v3 or later. See the `LICENSE.txt` file for details.
