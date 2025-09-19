@@ -12,6 +12,13 @@ Copy it into the plugins folder.
 
 GPL v3 or later
 
+
+## Development:
+
+### Fix needed to compile vue assets
+Replace "if (this.$refs.list?.scrollTop" with "if (this.$refs.list && this.$refs.list.scrollTop"
+in "node_modules/vue-multiselect".
+
 ## Changelog
 ### 5.1.1
   - Update readme file

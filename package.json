@@ -6,6 +6,6 @@
   "license": "GPL-v3",
   "dependencies": {
     "vue": "^3.2.6",
-    "vue-multiselect": "^3.1.0"
+    "vue-multiselect": "^3.3.1"
   }
 }
