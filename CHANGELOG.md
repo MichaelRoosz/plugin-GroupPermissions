@@ -1,5 +1,8 @@
 
 # Changelog
+## 5.2.1
+  - Fix plugin version in plugin.json
+
 ## 5.2.0
   - Fix only first 100 groups beging shown, now showing all
   - Fix only first 100 group members beging shown, now showing all

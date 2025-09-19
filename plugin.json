@@ -7,7 +7,7 @@
         "email": "michael.roosz@web.de"
     }],
     "description": "Manage user permissions with groups.",
-    "version": "5.1.1",
+    "version": "5.2.1",
     "theme": false,
     "require": {
         "matomo": ">=5.0.0-b1,<6.0.0-b1"
