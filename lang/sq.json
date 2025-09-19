@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Shtoni te ky grup një anëtar të ri",
         "AddUserToGroupButton": "Shtoni Anëtar",
+        "ChangeAccessToAllSitesConfirm": "Jeni i sigurt se doni t’i jepet “%s” hyrje te grupi '%s' për krejt sajtet?",
         "CreateNewGroup": "Krijoni grup të ri",
         "CreateNewGroupButton": "Krijoni Grup",
         "DeleteGroup": "Fshije këtë grup",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "Jeni i sigurt se doni të hiqet përdoruesi “%1$s” nga grupi “%2$s”?",
         "RenameGroup": "Riemërtojeni këtë grup",
         "RenameGroupButton": "Riemërtoje Grupin",
-        "RenameGroupConfirm": "Jeni i sigurt se doni të riemërtoni grupin “%1$s” si “%2$s”?"
+        "RenameGroupConfirm": "Jeni i sigurt se doni të riemërtoni grupin “%1$s” si “%2$s”?",
+        "SelectNewUser": "Përzgjidhni përdorues të ri"
     }
 }

@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Bu gruba yeni bir üye ekler",
         "AddUserToGroupButton": "Üye ekle",
+        "ChangeAccessToAllSitesConfirm": "Tüm siteler için '%s' iznini '%s' grubuna vermek istediğinize emin misiniz?",
         "CreateNewGroup": "Yeni bir grup ekler",
         "CreateNewGroupButton": "Grup ekle",
         "DeleteGroup": "Bu grubu siler",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "'%1$s' kullanıcısını '%2$s' grubundan silmek istediğinize emin misiniz?",
         "RenameGroup": "Bu grubu yeniden adlandırır",
         "RenameGroupButton": "Grubu yeniden adlandır",
-        "RenameGroupConfirm": "'%1$s' grubunun adını '%2$s' olarak değiştirmek istediğinize emin misiniz?"
+        "RenameGroupConfirm": "'%1$s' grubunun adını '%2$s' olarak değiştirmek istediğinize emin misiniz?",
+        "SelectNewUser": "Yeni bir kullanıcı seçin"
     }
 }

@@ -1,1 +1,30 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Cuir ball nua leis an ngrúpa seo",
+        "AddUserToGroupButton": "Cuir Ball leis",
+        "ChangeAccessToAllSitesConfirm": "An bhfuil tú cinnte gur mhaith leat rochtain a thabhairt do '%s' ar an ngrúpa '%s' do gach suíomh Gréasáin?",
+        "CreateNewGroup": "Cruthaigh grúpa nua",
+        "CreateNewGroupButton": "Cruthaigh Grúpa",
+        "DeleteGroup": "Scrios an grúpa seo",
+        "DeleteGroupButton": "Scrios Grúpa",
+        "DeleteGroupConfirm": "An bhfuil tú cinnte gur mhaith leat an grúpa '%s' a scriosadh?",
+        "DescriptionAccessTab": "Déan cinneadh cé na grúpaí a bhfuil rochtain acu ar do shuímh Ghréasáin. Is féidir leat rochtain a thabhairt freisin ar na láithreáin ghréasáin go léir ag an am céanna trí \"Cuir i bhfeidhm ar gach láithreán Gréasáin\" a roghnú i roghnóir an láithreáin ghréasáin.",
+        "DescriptionGroupsTab": "Anseo is féidir leat breathnú ar na baill de gach grúpa. Féadfaidh sárúsáideoirí na grúpaí a chur in eagar.",
+        "ExceptionGroupDoesExist": "Tá grúpa ann cheana féin",
+        "ExceptionGroupDoesNotExist": "Níl an grúpa ann",
+        "ExceptionUserAlreadyInGroup": "Tá an t-úsáideoir sa ghrúpa cheana féin",
+        "Group": "Grúpa",
+        "GroupPermissions": "Ceadanna Grúpa",
+        "ManageAccess": "Bainistigh Rochtain",
+        "ManageGroup": "Bainistigh grúpa",
+        "ManageGroupMembers": "Bainistigh baill an ghrúpa",
+        "ManageGroups": "Bainistigh Grúpaí",
+        "MenuGroupPermissions": "Ceadanna Grúpa",
+        "RemoveFromGroup": "Bain",
+        "RemoveFromGroupConfirm": "An bhfuil tú cinnte gur mhaith leat úsáideoir '%1$s' a bhaint den ghrúpa '%2$s'?",
+        "RenameGroup": "Athainmnigh an grúpa seo",
+        "RenameGroupButton": "Athainmnigh an Grúpa",
+        "RenameGroupConfirm": "An bhfuil tú cinnte gur mhaith leat an grúpa '%1$s' a athainmniú go '%2$s'?",
+        "SelectNewUser": "Roghnaigh úsáideoir nua"
+    }
+}

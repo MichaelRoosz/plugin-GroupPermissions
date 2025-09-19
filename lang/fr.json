@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Ajouter un nouveau membre au groupe",
         "AddUserToGroupButton": "Ajouter un membre",
+        "ChangeAccessToAllSitesConfirm": "Êtes-vous sûr de vouloir donner à '%s' l'accès au groupe '%s' pour tous les sites web ?",
         "CreateNewGroup": "Créer un nouveau groupe",
         "CreateNewGroupButton": "Créer le groupe",
         "DeleteGroup": "Supprimer ce groupe",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "Êtes-vous sûr(e) de vouloir retirer l'utilisateur « %1$s » du groupe «%2$s » ?",
         "RenameGroup": "Renommer ce groupe",
         "RenameGroupButton": "Renommer le groupe",
-        "RenameGroupConfirm": "Êtes-vous sûr(e) de vouloir renommer le groupe « %1$s » en«%2$s » ?"
+        "RenameGroupConfirm": "Êtes-vous sûr(e) de vouloir renommer le groupe « %1$s » en«%2$s » ?",
+        "SelectNewUser": "Sélectionner un nouveau compte"
     }
 }

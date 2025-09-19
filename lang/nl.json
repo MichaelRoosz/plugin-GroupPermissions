@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Voeg een nieuw lid toe aan deze groep",
         "AddUserToGroupButton": "Lid toevoegen",
+        "ChangeAccessToAllSitesConfirm": "Ben je zeker dat je '%s' toegang wil geven tot de groep '%s' voor alle website?",
         "CreateNewGroup": "Maak een nieuwe groep",
         "CreateNewGroupButton": "Maak groep",
         "DeleteGroup": "Verwijder deze groep",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "Weet u zeker dat u gebruiker '%1$s' wilt verwijderen uit groep '%2$s'?",
         "RenameGroup": "Hernoem deze groep",
         "RenameGroupButton": "Hernoem groep",
-        "RenameGroupConfirm": "Weet u zeker dat u de groep '%1$s' wilt hernoemen naar '%2$s'?"
+        "RenameGroupConfirm": "Weet u zeker dat u de groep '%1$s' wilt hernoemen naar '%2$s'?",
+        "SelectNewUser": "Selecteer een nieuwe gebruiker"
     }
 }

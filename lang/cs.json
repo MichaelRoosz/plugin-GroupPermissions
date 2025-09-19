@@ -1,1 +1,9 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Přidat nového člena do této skupiny",
+        "AddUserToGroupButton": "Přidat člena",
+        "CreateNewGroup": "Vytvořit novou skupinu",
+        "CreateNewGroupButton": "Vytvořit skupinu",
+        "DeleteGroup": "Smazat tuto skupinu"
+    }
+}
