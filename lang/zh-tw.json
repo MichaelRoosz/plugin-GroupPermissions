@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "AddUserToGroup": "添加一個新成員到這個群組",
-        "AddUserToGroupButton": "新增成員"
+        "AddUserToGroupButton": "新增成員",
+        "RemoveFromGroup": "移除"
     }
 }
