@@ -4,6 +4,7 @@
         "AddUserToGroupButton": "Přidat člena",
         "CreateNewGroup": "Vytvořit novou skupinu",
         "CreateNewGroupButton": "Vytvořit skupinu",
-        "DeleteGroup": "Smazat tuto skupinu"
+        "DeleteGroup": "Smazat tuto skupinu",
+        "RemoveFromGroup": "Odstranit"
     }
 }
