@@ -13,6 +13,7 @@
         "ExceptionGroupDoesExist": "Il gruppo esiste già",
         "ExceptionGroupDoesNotExist": "Il gruppo non esiste",
         "ExceptionUserAlreadyInGroup": "L'utente è già nel gruppo",
-        "Group": "Gruppo"
+        "Group": "Gruppo",
+        "RemoveFromGroup": "Rimuovi"
     }
 }
