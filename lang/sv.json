@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Lägg till ny medlem i denna grupp",
         "AddUserToGroupButton": "Lägg till medlem",
+        "ChangeAccessToAllSitesConfirm": "Är du säker på att du vill ge '%s' åtkomst till gruppen '%s' för alla webbplatser?",
         "CreateNewGroup": "Skapa ny grupp",
         "CreateNewGroupButton": "Skapa grupp",
         "DeleteGroup": "Radera denna grupp",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "Är du säker på att du vill ta bort användaren '%1$s' från gruppen '%2$s'?",
         "RenameGroup": "Döp om denna grupp",
         "RenameGroupButton": "Döp om grupp",
-        "RenameGroupConfirm": "Är du säker på att du vill döpa om gruppen '%1$s' till '%2$s'?"
+        "RenameGroupConfirm": "Är du säker på att du vill döpa om gruppen '%1$s' till '%2$s'?",
+        "SelectNewUser": "Välj en ny användare"
     }
 }
