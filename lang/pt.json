@@ -23,6 +23,7 @@
         "RemoveFromGroupConfirm": "Tem certeza de que deseja remover o usuário '%1$s' do grupo '%2$s'?",
         "RenameGroup": "Renomear este grupo",
         "RenameGroupButton": "Renomear Grupo",
-        "RenameGroupConfirm": "Tem certeza de que deseja renomear o grupo '%1$s' para '%2$s'?"
+        "RenameGroupConfirm": "Tem certeza de que deseja renomear o grupo '%1$s' para '%2$s'?",
+        "SelectNewUser": "Selecione um novo usuário"
     }
 }
