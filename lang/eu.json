@@ -23,6 +23,7 @@
         "RemoveFromGroupConfirm": "Ziur zaude '%1$s' erabiltzailea kendu nahi duzula '%2$s' taldetik?",
         "RenameGroup": "Berrizendatu talde hau",
         "RenameGroupButton": "Berrizendatu taldea",
-        "RenameGroupConfirm": "Ziur zaude '%1$s' taldea '%2$s' bezala berrizendatu nahi duzula?"
+        "RenameGroupConfirm": "Ziur zaude '%1$s' taldea '%2$s' bezala berrizendatu nahi duzula?",
+        "SelectNewUser": "Hautatu erabiltzaile berri bat"
     }
 }
