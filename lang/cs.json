@@ -4,6 +4,14 @@
         "AddUserToGroupButton": "Přidat člena",
         "CreateNewGroup": "Vytvořit novou skupinu",
         "CreateNewGroupButton": "Vytvořit skupinu",
-        "DeleteGroup": "Smazat tuto skupinu"
+        "DeleteGroup": "Smazat tuto skupinu",
+        "DeleteGroupButton": "Smazat skupinu",
+        "DeleteGroupConfirm": "Opravdu chcete odstranit skupinu \"%s\"?",
+        "DescriptionAccessTab": "Rozhodněte, které skupiny mají přístup k vašim webovým stránkám. Přístup ke všem webovým stránkám můžete také udělit najednou výběrem možnosti \"Použít na všechny webové stránky\" ve voliči webových stránek.",
+        "DescriptionGroupsTab": "Zde si můžete prohlédnout členy jednotlivých skupin. Superuživatelé mohou skupiny upravovat.",
+        "ExceptionGroupDoesExist": "Skupina již existuje",
+        "ExceptionGroupDoesNotExist": "Skupina neexistuje",
+        "ExceptionUserAlreadyInGroup": "Uživatel je již ve skupině",
+        "RemoveFromGroup": "Odstranit"
     }
 }

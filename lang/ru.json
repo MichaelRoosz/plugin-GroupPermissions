@@ -1,1 +1,10 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroupButton": "Добавить участника",
+        "CreateNewGroup": "Создать новую группу",
+        "CreateNewGroupButton": "Создать группу",
+        "DeleteGroup": "Удалить эту группу",
+        "DeleteGroupButton": "Удалить группу",
+        "RemoveFromGroup": "Удалить"
+    }
+}

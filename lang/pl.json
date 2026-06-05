@@ -1,1 +1,6 @@
-{}
+{
+    "GroupPermissions": {
+        "ManageGroups": "Zarządzaj grupami",
+        "RemoveFromGroup": "Usuń"
+    }
+}

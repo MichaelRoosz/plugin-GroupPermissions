@@ -1,5 +1,6 @@
 {
     "GroupPermissions": {
+        "RemoveFromGroup": "Видалити",
         "RenameGroupConfirm": "Ви впевнені, що хочете перейменувати групу «%1$s» на «%2$s»?"
     }
 }

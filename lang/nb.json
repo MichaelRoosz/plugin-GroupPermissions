@@ -23,6 +23,7 @@
         "RemoveFromGroupConfirm": "Fjern «%1$s»-brukeren fra «%2$s»-gruppen?",
         "RenameGroup": "Gi denne gruppen et nytt navn",
         "RenameGroupButton": "Gi gruppen et nytt navn",
-        "RenameGroupConfirm": "Endre navn på gruppen fra «%1$s» til «%2$s»?"
+        "RenameGroupConfirm": "Endre navn på gruppen fra «%1$s» til «%2$s»?",
+        "SelectNewUser": "Velg en ny bruker"
     }
 }
