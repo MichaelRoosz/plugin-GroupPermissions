@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "このグループに新しいメンバーを追加する",
         "AddUserToGroupButton": "メンバーを追加",
+        "ChangeAccessToAllSitesConfirm": "すべてのウェブサイトについて、「%s」にグループ「%s」へのアクセス権を付与してもよろしいですか？",
         "CreateNewGroup": "新しいグループを作成する",
         "CreateNewGroupButton": "グループを作成します",
         "DeleteGroup": "このグループを削除",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "グループ '%2$s' からユーザー '%1$s' を削除してもよろしいですか?",
         "RenameGroup": "このグループの名前を変更",
         "RenameGroupButton": "グループの名前を変更",
-        "RenameGroupConfirm": "グループ '%1$s' の名前を '%2$s' に変更してもよろしいですか?"
+        "RenameGroupConfirm": "グループ '%1$s' の名前を '%2$s' に変更してもよろしいですか?",
+        "SelectNewUser": "新しいユーザーを選択してください"
     }
 }
