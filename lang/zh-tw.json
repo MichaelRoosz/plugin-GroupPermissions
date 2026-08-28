@@ -1,7 +1,30 @@
 {
     "GroupPermissions": {
-        "AddUserToGroup": "添加一個新成員到這個群組",
+        "AddUserToGroup": "新增成員到這個群組",
         "AddUserToGroupButton": "新增成員",
-        "RemoveFromGroup": "移除"
+        "ChangeAccessToAllSitesConfirm": "你確定要為所有網站授予「%s」對群組「%s」的存取權限嗎？",
+        "CreateNewGroup": "建立新群組",
+        "CreateNewGroupButton": "建立群組",
+        "DeleteGroup": "刪除這個群組",
+        "DeleteGroupButton": "刪除群組",
+        "DeleteGroupConfirm": "你確定要刪除群組「%s」嗎？",
+        "DescriptionAccessTab": "決定哪些群組可以存取你的網站。你也可以在網站選擇器中選擇「套用到所有網站」，一次授予所有網站的存取權限。",
+        "DescriptionGroupsTab": "你可以在這裡查看各個群組的成員。超級使用者可以編輯群組。",
+        "ExceptionGroupDoesExist": "群組已存在",
+        "ExceptionGroupDoesNotExist": "群組不存在",
+        "ExceptionUserAlreadyInGroup": "使用者已在群組中",
+        "Group": "群組",
+        "GroupPermissions": "群組權限",
+        "ManageAccess": "管理存取權限",
+        "ManageGroup": "管理群組",
+        "ManageGroupMembers": "管理群組成員",
+        "ManageGroups": "管理群組",
+        "MenuGroupPermissions": "群組權限",
+        "RemoveFromGroup": "移除",
+        "RemoveFromGroupConfirm": "你確定要將使用者「%1$s」從群組「%2$s」中移除嗎？",
+        "RenameGroup": "重新命名這個群組",
+        "RenameGroupButton": "重新命名群組",
+        "RenameGroupConfirm": "你確定要將群組「%1$s」重新命名為「%2$s」嗎？",
+        "SelectNewUser": "選擇新的使用者"
     }
 }
