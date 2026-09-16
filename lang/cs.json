@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Přidat nového člena do této skupiny",
         "AddUserToGroupButton": "Přidat člena",
+        "ChangeAccessToAllSitesConfirm": "Opravdu chcete oprávnění „%s“ udělit skupině „%s“ pro všechny weby?",
         "CreateNewGroup": "Vytvořit novou skupinu",
         "CreateNewGroupButton": "Vytvořit skupinu",
         "DeleteGroup": "Smazat tuto skupinu",
@@ -12,6 +13,18 @@
         "ExceptionGroupDoesExist": "Skupina již existuje",
         "ExceptionGroupDoesNotExist": "Skupina neexistuje",
         "ExceptionUserAlreadyInGroup": "Uživatel je již ve skupině",
-        "RemoveFromGroup": "Odstranit"
+        "Group": "Skupina",
+        "GroupPermissions": "Oprávnění skupin",
+        "ManageAccess": "Správa přístupu",
+        "ManageGroup": "Správa skupiny",
+        "ManageGroupMembers": "Správa členů skupiny",
+        "ManageGroups": "Správa skupin",
+        "MenuGroupPermissions": "Oprávnění skupin",
+        "RemoveFromGroup": "Odstranit",
+        "RemoveFromGroupConfirm": "Opravdu chcete odebrat uživatele „%1$s“ ze skupiny „%2$s“?",
+        "RenameGroup": "Přejmenovat tuto skupinu",
+        "RenameGroupButton": "Přejmenovat skupinu",
+        "RenameGroupConfirm": "Opravdu chcete přejmenovat skupinu „%1$s“ na „%2$s“?",
+        "SelectNewUser": "Vyberte nového uživatele"
     }
 }

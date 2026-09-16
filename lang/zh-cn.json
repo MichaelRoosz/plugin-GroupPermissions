@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "添加一个新成员至该用户组",
         "AddUserToGroupButton": "添加成员",
+        "ChangeAccessToAllSitesConfirm": "你确定你想为所有网站授予 ‘%s’ 对用户组 ‘%s’ 的权限吗？",
         "CreateNewGroup": "创建一个新用户组",
         "CreateNewGroupButton": "创建用户组",
         "DeleteGroup": "删除该用户组",
@@ -23,6 +24,7 @@
         "RemoveFromGroupConfirm": "你确定要将用户 '%1$s' 从用户组 '%2$s' 中移除？",
         "RenameGroup": "重命名该用户组",
         "RenameGroupButton": "重命名用户组",
-        "RenameGroupConfirm": "你确定要将用户组 '%1$s' 重命名为 '%2$s' ？"
+        "RenameGroupConfirm": "你确定要将用户组 '%1$s' 重命名为 '%2$s' ？",
+        "SelectNewUser": "选择新用户"
     }
 }
