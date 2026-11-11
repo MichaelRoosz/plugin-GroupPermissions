@@ -1,5 +1,29 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Poista"
+        "AddUserToGroup": "Lisää uusi jäsen tähän ryhmään",
+        "AddUserToGroupButton": "Lisää jäsen",
+        "ChangeAccessToAllSitesConfirm": "Haluatko varmasti antaa käyttöoikeuden '%s' ryhmälle '%s' kaikkiin verkkosivustoihin?",
+        "CreateNewGroup": "Luo uusi ryhmä",
+        "CreateNewGroupButton": "Luo ryhmä",
+        "DeleteGroup": "Poista tämä ryhmä",
+        "DeleteGroupButton": "Poista ryhmä",
+        "DeleteGroupConfirm": "Haluatko varmasti poistaa ryhmän '%s'?",
+        "DescriptionGroupsTab": "Täällä voit tarkastella kunkin ryhmän jäseniä. Pääkäyttäjät voivat muokata ryhmiä.",
+        "ExceptionGroupDoesExist": "Ryhmä on jo olemassa",
+        "ExceptionGroupDoesNotExist": "Ryhmää ei ole olemassa",
+        "ExceptionUserAlreadyInGroup": "Käyttäjä on jo ryhmässä",
+        "Group": "Ryhmä",
+        "GroupPermissions": "Ryhmien käyttöoikeudet",
+        "ManageAccess": "Hallitse käyttöoikeuksia",
+        "ManageGroup": "Hallitse ryhmää",
+        "ManageGroupMembers": "Hallitse ryhmän jäseniä",
+        "ManageGroups": "Hallitse ryhmiä",
+        "MenuGroupPermissions": "Ryhmien käyttöoikeudet",
+        "RemoveFromGroup": "Poista",
+        "RemoveFromGroupConfirm": "Haluatko varmasti poistaa käyttäjän '%1$s' ryhmästä '%2$s'?",
+        "RenameGroup": "Nimeä tämä ryhmä uudelleen",
+        "RenameGroupButton": "Nimeä ryhmä uudelleen",
+        "RenameGroupConfirm": "Haluatko varmasti nimetä ryhmän '%1$s' uudelleen nimellä '%2$s'?",
+        "SelectNewUser": "Valitse uusi käyttäjä"
     }
 }
