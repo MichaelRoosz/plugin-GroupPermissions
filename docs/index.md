@@ -15,7 +15,7 @@
 - Create, rename, and delete groups.
 - Add or remove users to/from a group. A user can be in multiple groups.
 - Duplicates are prevented; attempts to add an existing member will show an error.
-- Invite a new user by email directly into one or more groups. Unlike the core "Invite user" form, no initial website has to be granted: the user's access comes only from the selected groups. (Internally, Matomo still requires an initial website for invitations, so the plugin temporarily grants view access to a website of the selected groups — which is also the website named in the invitation email — and removes it right after the invite.)
+- Invite a new user by email directly into one or more groups. Unlike the core "Invite user" form, no initial website has to be granted: the user's access comes only from the selected groups. (Internally, Matomo still requires an initial website for invitations, so the plugin temporarily grants view access to a website of the selected groups — which is also the website named in the invitation email — and removes it right after the invite. If none of the selected groups has access to a website yet, the first existing website is used for this step instead; its access is removed right after the invite as well, so the user has no website access until one of their groups is granted one.)
 
 ## Permissions required
 
