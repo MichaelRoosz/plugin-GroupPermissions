@@ -74,7 +74,7 @@ return $config->setRules([
     'ternary_operator_spaces' => true,
     'trailing_comma_in_multiline' => true,
     'whitespace_after_comma_in_array' => true,
-    'visibility_required' => true,
+    'modifier_keywords' => true,
     'return_type_declaration'=> ['space_before' => 'none'],
 ])
     ->setIndent('    ')

@@ -10,9 +10,9 @@
 
 namespace Piwik\Plugins\GroupPermissions;
 
-use Piwik\Common;
 use Piwik\Piwik;
 use Piwik\Plugin\ControllerAdmin;
+use Piwik\Request;
 use Piwik\View;
 
 class Controller extends ControllerAdmin {
@@ -29,7 +29,7 @@ class Controller extends ControllerAdmin {
 
         $view = new View('@GroupPermissions/index');
 
-        $activeTab = Common::getRequestVar('show', 'access', 'string');
+        $activeTab = Request::fromRequest()->getStringParameter('show', 'access');
 
         $validTabs = ['access', 'groups'];
         if (!in_array($activeTab, $validTabs, true)) {

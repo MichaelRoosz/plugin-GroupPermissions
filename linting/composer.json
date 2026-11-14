@@ -11,8 +11,8 @@
     },
 
     "scripts": {
-        "lint": "vendor/bin/php-cs-fixer check",
-        "lint-fix": "vendor/bin/php-cs-fixer fix",
+        "lint": "PHP_CS_FIXER_FUTURE_MODE=1 vendor/bin/php-cs-fixer check",
+        "lint-fix": "PHP_CS_FIXER_FUTURE_MODE=1 vendor/bin/php-cs-fixer fix",
         "phpstan": "../vendor/bin/phpstan analyse"
     },
 
