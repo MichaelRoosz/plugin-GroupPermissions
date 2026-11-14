@@ -4,6 +4,12 @@
   - Security: `GroupPermissions.getAllGroups` and `GroupPermissions.getGroupWithId` now require admin access (previously any user could read group names, members and permissions); `setGroupAccess` checks admin access up front
   - Copy dashboards to all members of a group via the "Copy dashboard to user" dialog (`GroupPermissions.copyDashboardToGroup` API)
   - Invite new users directly into groups (Manage Groups tab / `GroupPermissions.inviteUserToGroups` API), no initial website access needed
+  - Fix `GroupPermissions.setGroupAccess` failing with "The arguments array must contain 2 items" instead of the proper error message for an invalid access value
+  - `GroupPermissions.setGroupAccess` rejects website IDs that do not exist (previously super users could store permissions for them, which a website created later with that ID would inherit)
+  - Manage Groups: the group dropdown is sorted by name right after loading (previously only after creating or renaming a group), so the first group by name is selected by default
+  - Manage Groups: show errors when removing a group member fails (the error container was missing)
+  - "Copy dashboard to user" dialog lists the groups sorted by name
+  - Add end-to-end tests (Playwright + Docker), a Docker based Matomo test instance (`tests/e2e/bin/start.sh`) and a GitHub Actions workflow running linting, PHPStan and the tests
   - Updated translations
 
 ## 5.2.1

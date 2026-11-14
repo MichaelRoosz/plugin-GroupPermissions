@@ -28,6 +28,7 @@
   </div>
 
   <div id="ajaxErrorLoadMembers" ref="errorContainer"></div>
+  <div id="ajaxErrorManageGroupMembers"></div>
   <ActivityIndicator
     :loading="isLoadingMembers"
     style="padding-top: 10px;"

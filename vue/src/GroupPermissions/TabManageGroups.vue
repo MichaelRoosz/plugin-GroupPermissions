@@ -90,6 +90,7 @@ export default defineComponent({
         errorElement: '#ajaxErrorManageGroups',
       }).then((response) => {
         this.groups = response;
+        this.sortGroups();
       }).finally(() => {
         this.isLoadingGroups = false;
         this.loadDefaultGroup();

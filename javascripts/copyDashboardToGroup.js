@@ -70,10 +70,14 @@ $(function () {
         groupsRequest.addParams({
             module: 'API',
             method: 'GroupPermissions.getAllGroups',
-            format: 'json'
+            format: 'json',
+            filter_limit: '-1'
         }, 'get');
         groupsRequest.setCallback(function (response) {
             groups = $.isArray(response) ? response : [];
+            groups.sort(function (a, b) {
+                return String(a.name).localeCompare(String(b.name));
+            });
             render();
         });
         groupsRequest.setErrorCallback(function () {

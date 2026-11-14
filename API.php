@@ -293,6 +293,11 @@ class API extends \Piwik\Plugin\API {
         // basically an admin can give the view or the admin access to any user for the websites he manages
         Piwik::checkUserHasAdminAccess($idSites);
 
+        // super users pass the access check above for any id, make sure the websites exist
+        foreach ($idSites as $idSite) {
+            new Site($idSite);
+        }
+
         foreach ($idSites as $idSite) {
             $this->model->removePermission($idGroup, $idSite);
         }
@@ -502,7 +507,7 @@ class API extends \Piwik\Plugin\API {
         $roles = $this->roleProvider->getAllRoleIds();
 
         if (!in_array($access, $roles, true)) {
-            throw new Exception(Piwik::translate('UsersManager_ExceptionAccessValues', implode(', ', $roles), $access));
+            throw new Exception(Piwik::translate('UsersManager_ExceptionAccessValues', [implode(', ', $roles), $access]));
         }
     }
 }
