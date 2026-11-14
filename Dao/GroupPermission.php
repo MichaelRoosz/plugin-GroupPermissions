@@ -37,13 +37,11 @@ class GroupPermission {
     }
 
     public function createPermission(int $idGroup, int $idSite, string $access): void {
-        $db = $this->getDb();
-
         $query = 'INSERT INTO ' . $this->tablePrefixed
                 . ' (idgroup,idsite,access) VALUES (?,?,?)'
                 . ' ON DUPLICATE KEY UPDATE access=?';
 
-        $db->query($query, [
+        Db::query($query, [
             $idGroup,
             $idSite,
             $access,
@@ -61,7 +59,7 @@ class GroupPermission {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        $rows = Rows::list($this->getDb()->fetchAll("SELECT idsite, access FROM $table WHERE idgroup = ?", [$idGroup]));
+        $rows = Rows::list(Db::fetchAll("SELECT idsite, access FROM $table WHERE idgroup = ?", [$idGroup]));
 
         return array_map(static function (array $row): array {
             return [
@@ -81,7 +79,7 @@ class GroupPermission {
         $idSite = intval($idSite);
         $table = $this->tablePrefixed;
 
-        $rows = Rows::list($this->getDb()->fetchAll("SELECT idgroup, access FROM $table WHERE idsite = ?", [$idSite]));
+        $rows = Rows::list(Db::fetchAll("SELECT idgroup, access FROM $table WHERE idsite = ?", [$idSite]));
 
         return array_map(static function (array $row): array {
             return [
@@ -95,28 +93,20 @@ class GroupPermission {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ? AND idSite = ?";
         $bind = [intval($idGroup), intval($idSite)];
-        $this->getDb()->query($query, $bind);
+        Db::query($query, $bind);
     }
 
     public function removeAllPermissionsOfGroup(int $idGroup): void {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ?";
         $bind = [intval($idGroup)];
-        $this->getDb()->query($query, $bind);
+        Db::query($query, $bind);
     }
 
     public function removeAllPermissionsForSite(int $idSite): void {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idSite = ?";
         $bind = [intval($idSite)];
-        $this->getDb()->query($query, $bind);
-    }
-
-    /**
-     * @return \Piwik\Tracker\Db|\Piwik\Db
-     */
-    private function getDb() {
-        /** @phpstan-ignore return.type */
-        return Db::get();
+        Db::query($query, $bind);
     }
 }

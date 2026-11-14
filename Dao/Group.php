@@ -38,15 +38,14 @@ class Group {
     }
 
     public function createGroup(string $name): int {
-        $db = $this->getDb();
+        Db::query("INSERT INTO `{$this->tablePrefixed}` (name) VALUES (?)", [$name]);
 
-        /** @phpstan-ignore method.notFound */
-        $db->insert($this->tablePrefixed, [
-            'name' => $name,
-        ]);
+        $idGroup = Db::fetchOne('SELECT LAST_INSERT_ID()');
+        if (!is_numeric($idGroup)) {
+            throw new Exception('Could not determine the ID of the new group');
+        }
 
-        /** @phpstan-ignore method.notFound */
-        return $db->lastInsertId();
+        return (int) $idGroup;
     }
 
     /**
@@ -58,7 +57,7 @@ class Group {
     public function getAllGroups(): array {
         $table = $this->tablePrefixed;
 
-        $rows = Rows::list($this->getDb()->fetchAll("SELECT * FROM $table"));
+        $rows = Rows::list(Db::fetchAll("SELECT * FROM $table"));
 
         return array_map([$this, 'mapGroup'], $rows);
     }
@@ -73,7 +72,7 @@ class Group {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        $group = Rows::row($this->getDb()->fetchRow("SELECT * FROM $table WHERE idgroup = ?", [$idGroup]));
+        $group = Rows::row(Db::fetchRow("SELECT * FROM $table WHERE idgroup = ?", [$idGroup]));
         if (!$group) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
         }
@@ -90,7 +89,7 @@ class Group {
     public function getGroupWithName(string $name): array {
         $table = $this->tablePrefixed;
 
-        $group = Rows::row($this->getDb()->fetchRow("SELECT * FROM $table WHERE name = ?", [$name]));
+        $group = Rows::row(Db::fetchRow("SELECT * FROM $table WHERE name = ?", [$name]));
         if (!$group) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $name));
         }
@@ -99,21 +98,14 @@ class Group {
     }
 
     public function renameGroup(int $idGroup, string $newName): void {
-        $idGroup = intval($idGroup);
-
-        $db = $this->getDb();
-
-        /** @phpstan-ignore method.notFound */
-        $db->update($this->tablePrefixed, [
-            'name' => $newName,
-        ], "idgroup = $idGroup");
+        Db::query("UPDATE `{$this->tablePrefixed}` SET name = ? WHERE idgroup = ?", [$newName, $idGroup]);
     }
 
     public function deleteGroup(int $idGroup): void {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ?";
         $bind = [intval($idGroup)];
-        $this->getDb()->query($query, $bind);
+        Db::query($query, $bind);
     }
 
     /**
@@ -129,13 +121,5 @@ class Group {
             'idgroup' => Rows::int($row, 'idgroup'),
             'name' => Rows::string($row, 'name'),
         ];
-    }
-
-    /**
-     * @return \Piwik\Tracker\Db|\Piwik\Db
-     */
-    private function getDb() {
-        /** @phpstan-ignore return.type */
-        return Db::get();
     }
 }

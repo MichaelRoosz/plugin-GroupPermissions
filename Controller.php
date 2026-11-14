@@ -29,13 +29,14 @@ class Controller extends ControllerAdmin {
 
         $view = new View('@GroupPermissions/index');
 
-        /** @phpstan-ignore property.notFound  */
-        $view->activeTab = Common::getRequestVar('show', 'access');
+        $activeTab = Common::getRequestVar('show', 'access', 'string');
 
         $validTabs = ['access', 'groups'];
-        if (!in_array($view->activeTab, $validTabs)) {
-            $view->activeTab = 'access';
+        if (!in_array($activeTab, $validTabs, true)) {
+            $activeTab = 'access';
         }
+
+        $view->assign('activeTab', $activeTab);
 
         $this->setBasicVariablesView($view);
 

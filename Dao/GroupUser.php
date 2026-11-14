@@ -36,13 +36,7 @@ class GroupUser {
     }
 
     public function addUserToGroup(int $idGroup, string $login): void {
-        $db = $this->getDb();
-
-        /** @phpstan-ignore method.notFound */
-        $db->insert($this->tablePrefixed, [
-            'idgroup' => $idGroup,
-            'login' => $login,
-        ]);
+        Db::query("INSERT INTO `{$this->tablePrefixed}` (idgroup, login) VALUES (?, ?)", [$idGroup, $login]);
     }
 
     /**
@@ -54,7 +48,7 @@ class GroupUser {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        $rows = Rows::list($this->getDb()->fetchAll("SELECT login FROM $table WHERE idgroup = ?", [$idGroup]));
+        $rows = Rows::list(Db::fetchAll("SELECT login FROM $table WHERE idgroup = ?", [$idGroup]));
 
         return array_map(static function (array $row): array {
             return ['login' => Rows::string($row, 'login')];
@@ -65,7 +59,7 @@ class GroupUser {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        return (bool) $this->getDb()->fetchAll("SELECT login FROM $table WHERE login = ? AND idgroup = ?", [$login, $idGroup]);
+        return (bool) Db::fetchAll("SELECT login FROM $table WHERE login = ? AND idgroup = ?", [$login, $idGroup]);
     }
 
     /**
@@ -76,7 +70,7 @@ class GroupUser {
     public function getGroupsOfUser(string $login): array {
         $table = $this->tablePrefixed;
 
-        $rows = Rows::list($this->getDb()->fetchAll("SELECT idgroup FROM $table WHERE login = ?", [$login]));
+        $rows = Rows::list(Db::fetchAll("SELECT idgroup FROM $table WHERE login = ?", [$login]));
 
         return array_map(static function (array $row): array {
             return ['idgroup' => Rows::int($row, 'idgroup')];
@@ -87,28 +81,20 @@ class GroupUser {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ? AND login = ?";
         $bind = [intval($idGroup), $login];
-        $this->getDb()->query($query, $bind);
+        Db::query($query, $bind);
     }
 
     public function removeAllUsersOfGroup(int $idGroup): void {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ?";
         $bind = [intval($idGroup)];
-        $this->getDb()->query($query, $bind);
+        Db::query($query, $bind);
     }
 
     public function removeUserFromAllGroups(string $login): void {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE login = ?";
         $bind = [$login];
-        $this->getDb()->query($query, $bind);
-    }
-
-    /**
-     * @return \Piwik\Tracker\Db|\Piwik\Db
-     */
-    private function getDb() {
-        /** @phpstan-ignore return.type */
-        return Db::get();
+        Db::query($query, $bind);
     }
 }

@@ -39,7 +39,7 @@ class MultiTable {
                 ON ga.idgroup = gu.idgroup 
                 WHERE gu.login = ?";
 
-        $rows = Rows::list($this->getDb()->fetchAll($sql, [$login]));
+        $rows = Rows::list(Db::fetchAll($sql, [$login]));
 
         return array_map(static function (array $row): array {
             return [
@@ -47,13 +47,5 @@ class MultiTable {
                 'access' => Rows::string($row, 'access'),
             ];
         }, $rows);
-    }
-
-    /**
-     * @return \Piwik\Tracker\Db|\Piwik\Db
-     */
-    private function getDb() {
-        /** @phpstan-ignore return.type */
-        return Db::get();
     }
 }
