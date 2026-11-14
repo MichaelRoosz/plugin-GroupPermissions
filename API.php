@@ -14,7 +14,11 @@ use Exception;
 use Piwik\Access;
 use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
+use Piwik\API\Request;
 use Piwik\Piwik;
+use Piwik\Plugin\Manager as PluginManager;
+use Piwik\Plugins\Dashboard\Dashboard;
+use Piwik\Plugins\Dashboard\Model as DashboardModel;
 use Piwik\Site;
 use Piwik\Tracker\Cache;
 use Piwik\Plugins\UsersManager\API as UsersManagerAPI;
@@ -371,6 +375,74 @@ class API extends \Piwik\Plugin\API {
         $this->model->removeAllUsersOfGroup($idGroup);
 
         $this->model->deleteGroup($idGroup);
+    }
+
+    /**
+     * Copies a dashboard of the current user to all members of a group.
+     *
+     * Like Dashboard.copyDashboardToUser, the dashboard is only copied to users the current user is allowed to
+     * see (super users see everyone, admins see the users of their websites). The current user and the anonymous
+     * user are skipped.
+     *
+     * @param int $idDashboard Id of the current user's dashboard that should be copied
+     * @param int $idGroup Group whose members receive a copy
+     * @param string $dashboardName Name of the new dashboards
+     *
+     * @return array<string> Logins of the users the dashboard was copied to
+     */
+    public function copyDashboardToGroup(int $idDashboard, int $idGroup, string $dashboardName = ''): array {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        if (!PluginManager::getInstance()->isPluginActivated('Dashboard')) {
+            throw new Exception('The Dashboard plugin is not activated.');
+        }
+
+        $group = $this->model->getGroupWithId($idGroup);
+        if (empty($group['idgroup'])) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
+        }
+
+        $currentLogin = Piwik::getCurrentUserLogin();
+
+        $dashboard = StaticContainer::get(Dashboard::class);
+        if (!($dashboard instanceof Dashboard)) {
+            throw new Exception('Dashboard plugin could not be loaded.');
+        }
+
+        $layout = $dashboard->getLayoutForUser($currentLogin, $idDashboard);
+        if ($layout === false) {
+            throw new Exception('Dashboard not found');
+        }
+
+        // UsersManager.getUsers only returns users the current user is allowed to manage
+        $visibleLogins = [];
+        $users = Request::processRequest('UsersManager.getUsers', ['filter_limit' => -1]);
+        if (is_array($users)) {
+            foreach ($users as $user) {
+                if (is_array($user) && isset($user['login']) && is_string($user['login'])) {
+                    $visibleLogins[$user['login']] = true;
+                }
+            }
+        }
+
+        $dashboardModel = StaticContainer::get(DashboardModel::class);
+        if (!($dashboardModel instanceof DashboardModel)) {
+            throw new Exception('Dashboard plugin could not be loaded.');
+        }
+
+        $copiedTo = [];
+        foreach ($this->model->getMembersOfGroup($group['idgroup']) as $member) {
+            $login = $member['login'];
+
+            if ($login === $currentLogin || $login === 'anonymous' || !isset($visibleLogins[$login])) {
+                continue;
+            }
+
+            $dashboardModel->createNewDashboardForUser($login, $dashboardName, $layout);
+            $copiedTo[] = $login;
+        }
+
+        return $copiedTo;
     }
 
     /**

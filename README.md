@@ -88,6 +88,11 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
   ```text
   index.php?module=API&method=GroupPermissions.setGroupAccess&name=Marketing&access=view&idSites=all&format=JSON&token_auth=YOUR_TOKEN
   ```
+- Copy one of your dashboards to all members of a group (returns the logins it was copied to):
+  ```text
+  index.php?module=API&method=GroupPermissions.copyDashboardToGroup&idDashboard=1&idGroup=1&dashboardName=Marketing&format=JSON&token_auth=YOUR_TOKEN
+  ```
+  The same is available in the dashboard menu under "Copy dashboard to user", where groups are listed below the users.
 
 Notes:
 - Use `idSites=all` to apply to all sites you administer, or `idSites=1,2,3` for a list.

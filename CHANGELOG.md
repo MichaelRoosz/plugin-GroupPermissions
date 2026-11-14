@@ -1,6 +1,7 @@
 
 # Changelog
 ## Unreleased
+  - Copy dashboards to all members of a group via the "Copy dashboard to user" dialog (`GroupPermissions.copyDashboardToGroup` API)
   - Invite new users directly into groups (Manage Groups tab / `GroupPermissions.inviteUserToGroups` API), no initial website access needed
 
 ## 5.2.1

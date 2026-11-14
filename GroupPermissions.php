@@ -30,11 +30,23 @@ class GroupPermissions extends Plugin {
      */
     public function registerEvents(): array {
         return [
+            'AssetManager.getJavaScriptFiles'        => 'getJavaScriptFiles',
             'AssetManager.getStylesheetFiles'        => 'getStylesheetFiles',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             'UsersManager.deleteUser'                => 'deleteUser',
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
         ];
+    }
+
+    /**
+     * Return list of plug-in specific JavaScript files to be imported by the asset manager
+     *
+     * @see Piwik\AssetManager
+     *
+     * @param array<string> $jsFiles
+     */
+    public function getJavaScriptFiles(array &$jsFiles): void {
+        $jsFiles[] = 'plugins/GroupPermissions/javascripts/copyDashboardToGroup.js';
     }
 
     /**
@@ -58,6 +70,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_ChangeAccessToAllSitesConfirm';
         $translations[] = 'GroupPermissions_CreateNewGroup';
         $translations[] = 'GroupPermissions_CreateNewGroupButton';
+        $translations[] = 'GroupPermissions_DashboardCopiedToGroup';
         $translations[] = 'GroupPermissions_DeleteGroup';
         $translations[] = 'GroupPermissions_DeleteGroupButton';
         $translations[] = 'GroupPermissions_DeleteGroupConfirm';
@@ -68,6 +81,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_ExceptionNoGroupSelected';
         $translations[] = 'GroupPermissions_ExceptionUserAlreadyInGroup';
         $translations[] = 'GroupPermissions_Group';
+        $translations[] = 'GroupPermissions_Groups';
         $translations[] = 'GroupPermissions_GroupPermissions';
         $translations[] = 'GroupPermissions_InviteUser';
         $translations[] = 'GroupPermissions_InviteUserButton';
@@ -85,6 +99,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_RenameGroupConfirm';
         $translations[] = 'GroupPermissions_SelectGroups';
         $translations[] = 'GroupPermissions_SelectNewUser';
+        $translations[] = 'GroupPermissions_Users';
 
         $translations[] = 'UsersManager_ApplyToAllWebsites';
         $translations[] = 'UsersManager_PrivNone';
@@ -93,6 +108,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'UsersManager_PrivAdmin';
 
         $translations[] = 'UsersManager_Email';
+
+        $translations[] = 'Dashboard_DashboardCopied';
 
         $translations[] = 'General_Username';
         $translations[] = 'General_Yes';

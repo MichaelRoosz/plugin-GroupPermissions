@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "Are you sure you want to give '%s' access to the group '%s' for all the websites?",
         "CreateNewGroup": "Create a new group",
         "CreateNewGroupButton": "Create Group",
+        "DashboardCopiedToGroup": "Dashboard copied to %1$s member(s) of the group '%2$s'.",
         "DeleteGroup": "Delete this group",
         "DeleteGroupButton": "Delete Group",
         "DeleteGroupConfirm": "Are you sure you want to delete the group '%s'?",
@@ -16,6 +17,7 @@
         "ExceptionUserAlreadyInGroup": "User is already in group",
         "Group": "Group",
         "GroupPermissions": "Group Permissions",
+        "Groups": "Groups",
         "InviteUser": "Invite a new user to groups",
         "InviteUserButton": "Invite User",
         "InviteUserDescription": "Invite a new user by email and add them directly to the selected groups. The user gets access to websites through these groups only.",
@@ -31,6 +33,7 @@
         "RenameGroupButton": "Rename Group",
         "RenameGroupConfirm": "Are you sure you want to rename the group '%1$s' to '%2$s'?",
         "SelectGroups": "Select groups",
-        "SelectNewUser": "Select a new user"
+        "SelectNewUser": "Select a new user",
+        "Users": "Users"
     }
 }
