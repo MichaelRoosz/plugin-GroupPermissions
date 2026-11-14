@@ -110,6 +110,8 @@ class API extends \Piwik\Plugin\API {
      * }>
      */
     public function getAllGroups(): array {
+        Piwik::checkUserHasSomeAdminAccess();
+
         $groups = $this->model->getAllGroups();
         if (!$groups) {
             return [];
@@ -133,6 +135,8 @@ class API extends \Piwik\Plugin\API {
      * }
      */
     public function getGroupWithId(int $idGroup): array {
+        Piwik::checkUserHasSomeAdminAccess();
+
         $group = $this->model->getGroupWithId($idGroup);
         if (!$group) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
@@ -196,6 +200,8 @@ class API extends \Piwik\Plugin\API {
     }
 
     public function setGroupAccess(string $name, string $access, string $idSites): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
         if ($access != 'noaccess') {
             $this->checkAccessType($access);
         }
