@@ -37,6 +37,21 @@ test.describe('Group management API', () => {
     }
   });
 
+  test('names longer than the name column are rejected instead of being truncated', async () => {
+    const fits = `${'x'.repeat(64 - RUN_ID.length - 1)} ${RUN_ID}`;
+    expect(fits).toHaveLength(64);
+    const created = await su.call('GroupPermissions.createGroup', { groupName: fits });
+    expect((await su.call('GroupPermissions.getGroupWithId', { idGroup: created.idGroup })).name).toBe(fits);
+
+    const tooLong = `${fits}y`;
+    expect(await su.expectError('GroupPermissions.createGroup', { groupName: tooLong })).toMatch(/group name is too long \(at most 64 characters/);
+    expect(await su.groupByName(tooLong.slice(0, 64))).toEqual(created); // no truncated duplicate
+    expect(await su.expectError('GroupPermissions.renameGroup', { idGroup: created.idGroup, newName: tooLong })).toMatch(/too long/);
+
+    // escaped special characters count with their escaped length: 13 quotes are stored as 78 characters
+    expect(await su.expectError('GroupPermissions.createGroup', { groupName: '"'.repeat(13) })).toMatch(/too long/);
+  });
+
   test('getGroupWithId rejects unknown groups', async () => {
     expect(await su.expectError('GroupPermissions.getGroupWithId', { idGroup: 999999 })).toMatch(/Group does not exist/);
   });

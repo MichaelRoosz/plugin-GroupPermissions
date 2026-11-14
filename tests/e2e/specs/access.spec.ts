@@ -40,6 +40,10 @@ test.describe('Group site access', () => {
     }
   });
 
+  test('getGroupAccessFromSite rejects unknown websites', async () => {
+    expect(await su.expectError('GroupPermissions.getGroupAccessFromSite', { idSite: 999999 })).toMatch(/website id was set to '999999'/);
+  });
+
   test('setGroupAccess validates its input', async () => {
     const group = await su.createGroup('Access invalid');
     expect(await su.expectError('GroupPermissions.setGroupAccess', { name: group.name, access: 'superuser', idSites: '1' }))
@@ -48,6 +52,12 @@ test.describe('Group site access', () => {
       .toMatch(/Group does not exist/);
     expect(await su.expectError('GroupPermissions.setGroupAccess', { name: group.name, access: 'view', idSites: '999999' }))
       .toMatch(/unexpected website was found in the request: website id was set to '999999'/);
+    expect(await su.expectError('GroupPermissions.setGroupAccess', { name: group.name, access: 'view', idSites: 'abc' }))
+      .toMatch(/./);
+    expect(await su.expectError('GroupPermissions.setGroupAccess', { name: group.name, access: 'view', idSites: '' }))
+      .toMatch(/idSites/);
+    // nothing was stored by the failed calls
+    expect((await su.groupAccess(1))[group.name]).toBe('noaccess');
   });
 
   test('group members get the access of their groups', async () => {
@@ -92,6 +102,52 @@ test.describe('Group site access', () => {
     const member = await MatomoApi.forUser(login, DEFAULT_PASSWORD);
     const admin = (await member.call('SitesManager.getSitesIdWithAdminAccess')).map(Number).sort();
     expect(admin).toEqual([siteGroupHigher, siteUserHigher].sort());
+  });
+
+  test('two groups with different access on the same website: the higher one wins', async () => {
+    const idSite = await su.createSite('Two Groups Site');
+    const viewGroup = await su.createGroup('Same site view');
+    const adminGroup = await su.createGroup('Same site admin');
+    await su.setGroupAccess(viewGroup.name, 'view', idSite);
+    await su.setGroupAccess(adminGroup.name, 'admin', idSite);
+    const login = await su.createUser('two_groups');
+    await su.addMembers(viewGroup.idGroup, [login]);
+    await su.addMembers(adminGroup.idGroup, [login]);
+
+    const member = await MatomoApi.forUser(login, DEFAULT_PASSWORD);
+    expect((await member.call('SitesManager.getSitesIdWithAdminAccess')).map(Number)).toEqual([idSite]);
+
+    // removing the admin group falls back to the view access of the other group
+    await su.call('GroupPermissions.removeUserFromGroup', { idGroup: adminGroup.idGroup, login });
+    expect((await member.call('SitesManager.getSitesIdWithAdminAccess')).map(Number)).toEqual([]);
+    expect((await member.call('SitesManager.getSitesIdWithAtLeastViewAccess')).map(Number)).toEqual([idSite]);
+  });
+
+  test('write access of a group upgrades the view access of the user (and vice versa)', async () => {
+    const goal = { name: 'Goal', matchAttribute: 'url', pattern: 'x', patternType: 'contains' };
+    const group = await su.createGroup('Write upgrade');
+    const groupWriteSite = await su.createSite('Group Write Site');
+    const userWriteSite = await su.createSite('User Write Site');
+    await su.setGroupAccess(group.name, 'write', groupWriteSite);
+    await su.setGroupAccess(group.name, 'view', userWriteSite);
+
+    const login = await su.createUser('write_upgrade');
+    await su.setUserAccess(login, 'view', groupWriteSite);
+    await su.setUserAccess(login, 'write', userWriteSite);
+    await su.addMembers(group.idGroup, [login]);
+    const member = await MatomoApi.forUser(login, DEFAULT_PASSWORD);
+
+    await member.call('Goals.addGoal', { idSite: groupWriteSite, ...goal });
+    await member.call('Goals.addGoal', { idSite: userWriteSite, ...goal });
+    expect((await member.call('SitesManager.getSitesIdWithAdminAccess')).map(Number)).toEqual([]);
+  });
+
+  test('a group without members or permissions changes nothing', async () => {
+    const login = await su.createUser('no_group');
+    await su.setUserAccess(login, 'view', 1);
+    await su.createGroup('Unrelated');
+    const user = await MatomoApi.forUser(login, DEFAULT_PASSWORD);
+    expect((await user.call('SitesManager.getSitesIdWithAtLeastViewAccess')).map(Number)).toEqual([1]);
   });
 
   test('removing a user from a group removes the access granted by it', async () => {

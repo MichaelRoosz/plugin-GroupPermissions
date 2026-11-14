@@ -50,6 +50,10 @@ test.describe('Admin page permissions', () => {
     await su.setUserAccess(admin, 'admin', idSite);
     const page = await pageAs(browser, admin);
 
+    await page.goto(`/index.php?module=CoreAdminHome&action=home&idSite=${idSite}&period=day&date=yesterday`);
+    await page.locator('text="System" >> visible=true').first().click();
+    await expect(page.locator('a:text-is("Group Permissions") >> visible=true')).toHaveCount(1);
+
     await page.goto(`/index.php?module=GroupPermissions&action=index&idSite=${idSite}&period=day&date=yesterday&show=groups`);
     await waitForIdle(page);
     await expect(page.locator('h2:text-is("Group Permissions")')).toBeVisible();

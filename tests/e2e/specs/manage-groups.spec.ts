@@ -128,12 +128,21 @@ test.describe('Manage Groups tab', () => {
     await screenshot(createCard(page), 'create-group-duplicate-error');
   });
 
-  test('creating a group without a name shows an error', async ({ page }) => {
-    const before = await allGroupNames();
+  test('creating a group with a too long name shows an error', async ({ page }) => {
     await openGroupPermissions(page, 'groups');
+    await createCard(page).locator('input[type=text]').fill('x'.repeat(65));
     await createCard(page).locator('input[type=button]').click();
-    await expect(page.locator('#ajaxErrorCreateGroup')).toContainText(/specify a value for 'groupName'/);
-    expect(await allGroupNames()).toEqual(before);
+    await expect(page.locator('#ajaxErrorCreateGroup')).toContainText('The group name is too long');
+  });
+
+  test('"Create Group" is disabled without a name', async ({ page }) => {
+    await openGroupPermissions(page, 'groups');
+    const button = createCard(page).locator('input[type=button][value="Create Group"]');
+    await expect(button).toBeDisabled();
+    await createCard(page).locator('input[type=text]').fill('   ');
+    await expect(button).toBeDisabled();
+    await createCard(page).locator('input[type=text]').fill(`x ${RUN_ID}`);
+    await expect(button).toBeEnabled();
   });
 
   // ---- members ----
@@ -146,7 +155,9 @@ test.describe('Manage Groups tab', () => {
     await openGroupPermissions(page, 'groups', `&idGroup=${group.idGroup}`);
     const options = await multiselectOptions(addMemberSelect(page));
     const users: string[] = await su.call('UsersManager.getUsersLogin', { filter_limit: -1 });
-    expect([...options].sort()).toEqual([...users].sort());
+    // all users except anonymous, which cannot be member of a group
+    expect(options).not.toContain('anonymous');
+    expect([...options].sort()).toEqual(users.filter((u) => u !== 'anonymous').sort());
     expect(options).toEqual([...options].sort());
 
     await multiselectPick(addMemberSelect(page), amy);
@@ -169,12 +180,14 @@ test.describe('Manage Groups tab', () => {
     expect(await su.members(group.idGroup)).toEqual([login]);
   });
 
-  test('adding without selecting a user shows an error', async ({ page }) => {
+  test('"Add Member" is disabled until a user is selected', async ({ page }) => {
     const group = await su.createGroup('Add nobody');
+    const login = await su.createUser('add_nobody');
     await openGroupPermissions(page, 'groups', `&idGroup=${group.idGroup}`);
-    await page.locator('.groupPermissionsGroupAddMemberWrapper input[type=button]').click();
-    await expect(page.locator('#ajaxErrorAddMember')).toContainText(/specify a value for 'login'/);
-    await expect(manageGroupCard(page).locator('td.login')).toHaveCount(0);
+    const button = page.locator('.groupPermissionsGroupAddMemberWrapper input[type=button]');
+    await expect(button).toBeDisabled();
+    await multiselectPick(addMemberSelect(page), login);
+    await expect(button).toBeEnabled();
   });
 
   test('removes a member after confirmation', async ({ page }) => {
@@ -238,6 +251,19 @@ test.describe('Manage Groups tab', () => {
     expect(options).toContain(newName);
     expect(options).not.toContain(group.name);
     expect(options).toEqual([...options].sort((x, y) => x.localeCompare(y)));
+  });
+
+  test('"Rename Group" is disabled for an empty or unchanged name', async ({ page }) => {
+    const group = await su.createGroup('Rename disabled');
+    await openGroupPermissions(page, 'groups', `&idGroup=${group.idGroup}`);
+    const button = manageGroupCard(page).locator('input[type=button][value="Rename Group"]');
+    await expect(button).toBeDisabled(); // unchanged
+    await renameInput(page).fill('  ');
+    await expect(button).toBeDisabled();
+    await renameInput(page).fill(`${group.name}!`);
+    await expect(button).toBeEnabled();
+    await renameInput(page).fill(group.name);
+    await expect(button).toBeDisabled();
   });
 
   test('renaming to an existing name shows an error', async ({ page }) => {

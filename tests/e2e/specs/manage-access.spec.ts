@@ -38,24 +38,49 @@ test.describe('Manage Access tab', () => {
     su = await MatomoApi.superUser();
   });
 
-  test('shows the description and preselects a website whose access is shown', async ({ page }) => {
+  test('shows the description and opens with the website from the URL', async ({ page }) => {
+    const idSite = await createSite('Initial Site');
     const group = await su.createGroup('Initial');
-    // give the group a different access on every site, so the table identifies the preselected website
-    const levels = ['view', 'write', 'admin'] as const;
-    const sites: Array<{ idsite: number; name: string }> = Object.values(await su.call('SitesManager.getAllSites', { filter_limit: -1 }));
-    for (const [i, site] of sites.entries()) {
-      await su.setGroupAccess(group.name, levels[i % 3], Number(site.idsite));
-    }
+    await su.setGroupAccess(group.name, 'write', idSite);
 
-    await openGroupPermissions(page, 'access');
+    await openGroupPermissions(page, 'access', '', idSite);
     await expect(page.locator('.nav-pills li.active')).toHaveText('Manage Access');
     await expect(page.getByText('Decide which groups have access to your websites.')).toBeVisible();
+    await expect(page.locator('.siteSelector .title').first()).toContainText(siteNames.get(idSite)!, { ignoreCase: true });
+    await expectAccess(accessRow(page, group.name), 'write');
 
-    // note: the site selector preselects the first website of its list, not the idSite of the URL
-    const shownName = (await page.locator('.siteSelector .title').first().innerText()).trim();
-    const index = sites.findIndex((s) => s.name.toUpperCase() === shownName.toUpperCase());
-    expect(index, `preselected website "${shownName}"`).toBeGreaterThanOrEqual(0);
-    await expectAccess(accessRow(page, group.name), levels[index % 3]);
+    // and for another website of the URL
+    await openGroupPermissions(page, 'access', '', 1);
+    await expect(page.locator('.siteSelector .title').first()).toContainText('Site One', { ignoreCase: true });
+    await expectAccess(accessRow(page, group.name), 'noaccess');
+  });
+
+  test('a slow response of the previously selected website does not overwrite the current one', async ({ page }) => {
+    const slowSite = await createSite('Slow Site');
+    const fastSite = await createSite('Fast Site');
+    const group = await su.createGroup('Race');
+    await su.setGroupAccess(group.name, 'admin', slowSite);
+    await su.setGroupAccess(group.name, 'view', fastSite);
+
+    await openGroupPermissions(page, 'access', '', 1);
+    // delay the access list of the slow website
+    await page.route(/method=GroupPermissions\.getGroupAccessFromSite/, async (route) => {
+      if ((route.request().postData() || '').includes(`idSite=${slowSite}`)) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+      await route.continue();
+    });
+    const selector = page.locator('.siteSelector').first();
+    for (const idSite of [slowSite, fastSite]) {
+      await selector.locator('.title').click();
+      const search = selector.locator('input.websiteSearch');
+      if (await search.isVisible()) await search.fill(siteNames.get(idSite)!);
+      await selector.locator('.custom_select_ul_list li a', { hasText: siteNames.get(idSite)! }).first().click();
+    }
+    await expectAccess(accessRow(page, group.name), 'view');
+    await page.waitForTimeout(3500); // the slow response arrives
+    await expectAccess(accessRow(page, group.name), 'view');
+    await expect(selector.locator('.title')).toContainText(siteNames.get(fastSite)!, { ignoreCase: true });
   });
 
   test('lists all groups alphabetically with their current access', async ({ page }) => {
@@ -195,7 +220,15 @@ test.describe('Manage Access tab', () => {
       await su.setUserAccess(admin, 'view', viewSite);
 
       await login(page, admin, DEFAULT_PASSWORD);
+
+      // a website of the URL the user only has view access to falls back to an administered website
+      await openGroupPermissions(page, 'access', '', viewSite);
+      const shown = (await page.locator('.siteSelector .title').first().innerText()).trim().toUpperCase();
+      expect([siteNames.get(adminSite1)!, siteNames.get(adminSite2)!].map((n) => n.toUpperCase())).toContain(shown);
+      await expect(accessRow(page, group.name)).toBeVisible();
+
       await openGroupPermissions(page, 'access', '', adminSite1);
+      await expect(page.locator('.siteSelector .title').first()).toContainText(siteNames.get(adminSite1)!, { ignoreCase: true });
 
       const selector = page.locator('.siteSelector').first();
       await selector.locator('.title').click();

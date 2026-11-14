@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
 import { RUN_ID, SUPERUSER, superUserStorageState, DEFAULT_PASSWORD } from '../helpers/env';
-import { openGroupPermissions, screenshot, multiselectPick, multiselectClose, confirmPassword, waitForIdle } from '../helpers/ui';
+import {
+  openGroupPermissions, screenshot, multiselectPick, multiselectClose, multiselectOptions, confirmPassword, clickModalButton, waitForIdle,
+} from '../helpers/ui';
 import { waitForMessageTo } from '../helpers/mailpit';
 
 /**
@@ -106,6 +108,83 @@ test.describe('Invite user to groups', () => {
       await screenshot(manageCard, 'invite-user-member-list-refreshed');
     });
 
+    test('the invite button needs a non-blank username, an email and a group', async ({ page }) => {
+      await openGroupPermissions(page, 'groups');
+      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
+      const button = card.locator('input[type=button][value="Invite User"]');
+      const userInput = card.locator('label', { hasText: 'Username' }).locator('input');
+      const emailInput = card.locator('label', { hasText: 'Email' }).locator('input');
+
+      await multiselectPick(card.locator('.multiselect'), sales.name);
+      await multiselectClose(card.locator('.multiselect'));
+      await userInput.fill('   ');
+      await emailInput.fill(`blank_${RUN_ID}@example.org`);
+      await expect(button).toBeDisabled();
+      await userInput.fill(`blank_${RUN_ID}`);
+      await expect(button).toBeEnabled();
+      await emailInput.fill('  ');
+      await expect(button).toBeDisabled();
+    });
+
+    test('cancelling or a wrong password does not invite anybody', async ({ page }) => {
+      const login = `invited_cancel_${RUN_ID}`;
+      await openGroupPermissions(page, 'groups');
+      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
+      await card.locator('label', { hasText: 'Username' }).locator('input').fill(login);
+      await card.locator('label', { hasText: 'Email' }).locator('input').fill(`${login}@example.org`);
+      await multiselectPick(card.locator('.multiselect'), sales.name);
+      await multiselectClose(card.locator('.multiselect'));
+
+      await card.locator('input[type=button][value="Invite User"]').click();
+      const modal = page.locator('.confirm-password-modal.open');
+      await expect(modal).toBeVisible();
+      await modal.locator('.modal-footer .modal-no').click();
+      await expect(modal).toBeHidden();
+      await waitForIdle(page);
+      expect(await su.call('UsersManager.userExists', { userLogin: login })).toEqual({ value: false });
+
+      await card.locator('input[type=button][value="Invite User"]').click();
+      await confirmPassword(page, 'wrongPassword1!');
+      await expect(page.locator('#ajaxErrorInviteUser')).toContainText(/password/i);
+      expect(await su.call('UsersManager.userExists', { userLogin: login })).toEqual({ value: false });
+      expect(await su.members(sales.idGroup)).not.toContain(login);
+      // the form keeps its values for a retry
+      await expect(card.locator('label', { hasText: 'Username' }).locator('input')).toHaveValue(login);
+    });
+
+    test('the group list of the invite form follows created, renamed and deleted groups', async ({ page }) => {
+      await openGroupPermissions(page, 'groups');
+      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
+      const inviteGroups = card.locator('.multiselect');
+
+      // created
+      const created = `Invite list ${RUN_ID}`;
+      const createCard = page.locator('.card', { hasText: 'Create a new group' });
+      await createCard.locator('input[type=text]').fill(created);
+      await createCard.locator('input[type=button]').click();
+      await expect(page.locator('.card', { has: page.locator('h2', { hasText: /^Manage group$/ }) }).locator('.multiselect__single')).toHaveText(created);
+      expect(await multiselectOptions(inviteGroups)).toContain(created);
+
+      // selected in the invite form, then renamed
+      await multiselectPick(inviteGroups, created);
+      await multiselectClose(inviteGroups);
+      const renamed = `${created} renamed`;
+      const manage = page.locator('.card', { has: page.locator('h2', { hasText: /^Manage group$/ }) });
+      await manage.locator('h3', { hasText: 'Rename this group' }).locator('xpath=following-sibling::div[1]').locator('input[type=text]').fill(renamed);
+      await manage.locator('input[type=button][value="Rename Group"]').click();
+      await clickModalButton(page, 'Yes');
+      await expect(manage.locator('.multiselect__single')).toHaveText(renamed);
+      expect(await multiselectOptions(inviteGroups)).toContain(renamed);
+
+      // deleted: also removed from the selection of the invite form
+      await manage.locator('input[type=button][value="Delete Group"]').click();
+      await clickModalButton(page, 'Yes');
+      await waitForIdle(page);
+      expect(await multiselectOptions(inviteGroups)).not.toContain(renamed);
+      await expect(inviteGroups.locator('.multiselect__tag')).toHaveCount(0);
+      await expect(card.locator('input[type=button][value="Invite User"]')).toBeDisabled();
+    });
+
     test('shows the error of a failed invitation', async ({ page }) => {
       const existing = await su.createUser('existing_invite');
 
@@ -192,6 +271,71 @@ test.describe('Invite user to groups', () => {
       });
       expect(message).toMatch(/already|in use/i);
       expect(await su.members(sales.idGroup)).not.toContain(`dupe_target_${RUN_ID}`);
+    });
+
+    test('the invited user accepts the invitation and sees exactly the websites of the groups', async ({ page }) => {
+      const login = `invited_accept_${RUN_ID}`;
+      const email = `${login}@example.org`;
+      const password = 'acceptedPass1!';
+      await su.call('GroupPermissions.inviteUserToGroups', {
+        userLogin: login,
+        email,
+        idGroups: `${marketing.idGroup},${sales.idGroup}`,
+        passwordConfirmation: SUPERUSER.password,
+      });
+
+      // the link in the email points to Matomo's configured URL, use only its token
+      const mail = await waitForMessageTo(email);
+      const token = /action=acceptInvitation&(?:amp;)?token=([A-Za-z0-9]+)/.exec(mail.HTML)?.[1];
+      expect(token, 'invitation token in email').toBeTruthy();
+
+      await page.goto(`/index.php?module=Login&action=acceptInvitation&token=${token}`);
+      await expect(page.locator('#email')).toHaveValue(email);
+      await page.locator('#password').fill(password);
+      await page.locator('#password_confirm').fill(password);
+      if (await page.locator('#conditionCheck').count()) {
+        await page.locator('#conditionCheck').check({ force: true });
+      }
+      await screenshot(page, 'invite-user-accept-invitation');
+      await page.locator('#login_form_submit').click();
+      await page.waitForURL((url) => url.searchParams.get('action') !== 'acceptInvitation');
+
+      const user = await su.call('UsersManager.getUser', { userLogin: login });
+      expect(user.invite_status).toBe('active');
+
+      const member = await MatomoApi.forUser(login, password);
+      const ids = (await member.call('SitesManager.getSitesIdWithAtLeastViewAccess')).map(Number).sort();
+      expect(ids).toEqual([1, idSiteMarketing].sort()); // sales: write on site 1, marketing: view on its site
+      expect((await member.call('SitesManager.getSitesIdWithAdminAccess')).map(Number)).toEqual([]);
+      // still no direct access, everything comes from the groups
+      expect(await su.call('UsersManager.getSitesAccessFromUser', { userLogin: login })).toEqual([]);
+    });
+
+    test('passes expiryInDays on to the invitation', async () => {
+      const login = `invited_expiry_${RUN_ID}`;
+      await su.call('GroupPermissions.inviteUserToGroups', {
+        userLogin: login,
+        email: `${login}@example.org`,
+        idGroups: String(sales.idGroup),
+        expiryInDays: 2,
+        passwordConfirmation: SUPERUSER.password,
+      });
+      const user = await su.call('UsersManager.getUser', { userLogin: login });
+      expect(Number(user.invite_status)).toBeLessThanOrEqual(2);
+      expect(Number(user.invite_status)).toBeGreaterThan(0);
+    });
+
+    test('an invalid email is rejected and nobody is added to the group', async () => {
+      const login = `invited_bad_email_${RUN_ID}`;
+      const message = await su.expectError('GroupPermissions.inviteUserToGroups', {
+        userLogin: login,
+        email: 'not-an-email',
+        idGroups: String(sales.idGroup),
+        passwordConfirmation: SUPERUSER.password,
+      });
+      expect(message).toMatch(/email/i);
+      expect(await su.members(sales.idGroup)).not.toContain(login);
+      expect(await su.call('UsersManager.userExists', { userLogin: login })).toEqual({ value: false });
     });
 
     test('group members see exactly the websites of their groups', async () => {

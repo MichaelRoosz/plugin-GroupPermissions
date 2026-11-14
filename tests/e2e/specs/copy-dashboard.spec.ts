@@ -101,6 +101,19 @@ test.describe('Copy dashboard to group', () => {
       expect(await dashboardNames(su, SUPERUSER.login)).toEqual(superUserDashboardsBefore);
     });
 
+    test('falls back to the user list if the groups cannot be loaded', async ({ page }) => {
+      await page.route(/method=GroupPermissions\.getAllGroups/, (route) =>
+        route.fulfill({ contentType: 'application/json', body: '{"result":"error","message":"failed"}' }));
+      await page.goto('/index.php?module=CoreHome&action=index&idSite=1&period=day&date=yesterday#?idSite=1&period=day&date=yesterday&category=Dashboard_Dashboard&subcategory=1');
+      await waitForIdle(page);
+      await page.locator('.dashboard-manager .title').click();
+      await page.locator('text="Copy dashboard to user" >> visible=true').first().click();
+      const select = page.locator('.modal.open select[name="copyDashboardUser"]');
+      await expect(select.locator('option', { hasText: members[0] })).toHaveCount(1);
+      await expect(select.locator('optgroup')).toHaveCount(0);
+      await expect(select.locator('option').first()).toHaveText(SUPERUSER.login);
+    });
+
     test('copying to a single user still works', async ({ page }) => {
       const dashboardName = `Single dashboard ${RUN_ID}`;
 
@@ -131,6 +144,15 @@ test.describe('Copy dashboard to group', () => {
       expect([...copiedTo].sort()).toEqual([...members].sort());
       for (const login of members) {
         expect(await dashboardNames(su, login)).toContain(`API copy ${RUN_ID}`);
+      }
+    });
+
+    test('without a dashboard name the copies are created with the default name', async () => {
+      const before = await Promise.all(members.map((login) => dashboardNames(su, login)));
+      const copiedTo = await su.call('GroupPermissions.copyDashboardToGroup', { idDashboard, idGroup: team.idGroup });
+      expect([...copiedTo].sort()).toEqual([...members].sort());
+      for (const [i, login] of members.entries()) {
+        expect((await dashboardNames(su, login)).length).toBe(before[i].length + 1);
       }
     });
 

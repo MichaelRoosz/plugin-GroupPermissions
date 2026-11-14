@@ -57,10 +57,13 @@ services:
     environment:
       MATOMO_URL: http://matomo
       MAILPIT_URL: http://mail:8025
+      PLUGIN_DIR: /plugin
       CI: ${CI:-}
     volumes:
       - .:/e2e
       - e2e_node_modules:/e2e/node_modules
+      # plugin sources, read by static checks (e.g. translations)
+      - ../..:/plugin:ro
     ipc: host
 
 volumes:

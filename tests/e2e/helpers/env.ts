@@ -18,3 +18,6 @@ export const SCREENSHOT_DIR = path.join(__dirname, '..', 'screenshots');
 export const RUN_ID = `${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`;
 
 export const DEFAULT_PASSWORD = 'secretPass1!';
+
+/** Root of the plugin sources (mounted read-only into the Playwright container). */
+export const PLUGIN_DIR = process.env.PLUGIN_DIR || path.join(__dirname, '..', '..', '..');

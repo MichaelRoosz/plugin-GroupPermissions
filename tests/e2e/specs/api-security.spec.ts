@@ -72,8 +72,61 @@ test.describe('API access checks', () => {
       .toMatch(/'?admin'? access/);
   });
 
+  test('getGroupAccessFromSite requires admin access on that website', async () => {
+    await expect(MatomoApi.raw('GroupPermissions.getGroupAccessFromSite', { idSite })).rejects.toThrow(/'?admin'? access/);
+    expect(await viewUser.expectError('GroupPermissions.getGroupAccessFromSite', { idSite })).toMatch(/'?admin'? access/);
+    expect(await adminUser.expectError('GroupPermissions.getGroupAccessFromSite', { idSite: 1 })).toMatch(/'?admin'? access/);
+    expect(await adminUser.call('GroupPermissions.getGroupAccessFromSite', { idSite })).toHaveProperty([group.name]);
+  });
+
+  test('"all" websites for a site admin only means the websites he administers', async () => {
+    const allGroup = await su.createGroup('Admin all');
+    await adminUser.call('GroupPermissions.setGroupAccess', { name: allGroup.name, access: 'view', idSites: 'all' });
+    expect((await su.groupAccess(idSite))[allGroup.name]).toBe('view');
+    expect((await su.groupAccess(1))[allGroup.name]).toBe('noaccess');
+  });
+
+  test('a site admin cannot grant access to a website list containing a foreign website', async () => {
+    const listGroup = await su.createGroup('Admin list');
+    expect(await adminUser.expectError('GroupPermissions.setGroupAccess', { name: listGroup.name, access: 'view', idSites: `${idSite},1` }))
+      .toMatch(/'?admin'? access/);
+    // nothing was stored, not even for the administered website
+    expect((await su.groupAccess(idSite))[listGroup.name]).toBe('noaccess');
+  });
+
+  test('view users cannot copy dashboards or manage groups', async () => {
+    for (const [method, params] of [
+      ['GroupPermissions.copyDashboardToGroup', { idDashboard: 1, idGroup: group.idGroup }],
+      ['GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: viewUser.login }],
+      ['GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: viewUser.login }],
+      ['GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: 'x' }],
+      ['GroupPermissions.deleteGroup', { idGroup: group.idGroup }],
+    ] as const) {
+      expect(await viewUser.expectError(method, params), method).toMatch(/access/);
+    }
+    expect(await su.call('GroupPermissions.getGroupWithId', { idGroup: group.idGroup })).toEqual(group);
+  });
+
+  test('the anonymous user cannot be added to a group (groups could grant admin access to every visitor)', async () => {
+    const anonGroup = await su.createGroup('Anonymous');
+    await su.setGroupAccess(anonGroup.name, 'admin', idSite);
+    expect(await su.expectError('GroupPermissions.addUserToGroup', { idGroup: anonGroup.idGroup, login: 'anonymous' }))
+      .toMatch(/anonymous user cannot be added to a group/);
+    expect(await su.members(anonGroup.idGroup)).toEqual([]);
+    expect((await MatomoApi.raw('SitesManager.getSitesIdWithAtLeastViewAccess')).map(Number)).not.toContain(idSite);
+  });
+
   test('super user only methods are rejected for site admins', async () => {
     expect(await adminUser.expectError('GroupPermissions.createGroup', { groupName: 'nope' })).toMatch(/super ?user/i);
+    for (const [method, params] of [
+      ['GroupPermissions.getMembersOfGroup', { idGroup: group.idGroup }],
+      ['GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: adminUser.login }],
+      ['GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: adminUser.login }],
+      ['GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: 'nope' }],
+      ['GroupPermissions.deleteGroup', { idGroup: group.idGroup }],
+    ] as const) {
+      expect(await adminUser.expectError(method, params), method).toMatch(/super ?user/i);
+    }
     expect(await adminUser.expectError('GroupPermissions.inviteUserToGroups', {
       userLogin: 'nope', email: 'nope@example.org', idGroups: String(group.idGroup),
     })).toMatch(/super ?user/i);

@@ -20,3 +20,8 @@ docker compose --profile test run --rm -e HOST_UID="$(id -u)" -e HOST_GID="$(id 
              npm ci --no-audit --no-fund --loglevel=error && npx playwright test "$@"; status=$?
              chown -R "$HOST_UID:$HOST_GID" screenshots test-results playwright-report .auth 2>/dev/null
              exit $status' -- "$@"
+
+# plugin lifecycle (deactivate/uninstall/reinstall) checks: only on a full run, they modify the plugin data
+if [ "$#" -eq 0 ]; then
+    ./bin/lifecycle-test.sh
+fi
