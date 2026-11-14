@@ -108,6 +108,24 @@ class Model {
         return $user->getMembersOfGroup($idGroup);
     }
 
+    /**
+     * @return array<int, int>
+     */
+    public function countMembersPerGroup(): array {
+        $user = new GroupUser();
+
+        return $user->countMembersPerGroup();
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function countSitesPerGroup(): array {
+        $permission = new GroupPermission();
+
+        return $permission->countSitesPerGroup();
+    }
+
     public function isUserInGroup(string $login, int $idGroup): bool {
         $user = new GroupUser();
 

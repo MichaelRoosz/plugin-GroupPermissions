@@ -1,4 +1,389 @@
+// Group Permissions admin page, styled after Matomo's own admin screens (Users, Goals)
 
-.groupPermissions .custom_select_all  {
+.groupPermissions {
+  .custom_select_all {
     font-weight: 700;
+  }
+
+  // tabs below the headline (server side links)
+  .groupPermissionsTabs {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid @theme-color-border;
+
+    li {
+      margin: 0 8px -1px 0;
+
+      a {
+        display: block;
+        padding: 12px 16px;
+        text-decoration: none;
+        color: @theme-color-text-light;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        transition: color .15s, border-color .15s;
+
+        &:hover,
+        &:focus-visible {
+          color: @theme-color-text;
+          border-bottom-color: @theme-color-text-lighter;
+        }
+      }
+
+      &.active a {
+        color: @theme-color-link;
+        border-bottom-color: @theme-color-link;
+      }
+    }
+  }
+
+  .groupPermissionsIntro {
+    margin: 0 0 16px;
+    max-width: 900px;
+  }
+
+  // toolbar above the tables: buttons left, search right
+  .groupPermissionsToolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin: 0 0 16px;
+
+    > .col {
+      float: none;
+    }
+
+    .form-group,
+    .input-field {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .groupPermissionsToolbarButtons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-left: 0;
+
+      .btn [class^="icon-"] {
+        margin-right: 4px;
+        vertical-align: text-bottom;
+      }
+    }
+
+    .groupPermissionsSearch .input-field {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .groupPermissionsSiteField {
+      padding-left: 0;
+    }
+  }
+
+  .groupPermissionsLabel {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: @theme-color-text-light;
+  }
+
+  // links inside the page are only underlined on hover (like Matomo's menus and tables)
+  .groupPermissionsEditGroup .listCircle a,
+  .entityCancelLink,
+  td.groupName a,
+  .groupPermissionsInviteIntoGroup {
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+
+  // tables
+  table.dataTable,
+  table[class*="groupPermissions"] {
+    // Matomo's content tables align cells to the top; center them, the rows contain selects and icon buttons
+    > tbody > tr > td {
+      vertical-align: middle !important;
+    }
+
+    td.groupName,
+    td.siteName,
+    td.login {
+      font-weight: 500;
+    }
+
+    // long names without spaces (e.g. logins or emails) must not widen the table
+    td.groupName,
+    td.siteName,
+    td.login,
+    td.email {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    td.actions-cell {
+      white-space: nowrap;
+    }
+
+    td.access-cell {
+      min-width: 180px;
+
+      .form-group,
+      .input-field {
+        margin: 0;
+      }
+    }
+
+    tr.groupPermissionsEmpty td {
+      padding: 24px 20px;
+      color: @theme-color-text-light;
+    }
+
+    tr.groupPermissionsRolesHelp td {
+      background: @theme-color-background-tinyContrast;
+
+      ul {
+        margin: 0;
+      }
+
+      li {
+        margin: 4px 0;
+      }
+    }
+
+    .groupPermissionsRolesHelpToggle {
+      cursor: pointer;
+      margin-left: 4px;
+      opacity: .7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    td.groupName a {
+      font-weight: 500;
+    }
+
+    td.status .active {
+      color: #43a047;
+    }
+
+    td.status .pending {
+      color: #f57c00;
+    }
+
+    td.status .expired {
+      color: #d4291f;
+    }
+  }
+
+  // forms
+  .groupPermissionsFormActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+
+    .entityCancelLink {
+      margin: 0;
+    }
+  }
+
+  .groupPermissionsCheckboxList {
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 4px 0;
+
+    p.checkbox {
+      margin: 4px 0;
+
+      // materialize renders unchecked checkbox labels grey, which looks disabled
+      label > span {
+        color: @theme-color-text;
+      }
+    }
+  }
+
+  .groupPermissionsInviteGroups {
+    margin: 16px 0;
+
+    .form-help {
+      margin-top: 4px;
+    }
+  }
+
+  // group editor
+  .groupPermissionsEditGroup {
+    .entityList .listCircle li a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .groupPermissionsCount {
+      min-width: 24px;
+      padding: 0 8px;
+      border-radius: 12px;
+      background: @theme-color-background-tinyContrast;
+      color: @theme-color-text-light;
+      font-size: 12px;
+      line-height: 20px;
+      text-align: center;
+    }
+
+    .entityCancel {
+      margin-top: 24px;
+
+      [class^="icon-"] {
+        margin-right: 4px;
+      }
+    }
+
+    .visibleTab h3:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .groupPermissionsAddMember,
+  .groupPermissionsGiveAccess {
+    margin-bottom: 24px;
+  }
+
+  .groupPermissionsInlineForm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+
+    .multiselect {
+      flex: 1 1 320px;
+      max-width: 480px;
+    }
+
+    .groupPermissionsSiteField {
+      flex: 0 1 auto;
+    }
+
+    .groupPermissionsRoleField {
+      flex: 0 1 180px;
+
+      .form-group,
+      .input-field {
+        margin: 0;
+      }
+    }
+
+    .btn {
+      margin: 0;
+    }
+  }
+
+  .groupPermissionsInviteIntoGroup {
+    display: inline-block;
+    margin-top: 12px;
+
+    [class^="icon-"] {
+      margin-right: 4px;
+      vertical-align: text-bottom;
+    }
+  }
+
+  .groupPermissionsDeleteGroup {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid @theme-color-border;
+
+    .btn {
+      background-color: #d4291f;
+
+      &:hover {
+        background-color: darken(#d4291f, 8%);
+      }
+
+      [class^="icon-"] {
+        margin-right: 4px;
+        vertical-align: text-bottom;
+      }
+    }
+  }
+
+  // vue-multiselect, aligned with Matomo's text fields
+  .multiselect {
+    min-height: 40px;
+    color: @theme-color-text;
+
+    .multiselect__tags {
+      min-height: 40px;
+      padding: 8px 40px 0 0;
+      border: 0;
+      border-bottom: 1px solid #9e9e9e;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    &.multiselect--active .multiselect__tags {
+      border-bottom: 2px solid @theme-color-link;
+    }
+
+    .multiselect__input,
+    .multiselect__single,
+    .multiselect__placeholder {
+      padding-left: 0;
+      background: transparent;
+      font-size: 14px;
+    }
+
+    .multiselect__placeholder {
+      color: @theme-color-text-lighter;
+    }
+
+    .multiselect__input {
+      // Matomo's global input styles add a border and height
+      border: 0 !important;
+      height: auto !important;
+      box-shadow: none !important;
+      margin: 0;
+    }
+
+    .multiselect__option--highlight,
+    .multiselect__option--highlight:after {
+      background: @theme-color-link;
+    }
+
+    .multiselect__content-wrapper {
+      z-index: 999;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    }
+  }
+}
+
+// small screens: tighter tables so all columns fit without horizontal scrolling
+@media (max-width: 600px) {
+  .groupPermissions {
+    table[class*="groupPermissions"] {
+      > thead > tr > th,
+      > tbody > tr > td {
+        padding: 8px 6px !important;
+      }
+
+      td.actions-cell {
+        white-space: normal;
+      }
+
+      td.access-cell {
+        min-width: 120px;
+      }
+    }
+
+    .groupPermissionsTabs li a {
+      padding: 10px 8px;
+    }
+  }
 }

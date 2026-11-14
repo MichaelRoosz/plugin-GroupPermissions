@@ -36,6 +36,8 @@ test.describe('API access checks', () => {
     expect(await viewUser.expectError('GroupPermissions.getAllGroups')).toMatch(/'?admin'? access/);
     expect(await viewUser.expectError('GroupPermissions.getGroupWithId', { idGroup: group.idGroup })).toMatch(/'?admin'? access/);
     expect(await viewUser.expectError('GroupPermissions.getMembersOfGroup', { idGroup: group.idGroup })).toMatch(/super ?user/i);
+    expect(await viewUser.expectError('GroupPermissions.getGroupsOverview')).toMatch(/super ?user/i);
+    expect(await viewUser.expectError('GroupPermissions.getSitesAccessFromGroup', { idGroup: group.idGroup })).toMatch(/super ?user/i);
   });
 
   test('user with view access cannot change group access, even for a site he can view', async () => {
@@ -120,6 +122,8 @@ test.describe('API access checks', () => {
     expect(await adminUser.expectError('GroupPermissions.createGroup', { groupName: 'nope' })).toMatch(/super ?user/i);
     for (const [method, params] of [
       ['GroupPermissions.getMembersOfGroup', { idGroup: group.idGroup }],
+      ['GroupPermissions.getGroupsOverview', {}],
+      ['GroupPermissions.getSitesAccessFromGroup', { idGroup: group.idGroup }],
       ['GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: adminUser.login }],
       ['GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: adminUser.login }],
       ['GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: 'nope' }],

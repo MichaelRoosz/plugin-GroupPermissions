@@ -1,7 +1,7 @@
 import { test, expect, Browser } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
 import { DEFAULT_PASSWORD } from '../helpers/env';
-import { login, screenshot, waitForIdle } from '../helpers/ui';
+import { accessRow, login, screenshot, setAccess, waitForIdle } from '../helpers/ui';
 
 async function pageAs(browser: Browser, user: string) {
   const context = await browser.newContext();
@@ -41,7 +41,7 @@ test.describe('Admin page permissions', () => {
 
     await page.goto(`/index.php?module=GroupPermissions&action=index&idSite=${idSite}&period=day&date=yesterday`);
     await expect(page.locator('body')).toContainText(/admin access/);
-    await expect(page.locator('.nav-pills')).toHaveCount(0);
+    await expect(page.locator('.groupPermissionsTabs')).toHaveCount(0);
     await page.context().close();
   });
 
@@ -57,7 +57,7 @@ test.describe('Admin page permissions', () => {
     await page.goto(`/index.php?module=GroupPermissions&action=index&idSite=${idSite}&period=day&date=yesterday&show=groups`);
     await waitForIdle(page);
     await expect(page.locator('h2:text-is("Group Permissions")')).toBeVisible();
-    await expect(page.locator('.nav-pills')).toHaveCount(0);
+    await expect(page.locator('.groupPermissionsTabs')).toHaveCount(0);
     await expect(page.getByText('Create a new group')).toHaveCount(0);
     await expect(page.getByText('Decide which groups have access to your websites.')).toBeVisible();
 
@@ -68,9 +68,8 @@ test.describe('Admin page permissions', () => {
     await expect(selector.getByText('Apply to all websites')).toHaveCount(0);
     await page.keyboard.press('Escape');
 
-    const row = page.locator('tr', { has: page.locator('td', { hasText: new RegExp(`^${group.name}$`) }) });
-    await row.locator('td').nth(3).locator('img.updateAccess').click();
-    await expect(row.locator('td').nth(3).locator('img.accessGranted')).toBeVisible();
+    const row = accessRow(page, group.name);
+    await setAccess(page, row, 'write');
     await screenshot(page, 'manage-access-site-admin');
     await expect.poll(async () => (await su.groupAccess(idSite))[group.name]).toBe('write');
     await page.context().close();

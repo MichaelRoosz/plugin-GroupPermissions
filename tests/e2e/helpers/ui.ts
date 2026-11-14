@@ -82,41 +82,114 @@ export async function multiselectPick(multiselect: Locator, label: string): Prom
   await multiselect.locator('.multiselect__option', { hasText: label }).first().click();
 }
 
+// ---- Matomo form fields ----
+
+/**
+ * Fills a text input. Matomo's text Field updates its model on keydown (one key late) and on change,
+ * so the change event (fired by the browser when leaving the field) is dispatched as well.
+ */
+export async function fillField(input: Locator, value: string): Promise<void> {
+  await input.fill(value);
+  await input.dispatchEvent('change');
+}
+
+/** The (materialize) select of a Matomo select Field inside the given container. */
+export function roleSelect(container: Locator): Locator {
+  return container.locator('input.select-dropdown').first();
+}
+
+/** Chooses an option of a Matomo select Field by its label. */
+export async function chooseOption(container: Locator, label: string): Promise<void> {
+  await roleSelect(container).click();
+  const option = container.locator('ul.select-dropdown li', { hasText: new RegExp(`^\\s*${escapeRegExp(label)}\\s*$`) });
+  await option.first().click();
+}
+
+export const ROLE_LABELS = {
+  noaccess: 'No access',
+  view: 'View',
+  write: 'Write',
+  admin: 'Admin',
+} as const;
+export type AccessLevel = keyof typeof ROLE_LABELS;
+export const ACCESS_LEVELS = Object.keys(ROLE_LABELS) as AccessLevel[];
+
 // ---- Manage Access tab ----
 
-export const ACCESS_LEVELS = ['noaccess', 'view', 'write', 'admin'] as const;
-export type AccessLevel = typeof ACCESS_LEVELS[number];
-
-/** Row of a group in the Manage Access table (columns: name | none | view | write | admin). */
+/** Row of a group in the Manage Access table. */
 export function accessRow(page: Page, groupName: string): Locator {
-  return page.locator('.entityTable tbody tr', { has: page.locator('td:first-child', { hasText: new RegExp(`^\\s*${escapeRegExp(groupName)}\\s*$`) }) });
+  return page.locator('tr.groupPermissionsAccessRow', {
+    has: page.locator('td.groupName', { hasText: new RegExp(`^\\s*${escapeRegExp(groupName)}\\s*$`) }),
+  });
 }
 
-export function accessCell(row: Locator, access: AccessLevel): Locator {
-  return row.locator('td').nth(ACCESS_LEVELS.indexOf(access) + 1);
-}
-
-/** Asserts that exactly the given access level is marked as granted in the row. */
 export async function expectAccess(row: Locator, access: AccessLevel): Promise<void> {
-  for (const level of ACCESS_LEVELS) {
-    await expect(accessCell(row, level).locator(level === access ? 'img.accessGranted' : 'img.updateAccess')).toBeVisible();
-  }
+  await expect(roleSelect(row)).toHaveValue(ROLE_LABELS[access]);
+}
+
+/** Changes the role of a group in the Manage Access table and waits until it is saved. */
+export async function setAccess(page: Page, row: Locator, access: AccessLevel): Promise<void> {
+  await chooseOption(row, ROLE_LABELS[access]);
+  await waitForIdle(page);
+  await expectAccess(row, access);
 }
 
 /** Group names in the order shown in the Manage Access table. */
 export async function accessTableGroups(page: Page): Promise<string[]> {
-  return (await page.locator('.entityTable tbody tr td:first-child').allInnerTexts()).map((t) => t.trim());
+  return (await page.locator('tr.groupPermissionsAccessRow td.groupName').allInnerTexts()).map((t) => t.trim());
 }
 
 // ---- Manage Groups tab ----
 
-export function manageGroupCard(page: Page): Locator {
-  return page.locator('.card', { has: page.locator('h2', { hasText: /^Manage group$/ }) });
+export function groupRow(page: Page, groupName: string): Locator {
+  return page.locator('tr.groupPermissionsGroupRow', {
+    has: page.locator('td.groupName', { hasText: new RegExp(`^\\s*${escapeRegExp(groupName)}\\s*$`) }),
+  });
 }
 
-export function renameInput(page: Page): Locator {
-  return manageGroupCard(page).locator('h3', { hasText: 'Rename this group' })
-    .locator('xpath=following-sibling::div[1]').locator('input[type=text]');
+/** Group names in the order shown in the group list. */
+export async function groupListNames(page: Page): Promise<string[]> {
+  return (await page.locator('tr.groupPermissionsGroupRow td.groupName').allInnerTexts()).map((t) => t.trim());
+}
+
+export type EditorTab = 'members' | 'access' | 'settings';
+
+/** Opens the editor of a group directly (the view is kept in the URL hash). */
+export async function openGroupEditor(page: Page, idGroup: number, tab: EditorTab = 'members'): Promise<void> {
+  await page.goto(`/index.php?module=GroupPermissions&action=index&idSite=1&period=day&date=yesterday&show=groups#?idGroup=${idGroup}&groupTab=${tab}`);
+  await expect(page.locator('.groupPermissionsEditGroup')).toBeVisible();
+  await waitForIdle(page);
+}
+
+export function groupEditor(page: Page): Locator {
+  return page.locator('.groupPermissionsEditGroup');
+}
+
+export async function switchEditorTab(page: Page, tab: EditorTab): Promise<void> {
+  await groupEditor(page).locator(`.listCircle li[data-tab="${tab}"] a`).click();
+  await expect(groupEditor(page).locator(`.listCircle li[data-tab="${tab}"]`)).toHaveClass(/active/);
+  await waitForIdle(page);
+}
+
+export function memberRow(page: Page, login: string): Locator {
+  return page.locator('tr.groupPermissionsMemberRow', {
+    has: page.locator('td.login', { hasText: new RegExp(`^\\s*${escapeRegExp(login)}\\s*$`) }),
+  });
+}
+
+export async function memberLogins(page: Page): Promise<string[]> {
+  return (await page.locator('tr.groupPermissionsMemberRow td.login').allInnerTexts()).map((t) => t.trim());
+}
+
+export function websiteRow(page: Page, siteName: string): Locator {
+  return page.locator('tr.groupPermissionsWebsiteRow', {
+    has: page.locator('td.siteName', { hasText: new RegExp(`^\\s*${escapeRegExp(siteName)}\\s*$`) }),
+  });
+}
+
+/** Clicks a save button (Matomo's SaveButton component renders an input inside a wrapper). */
+export function saveButton(container: Locator, cssClass: string): Locator {
+  return container.locator(`.${cssClass} input[type=button]`);
 }
 
 /** Labels of all options of a vue-multiselect (opens and closes the dropdown). */
@@ -125,6 +198,11 @@ export async function multiselectOptions(multiselect: Locator): Promise<string[]
   const labels = (await multiselect.locator('.multiselect__element .multiselect__option > span').allInnerTexts()).map((t) => t.trim());
   await multiselect.locator('input.multiselect__input').press('Escape');
   return labels;
+}
+
+/** Text of the success toast (Matomo notifications). */
+export function toast(page: Page, text: string | RegExp): Locator {
+  return page.locator('.notification', { hasText: text });
 }
 
 export function escapeRegExp(value: string): string {

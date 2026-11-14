@@ -74,7 +74,7 @@ test.describe('Translations', () => {
     await login(page, germanAdmin, DEFAULT_PASSWORD);
     for (const tab of ['access', 'groups'] as const) {
       await openGroupPermissions(page, tab);
-      await expect(page.locator('.nav-pills li')).toHaveText(['Rechte verwalten', 'Gruppen verwalten']);
+      await expect(page.locator('.groupPermissionsTabs li')).toHaveText(['Rechte verwalten', 'Gruppen verwalten']);
       const text = await page.locator('#content').innerText();
       expect(text).not.toMatch(/\b[A-Z][A-Za-z]+_[A-Z][A-Za-z0-9]+\b/);
     }

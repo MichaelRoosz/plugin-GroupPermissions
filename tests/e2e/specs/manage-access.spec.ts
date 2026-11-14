@@ -2,12 +2,12 @@ import { test, expect, Page } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
 import { DEFAULT_PASSWORD, superUserStorageState } from '../helpers/env';
 import {
-  ACCESS_LEVELS, accessCell, accessRow, accessTableGroups, clickModalButton, expectAccess, login,
-  openGroupPermissions, screenshot, selectSite, waitForIdle,
+  ACCESS_LEVELS, accessRow, accessTableGroups, chooseOption, clickModalButton, expectAccess, fillField, login,
+  openGroupPermissions, ROLE_LABELS, roleSelect, screenshot, selectSite, setAccess, toast, waitForIdle,
 } from '../helpers/ui';
 
 /**
- * The "Manage Access" tab: choose a website and set the access of every group for it.
+ * The "Manage Access" tab: choose a website and set the role of every group for it.
  */
 test.describe('Manage Access tab', () => {
   test.use({ storageState: superUserStorageState });
@@ -22,20 +22,22 @@ test.describe('Manage Access tab', () => {
   }
 
   async function openForSite(page: Page, idSite: number) {
-    await openGroupPermissions(page, 'access');
-    await selectSite(page, siteNames.get(idSite)!);
+    await openGroupPermissions(page, 'access', '', idSite);
+    await expect(page.locator('.siteSelector .title').first()).toContainText(siteNames.get(idSite)!, { ignoreCase: true });
+    await waitForIdle(page);
   }
 
   async function chooseAllWebsites(page: Page) {
     const selector = page.locator('.siteSelector').first();
     await selector.locator('.title').click();
     await selector.getByText('Apply to all websites').click();
-    await expect(selector.locator('.title')).toContainText('Apply to all websites');
+    await expect(selector.locator('.title')).toContainText('Apply to all websites', { ignoreCase: true });
     await waitForIdle(page);
   }
 
   test.beforeAll(async () => {
     su = await MatomoApi.superUser();
+    siteNames.set(1, 'Site One');
   });
 
   test('shows the description and opens with the website from the URL', async ({ page }) => {
@@ -43,16 +45,120 @@ test.describe('Manage Access tab', () => {
     const group = await su.createGroup('Initial');
     await su.setGroupAccess(group.name, 'write', idSite);
 
-    await openGroupPermissions(page, 'access', '', idSite);
-    await expect(page.locator('.nav-pills li.active')).toHaveText('Manage Access');
+    await openForSite(page, idSite);
+    await expect(page.locator('.groupPermissionsTabs li.active')).toHaveText('Manage Access');
     await expect(page.getByText('Decide which groups have access to your websites.')).toBeVisible();
-    await expect(page.locator('.siteSelector .title').first()).toContainText(siteNames.get(idSite)!, { ignoreCase: true });
+    await expect(page.locator('.groupPermissionsManageAccess .card-title')).toHaveText(`Roles of the groups for '${siteNames.get(idSite)}'`);
     await expectAccess(accessRow(page, group.name), 'write');
 
     // and for another website of the URL
     await openGroupPermissions(page, 'access', '', 1);
     await expect(page.locator('.siteSelector .title').first()).toContainText('Site One', { ignoreCase: true });
     await expectAccess(accessRow(page, group.name), 'noaccess');
+  });
+
+  test('lists all groups alphabetically with their current role', async ({ page }) => {
+    const idSite = await createSite('Listing Site');
+    const groups: Record<string, string> = {};
+    for (const [prefix, access] of [['Zulu', 'admin'], ['alpha', 'view'], ['Mike', 'write'], ['Bravo', 'noaccess']]) {
+      const group = await su.createGroup(`List ${prefix}`);
+      await su.setGroupAccess(group.name, access, idSite);
+      groups[group.name] = access;
+    }
+
+    await openForSite(page, idSite);
+
+    const shown = await accessTableGroups(page);
+    const allGroups: string[] = (await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 })).map((g: any) => g.name);
+    expect([...shown].sort()).toEqual([...allGroups].sort());
+    expect(shown).toEqual([...shown].sort((a, b) => a.localeCompare(b)));
+
+    for (const [name, access] of Object.entries(groups)) {
+      await expectAccess(accessRow(page, name), access as any);
+    }
+    await expect(page.locator('.groupPermissionsAccessTable thead th')).toHaveText(['Group', 'Role'], { ignoreCase: true });
+  });
+
+  test('every role can be selected, is saved immediately and confirmed by a toast', async ({ page }) => {
+    const idSite = await createSite('Levels Site');
+    const group = await su.createGroup('Levels');
+    await openForSite(page, idSite);
+    const row = accessRow(page, group.name);
+    await expectAccess(row, 'noaccess');
+
+    // the role select offers "No access" and Matomo's roles
+    await roleSelect(row).click();
+    await expect(row.locator('ul.select-dropdown li')).toHaveText(Object.values(ROLE_LABELS));
+    await page.locator('.groupPermissionsIntro').click(); // close the dropdown
+
+    for (const access of ['view', 'write', 'admin', 'noaccess'] as const) {
+      await setAccess(page, row, access);
+      await expect(toast(page, `The group '${group.name}' now has the role '${ROLE_LABELS[access]}'`).first()).toBeVisible();
+      expect((await su.groupAccess(idSite))[group.name]).toBe(access);
+      if (access === 'admin') {
+        await screenshot(page, 'manage-access-admin-granted');
+      }
+    }
+
+    // reload shows the stored state
+    await su.setGroupAccess(group.name, 'write', idSite);
+    await openForSite(page, idSite);
+    await expectAccess(accessRow(page, group.name), 'write');
+  });
+
+  test('changing the role for one website does not affect other websites or groups', async ({ page }) => {
+    const s1 = await createSite('Isolated One');
+    const s2 = await createSite('Isolated Two');
+    const group = await su.createGroup('Isolated');
+    const other = await su.createGroup('Isolated other');
+    await su.setGroupAccess(other.name, 'view', s1);
+
+    await openForSite(page, s1);
+    await setAccess(page, accessRow(page, group.name), 'admin');
+
+    expect(await su.groupAccess(s1)).toMatchObject({ [group.name]: 'admin', [other.name]: 'view' });
+    expect((await su.groupAccess(s2))[group.name]).toBe('noaccess');
+  });
+
+  test('switching websites shows the roles of the selected website', async ({ page }) => {
+    const group = await su.createGroup('Switch sites');
+    const s1 = await createSite('Switch One');
+    const s2 = await createSite('Switch Two');
+    await su.setGroupAccess(group.name, 'admin', s1);
+    await su.setGroupAccess(group.name, 'write', s2);
+
+    await openForSite(page, s1);
+    await expectAccess(accessRow(page, group.name), 'admin');
+    await selectSite(page, siteNames.get(s2)!);
+    await expect(page.locator('.groupPermissionsManageAccess .card-title')).toContainText(siteNames.get(s2)!);
+    await expectAccess(accessRow(page, group.name), 'write');
+  });
+
+  test('the search filters the groups', async ({ page }) => {
+    const idSite = await createSite('Search Site');
+    const needle = await su.createGroup('Needle');
+    await su.createGroup('Haystack');
+    await openForSite(page, idSite);
+
+    const search = page.locator('.groupPermissionsSearch input');
+    await fillField(search, needle.name.toLowerCase());
+    await expect(page.locator('tr.groupPermissionsAccessRow')).toHaveCount(1);
+    await expect(accessRow(page, needle.name)).toBeVisible();
+
+    await fillField(search, 'no group has this name');
+    await expect(page.locator('tr.groupPermissionsAccessRow')).toHaveCount(0);
+    await expect(page.locator('tr.groupPermissionsEmpty')).toHaveText('No groups match your search.');
+  });
+
+  test('the role help explains the roles', async ({ page }) => {
+    await openForSite(page, 1);
+    await page.locator('.groupPermissionsAccessTable .groupPermissionsRolesHelpToggle').click();
+    const help = page.locator('.groupPermissionsAccessTable tr.groupPermissionsRolesHelp');
+    await expect(help).toContainText('View:');
+    await expect(help).toContainText('Write:');
+    await expect(help).toContainText('Admin:');
+    await page.locator('.groupPermissionsAccessTable .groupPermissionsRolesHelpToggle').click();
+    await expect(help).toHaveCount(0);
   });
 
   test('a slow response of the previously selected website does not overwrite the current one', async ({ page }) => {
@@ -62,7 +168,7 @@ test.describe('Manage Access tab', () => {
     await su.setGroupAccess(group.name, 'admin', slowSite);
     await su.setGroupAccess(group.name, 'view', fastSite);
 
-    await openGroupPermissions(page, 'access', '', 1);
+    await openForSite(page, 1);
     // delay the access list of the slow website
     await page.route(/method=GroupPermissions\.getGroupAccessFromSite/, async (route) => {
       if ((route.request().postData() || '').includes(`idSite=${slowSite}`)) {
@@ -83,106 +189,30 @@ test.describe('Manage Access tab', () => {
     await expect(selector.locator('.title')).toContainText(siteNames.get(fastSite)!, { ignoreCase: true });
   });
 
-  test('lists all groups alphabetically with their current access', async ({ page }) => {
-    const idSite = await createSite('Listing Site');
-    const groups: Record<string, string> = {};
-    for (const [prefix, access] of [['Zulu', 'admin'], ['alpha', 'view'], ['Mike', 'write'], ['Bravo', 'noaccess']]) {
-      const group = await su.createGroup(`List ${prefix}`);
-      await su.setGroupAccess(group.name, access, idSite);
-      groups[group.name] = access;
-    }
-
-    await openForSite(page, idSite);
-
-    const shown = await accessTableGroups(page);
-    const allGroups: string[] = (await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 })).map((g: any) => g.name);
-    expect([...shown].sort()).toEqual([...allGroups].sort());
-    expect(shown).toEqual([...shown].sort());
-
-    for (const [name, access] of Object.entries(groups)) {
-      await expectAccess(accessRow(page, name), access as any);
-    }
-    await expect(page.locator('.entityTable thead th')).toHaveText(['Group', 'No access', 'View', 'Write', 'Admin'], { ignoreCase: true });
-  });
-
-  test('every access level can be set and is persisted', async ({ page }) => {
-    const idSite = await createSite('Levels Site');
-    const group = await su.createGroup('Levels');
-    await openForSite(page, idSite);
-    const row = accessRow(page, group.name);
-    await expectAccess(row, 'noaccess');
-
-    for (const access of ['view', 'write', 'admin', 'noaccess'] as const) {
-      await accessCell(row, access).locator('img.updateAccess').click();
-      await expectAccess(row, access);
-      await waitForIdle(page);
-      expect((await su.groupAccess(idSite))[group.name]).toBe(access);
-
-      if (access === 'admin') {
-        await screenshot(page, 'manage-access-admin-granted');
-      }
-    }
-
-    // the granted level is not clickable
-    await expect(accessCell(row, 'noaccess').locator('img.updateAccess')).toHaveCount(0);
-
-    // reload shows the stored state
-    await su.setGroupAccess(group.name, 'write', idSite);
-    await openForSite(page, idSite);
-    await expectAccess(accessRow(page, group.name), 'write');
-  });
-
-  test('changing the access of one site does not affect other sites or groups', async ({ page }) => {
-    const s1 = await createSite('Isolated One');
-    const s2 = await createSite('Isolated Two');
-    const group = await su.createGroup('Isolated');
-    const other = await su.createGroup('Isolated other');
-    await su.setGroupAccess(other.name, 'view', s1);
-
-    await openForSite(page, s1);
-    await accessCell(accessRow(page, group.name), 'admin').locator('img.updateAccess').click();
-    await expectAccess(accessRow(page, group.name), 'admin');
-    await waitForIdle(page);
-
-    expect(await su.groupAccess(s1)).toMatchObject({ [group.name]: 'admin', [other.name]: 'view' });
-    expect((await su.groupAccess(s2))[group.name]).toBe('noaccess');
-  });
-
-  test('switching websites shows the access of the selected website', async ({ page }) => {
-    const group = await su.createGroup('Switch sites');
-    const s1 = await createSite('Switch One');
-    const s2 = await createSite('Switch Two');
-    await su.setGroupAccess(group.name, 'admin', s1);
-    await su.setGroupAccess(group.name, 'write', s2);
-
-    await openForSite(page, s1);
-    await expectAccess(accessRow(page, group.name), 'admin');
-    await selectSite(page, siteNames.get(s2)!);
-    await expectAccess(accessRow(page, group.name), 'write');
-  });
-
-  test('"Apply to all websites" lists every group and asks for confirmation', async ({ page }) => {
+  test('"Apply to all websites" lists every group, explains itself and asks for confirmation', async ({ page }) => {
     const group = await su.createGroup('All sites');
     const withAccess = await su.createGroup('All sites existing');
     await su.setGroupAccess(withAccess.name, 'admin', 1);
-    await openGroupPermissions(page, 'access');
+    await openForSite(page, 1);
     await chooseAllWebsites(page);
 
+    await expect(page.locator('.groupPermissionsAllWebsitesNote')).toContainText('changes the role of a group for every website');
     // the all-websites view does not show existing per-site access, every group starts at "no access"
     const allGroups: string[] = (await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 })).map((g: any) => g.name);
     expect((await accessTableGroups(page)).sort()).toEqual([...allGroups].sort());
     await expectAccess(accessRow(page, withAccess.name), 'noaccess');
 
     const row = accessRow(page, group.name);
-    await accessCell(row, 'view').locator('img.updateAccess').click();
-    await expect(page.locator('.modal.open')).toContainText(`Are you sure you want to give 'view' access to the group '${group.name}' for all the websites?`);
+    await chooseOption(row, 'View');
+    await expect(page.locator('.modal.open')).toContainText(`Are you sure you want to give 'View' access to the group '${group.name}' for all the websites?`);
     await screenshot(page, 'manage-access-all-websites-confirmation');
 
+    // "No" resets the select
     await clickModalButton(page, 'No');
     await expectAccess(row, 'noaccess');
     expect((await su.groupAccess(1))[group.name]).toBe('noaccess');
 
-    await accessCell(row, 'view').locator('img.updateAccess').click();
+    await chooseOption(row, 'View');
     await clickModalButton(page, 'Yes');
     await expectAccess(row, 'view');
     await waitForIdle(page);
@@ -192,7 +222,7 @@ test.describe('Manage Access tab', () => {
     }
   });
 
-  test('shows an error if the group was deleted in the meantime', async ({ page }) => {
+  test('shows an error and resets the select if the group was deleted in the meantime', async ({ page }) => {
     const idSite = await createSite('Stale Site');
     const group = await su.createGroup('Stale');
     await openForSite(page, idSite);
@@ -200,11 +230,21 @@ test.describe('Manage Access tab', () => {
     await expectAccess(row, 'noaccess');
 
     await su.call('GroupPermissions.deleteGroup', { idGroup: group.idGroup });
-    await accessCell(row, 'view').locator('img.updateAccess').click();
+    await chooseOption(row, 'View');
 
     await expect(page.locator('#ajaxErrorAccessGroupMember')).toContainText('Group does not exist');
     await expectAccess(row, 'noaccess');
     await screenshot(page, 'manage-access-error');
+  });
+
+  test('without groups an empty state links to Manage Groups', async ({ page }) => {
+    await page.route(/method=GroupPermissions\.getGroupAccessFromSite/, (route) =>
+      route.fulfill({ contentType: 'application/json', body: '[]' }));
+    await openForSite(page, 1);
+    const empty = page.locator('.groupPermissionsAccessTable tr.groupPermissionsEmpty');
+    await expect(empty).toContainText('There are no groups yet.');
+    await empty.getByRole('link', { name: 'Manage Groups' }).click();
+    await expect(page.locator('.groupPermissionsTabs li.active')).toHaveText('Manage Groups');
   });
 
   test.describe('as site admin', () => {
@@ -241,9 +281,7 @@ test.describe('Manage Access tab', () => {
 
       const row = accessRow(page, group.name);
       for (const access of ACCESS_LEVELS.slice(1)) {
-        await accessCell(row, access).locator('img.updateAccess').click();
-        await expectAccess(row, access);
-        await waitForIdle(page);
+        await setAccess(page, row, access);
         expect((await su.groupAccess(adminSite2))[group.name]).toBe(access);
       }
       expect((await su.groupAccess(adminSite1))[group.name]).toBe('noaccess');

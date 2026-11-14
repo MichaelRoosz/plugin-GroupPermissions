@@ -70,6 +70,19 @@ class GroupPermission {
     }
 
     /**
+     * @return array<int, int> number of websites with access by group id (groups without access are missing)
+     */
+    public function countSitesPerGroup(): array {
+        $table = $this->tablePrefixed;
+        $counts = [];
+        foreach (Rows::list(Db::fetchAll("SELECT idgroup, COUNT(*) AS cnt FROM $table GROUP BY idgroup")) as $row) {
+            $counts[Rows::int($row, 'idgroup')] = Rows::int($row, 'cnt');
+        }
+
+        return $counts;
+    }
+
+    /**
      * @return array<array{
      *   idgroup: int,
      *   access: string

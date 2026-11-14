@@ -52,6 +52,38 @@ test.describe('Group management API', () => {
     expect(await su.expectError('GroupPermissions.createGroup', { groupName: '"'.repeat(13) })).toMatch(/too long/);
   });
 
+  test('getGroupsOverview returns all groups sorted by name with member and website counts', async () => {
+    const busy = await su.createGroup('Overview busy');
+    const idle = await su.createGroup('overview idle');
+    await su.addMembers(busy.idGroup, [await su.createUser('overview_a'), await su.createUser('overview_b')]);
+    await su.setGroupAccess(busy.name, 'view', `1,${await su.createSite('Overview Site')}`);
+
+    const overview: Array<{ idGroup: number; name: string; memberCount: number; siteCount: number }> =
+      await su.call('GroupPermissions.getGroupsOverview', { filter_limit: -1 });
+    expect(overview.find((g) => g.idGroup === busy.idGroup)).toEqual({ idGroup: busy.idGroup, name: busy.name, memberCount: 2, siteCount: 2 });
+    expect(overview.find((g) => g.idGroup === idle.idGroup)).toEqual({ idGroup: idle.idGroup, name: idle.name, memberCount: 0, siteCount: 0 });
+
+    const names = overview.map((g) => g.name);
+    expect(names).toEqual([...names].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())));
+    expect(overview).toHaveLength((await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 })).length);
+  });
+
+  test('getSitesAccessFromGroup returns the websites of a group sorted by name', async () => {
+    const group = await su.createGroup('Sites of group');
+    const zeta = await su.createSite('Zeta Group Site');
+    const alpha = await su.createSite('Alpha Group Site');
+    await su.setGroupAccess(group.name, 'admin', zeta);
+    await su.setGroupAccess(group.name, 'view', alpha);
+    const name = async (idSite: number) => (await su.call('SitesManager.getSiteFromId', { idSite })).name;
+
+    expect(await su.call('GroupPermissions.getSitesAccessFromGroup', { idGroup: group.idGroup })).toEqual([
+      { idSite: alpha, name: await name(alpha), access: 'view' },
+      { idSite: zeta, name: await name(zeta), access: 'admin' },
+    ]);
+    expect(await su.call('GroupPermissions.getSitesAccessFromGroup', { idGroup: (await su.createGroup('No sites')).idGroup })).toEqual([]);
+    expect(await su.expectError('GroupPermissions.getSitesAccessFromGroup', { idGroup: 999999 })).toMatch(/Group does not exist/);
+  });
+
   test('getGroupWithId rejects unknown groups', async () => {
     expect(await su.expectError('GroupPermissions.getGroupWithId', { idGroup: 999999 })).toMatch(/Group does not exist/);
   });

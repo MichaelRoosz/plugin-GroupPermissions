@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
 import { RUN_ID, superUserStorageState } from '../helpers/env';
 import {
-  accessCell, accessRow, clickModalButton, expectAccess, manageGroupCard, multiselectOptions,
-  openGroupPermissions, renameInput, screenshot, selectSite, waitForIdle,
+  accessRow, chooseOption, clickModalButton, fillField, groupEditor, groupRow, memberRow, openGroupEditor,
+  openGroupPermissions, saveButton, screenshot, selectSite, setAccess, switchEditorTab, toast, waitForIdle,
 } from '../helpers/ui';
 
 /**
@@ -47,9 +47,7 @@ test.describe('Group names with special characters', () => {
     await openGroupPermissions(page, 'access');
     await selectSite(page, siteName);
     const row = accessRow(page, rnd.name);
-    await accessCell(row, 'write').locator('img.updateAccess').click();
-    await expectAccess(row, 'write');
-    await waitForIdle(page);
+    await setAccess(page, row, 'write');
     await expect(page.locator('#ajaxErrorAccessGroupMember')).toBeEmpty();
     expect((await su.groupAccess(idSite))[rnd.name]).toBe('write');
   });
@@ -67,9 +65,8 @@ test.describe('Group names with special characters', () => {
     await selectSite(page, siteName);
     const row = accessRow(page, NAME);
     await expect(row).toHaveCount(1);
-    await accessCell(row, 'admin').locator('img.updateAccess').click();
-    await expectAccess(row, 'admin');
-    await waitForIdle(page);
+    await setAccess(page, row, 'admin');
+    await expect(toast(page, `The group '${NAME}' now has the role 'Admin'`).first()).toBeVisible();
     expect((await su.groupAccess(idSite))[NAME]).toBe('admin');
 
     // the confirmation of "all websites" contains the name as text
@@ -77,36 +74,41 @@ test.describe('Group names with special characters', () => {
     await selector.locator('.title').click();
     await selector.getByText('Apply to all websites').click();
     await waitForIdle(page);
-    await accessCell(accessRow(page, NAME), 'view').locator('img.updateAccess').click();
+    await chooseOption(accessRow(page, NAME), 'View');
     await expect(page.locator('.modal.open')).toContainText(`to the group '${NAME}' for all the websites?`);
     await screenshot(page, 'special-characters-confirmation');
     await clickModalButton(page, 'No');
   });
 
-  test('Manage Groups renders the name as text in dropdowns, inputs and dialogs', async ({ page }) => {
-    await openGroupPermissions(page, 'groups', `&idGroup=${group.idGroup}`);
-    await expect(manageGroupCard(page).locator('.multiselect__single')).toHaveText(NAME);
-    await expect(renameInput(page)).toHaveValue(NAME);
-    expect(await multiselectOptions(manageGroupCard(page).locator('.multiselect').first())).toContain(NAME);
-
-    const invite = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
-    expect(await multiselectOptions(invite.locator('.multiselect'))).toContain(NAME);
-
-    await manageGroupCard(page).locator('input[type=button][value="Delete Group"]').click();
+  test('Manage Groups renders the name as text in the list, editor, forms and dialogs', async ({ page }) => {
+    await openGroupPermissions(page, 'groups');
+    await expect(groupRow(page, NAME)).toHaveCount(1);
+    await groupRow(page, NAME).locator('button.delete-group').click();
     await expect(page.locator('.modal.open')).toContainText(`delete the group '${NAME}'?`);
     await clickModalButton(page, 'No');
+
+    await openGroupEditor(page, group.idGroup, 'settings');
+    await expect(groupEditor(page).locator('.card-title').first()).toHaveText(`Edit group '${NAME}'`);
+    await expect(page.locator('input[name="groupPermissionsGroupName"]')).toHaveValue(NAME);
+
+    await switchEditorTab(page, 'members');
+    const member = (await su.members(group.idGroup))[0];
+    await memberRow(page, member).locator('button.groupPermissionsRemoveMember').click();
+    await expect(page.locator('.modal.open')).toContainText(`from group '${NAME}'?`);
+    await clickModalButton(page, 'No');
+
+    await page.locator('.groupPermissionsInviteIntoGroup').click();
+    await expect(page.locator('.groupPermissionsCheckboxList label', { hasText: NAME })).toHaveCount(1);
   });
 
   test('renaming to and from special characters works', async ({ page }) => {
     const other = await su.createGroup('Plain');
     const newName = `${NAME} r`;
-    await openGroupPermissions(page, 'groups', `&idGroup=${other.idGroup}`);
-    await renameInput(page).fill(newName);
-    await manageGroupCard(page).locator('input[type=button][value="Rename Group"]').click();
-    await expect(page.locator('.modal.open')).toContainText(`to '${newName}'?`);
-    await clickModalButton(page, 'Yes');
-    await expect(manageGroupCard(page).locator('.multiselect__single')).toHaveText(newName);
-    await waitForIdle(page);
+    await openGroupEditor(page, other.idGroup, 'settings');
+    await fillField(page.locator('input[name="groupPermissionsGroupName"]'), newName);
+    await saveButton(page.locator('.groupPermissionsRenameGroup'), 'groupPermissionsRenameGroupButton').click();
+    await expect(toast(page, `The group has been renamed to '${newName}'.`).first()).toBeVisible();
+    await expect(groupEditor(page).locator('.card-title').first()).toHaveText(`Edit group '${newName}'`);
     expect((await su.call('GroupPermissions.getGroupWithId', { idGroup: other.idGroup })).name).toBe(newName);
   });
 

@@ -54,23 +54,29 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 ### Navigation
 
 - Go to Administration → System → Group Permissions.
-- The page shows two tabs: "Manage Access" and "Manage Groups".
+- Super users see two tabs: "Manage Access" and "Manage Groups". Website admins only see "Manage Access" for the websites they administer.
 
 ### Manage Access tab
 
-- Select the target website(s). You can apply changes to a specific site ID or to all sites you administer.
-- For each group, choose one of the available roles for the selected site(s): `view`, `write`, or `admin`.
+- Choose a website in the website selector (the page opens with the website of the URL if you administer it). Super users can also choose "Apply to all websites".
+- The table lists every group with a role select (`No access`, `View`, `Write`, `Admin`, or other roles provided by Matomo). A change is saved immediately and confirmed by a notification; changes for all websites ask for confirmation first.
+- The help icon next to "Role" explains the roles, the search field filters the groups by name.
 
 ### Manage Groups tab
 
-- Create, rename, and delete groups.
-- Add or remove users to/from a group. A user can be in multiple groups.
-- Duplicates are prevented; attempts to add an existing member will show an error.
+- The group list shows every group with its number of members and websites. Search by name, open a group by its name or the edit icon, or delete it with the delete icon.
+- "Create a new group" asks for a name (at most 64 characters) and opens the new group.
+- The group editor has three sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
+  - **Members**: members with email and invitation status. Add existing users with the searchable user picker, remove members with the delete icon, or invite a new user directly into the group. A user can be in multiple groups; the anonymous user cannot be added to groups.
+  - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access.
+  - **Settings**: rename or delete the group. Deleting a group removes the access its members got through it; the users themselves are kept.
+- "Invite a new user" invites a user by email directly into one or more groups.
 
 ## Permissions required
 
-- Managing group membership (create/rename/delete groups, add/remove users) requires Super User access.
-- Changing site access for groups requires Admin access on the selected site(s).
+- Managing groups (create/rename/delete groups, add/remove members, invite users to groups, the group editor) requires Super User access.
+- Changing the access of groups requires Admin access on the selected website(s).
+- Members get the highest role of all their groups and their own permissions for each website.
 
 ## API
 
@@ -83,6 +89,22 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
 - Get members of a group:
   ```text
   index.php?module=API&method=GroupPermissions.getMembersOfGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Get all groups with their number of members and websites (super user):
+  ```text
+  index.php?module=API&method=GroupPermissions.getGroupsOverview&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Get the websites a group can access with its role (super user):
+  ```text
+  index.php?module=API&method=GroupPermissions.getSitesAccessFromGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Get the role of every group for a website:
+  ```text
+  index.php?module=API&method=GroupPermissions.getGroupAccessFromSite&idSite=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Invite a new user directly into groups (super user):
+  ```text
+  index.php?module=API&method=GroupPermissions.inviteUserToGroups&userLogin=jane&email=jane@example.org&idGroups=1,2&format=JSON&token_auth=YOUR_TOKEN
   ```
 - Set group access for site(s):
   ```text

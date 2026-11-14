@@ -143,6 +143,77 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
+     * Returns all groups sorted by name, with the number of members and of websites they have access to.
+     *
+     * @return array<array{
+     *   idGroup: int,
+     *   name: string,
+     *   memberCount: int,
+     *   siteCount: int
+     * }>
+     */
+    public function getGroupsOverview(): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $memberCounts = $this->model->countMembersPerGroup();
+        $siteCounts = $this->model->countSitesPerGroup();
+
+        $groups = [];
+        foreach ($this->model->getAllGroups() as $group) {
+            $groups[] = [
+                'idGroup' => intval($group['idgroup']),
+                'name' => $group['name'],
+                'memberCount' => $memberCounts[$group['idgroup']] ?? 0,
+                'siteCount' => $siteCounts[$group['idgroup']] ?? 0,
+            ];
+        }
+
+        usort($groups, static function (array $a, array $b): int {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        return $groups;
+    }
+
+    /**
+     * Returns the websites a group has access to, sorted by website name.
+     *
+     * @return array<array{
+     *   idSite: int,
+     *   name: string,
+     *   access: string
+     * }>
+     */
+    public function getSitesAccessFromGroup(int $idGroup): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->model->getGroupWithId($idGroup);
+        if (empty($group['idgroup'])) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
+        }
+
+        $sites = [];
+        foreach ($this->model->getPermissionsOfGroup($group['idgroup']) as $permission) {
+            $site = SitesManagerAPI::getInstance()->getSiteFromId($permission['idsite']);
+            if (!is_array($site) || !isset($site['name']) || !is_string($site['name'])) {
+                continue;
+            }
+
+            $sites[] = [
+                'idSite' => $permission['idsite'],
+                'name' => $site['name'],
+                'access' => $permission['access'],
+            ];
+        }
+
+        usort($sites, static function (array $a, array $b): int {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        return $sites;
+    }
+
+    /**
      * @return array{
      *   idGroup: int,
      *   name: string

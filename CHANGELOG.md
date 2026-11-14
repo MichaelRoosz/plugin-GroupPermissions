@@ -1,6 +1,8 @@
 
 # Changelog
 ## Unreleased
+  - New admin UI aligned with Matomo's own admin screens: group list with search and member/website counts, group editor (members with email and status, website access with role selects, settings), role selects with Matomo's role descriptions on the Manage Access tab, toasts after changes, empty states, deep links (`#?idGroup=…&groupTab=…`)
+  - New API methods `GroupPermissions.getGroupsOverview` and `GroupPermissions.getSitesAccessFromGroup` (super user only)
   - Security: `GroupPermissions.getAllGroups` and `GroupPermissions.getGroupWithId` now require admin access (previously any user could read group names, members and permissions); `setGroupAccess` checks admin access up front
   - Security: the anonymous user can no longer be added to groups, and group permissions never apply to the anonymous user (a group with admin access containing "anonymous" gave every visitor admin access)
   - Copy dashboards to all members of a group via the "Copy dashboard to user" dialog (`GroupPermissions.copyDashboardToGroup` API)

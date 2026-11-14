@@ -4,25 +4,29 @@
 
 {% block content %}
 
-<h2>{{ title }}</h2>
+<div class="groupPermissions">
+    <h2>{{ title }}</h2>
 
-{% if hasSuperUserAccess %}
-    <ul class="nav nav-pills">
-        <li {% if activeTab=='access' %}class="active"{% endif %}>
-            <a href="{{ linkTo({'show': 'access'}) }}">{{ 'GroupPermissions_ManageAccess'|translate }}</a>
-        </li>
-        <li {% if activeTab=='groups' %}class="active"{% endif %}>
-            <a href="{{ linkTo({'show': 'groups'}) }}">{{ 'GroupPermissions_ManageGroups'|translate }}</a>
-        </li>
-    </ul>
+    {% if hasSuperUserAccess %}
+        <ul class="groupPermissionsTabs" role="tablist">
+            <li role="presentation" {% if activeTab=='access' %}class="active"{% endif %}>
+                <a role="tab" aria-selected="{{ activeTab=='access' ? 'true' : 'false' }}"
+                   href="{{ linkTo({'show': 'access'}) }}">{{ 'GroupPermissions_ManageAccess'|translate }}</a>
+            </li>
+            <li role="presentation" {% if activeTab=='groups' %}class="active"{% endif %}>
+                <a role="tab" aria-selected="{{ activeTab=='groups' ? 'true' : 'false' }}"
+                   href="{{ linkTo({'show': 'groups'}) }}">{{ 'GroupPermissions_ManageGroups'|translate }}</a>
+            </li>
+        </ul>
 
-    {% if activeTab=='access' %}
+        {% if activeTab=='access' %}
+            {% include '@GroupPermissions/_access.twig' %}
+        {% elseif activeTab=='groups' %}
+            {% include '@GroupPermissions/_groups.twig' %}
+        {% endif %}
+    {% else %}
         {% include '@GroupPermissions/_access.twig' %}
-    {% elseif activeTab=='groups' %}
-        {% include '@GroupPermissions/_groups.twig' %}
     {% endif %}
-{% else %}
-    {% include '@GroupPermissions/_access.twig' %}
-{% endif %}
+</div>
 
 {% endblock %}

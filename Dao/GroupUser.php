@@ -55,6 +55,19 @@ class GroupUser {
         }, $rows);
     }
 
+    /**
+     * @return array<int, int> number of members by group id (groups without members are missing)
+     */
+    public function countMembersPerGroup(): array {
+        $table = $this->tablePrefixed;
+        $counts = [];
+        foreach (Rows::list(Db::fetchAll("SELECT idgroup, COUNT(*) AS cnt FROM $table GROUP BY idgroup")) as $row) {
+            $counts[Rows::int($row, 'idgroup')] = Rows::int($row, 'cnt');
+        }
+
+        return $counts;
+    }
+
     public function isUserInGroup(string $login, int $idGroup): bool {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;

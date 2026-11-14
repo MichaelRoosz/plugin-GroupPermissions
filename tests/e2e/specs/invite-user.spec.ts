@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
 import { RUN_ID, SUPERUSER, superUserStorageState, DEFAULT_PASSWORD } from '../helpers/env';
 import {
-  openGroupPermissions, screenshot, multiselectPick, multiselectClose, multiselectOptions, confirmPassword, clickModalButton, waitForIdle,
+  confirmPassword, fillField, groupEditor, memberRow, openGroupEditor, openGroupPermissions, saveButton, screenshot,
+  toast, waitForIdle,
 } from '../helpers/ui';
 import { waitForMessageTo } from '../helpers/mailpit';
 
@@ -29,43 +30,52 @@ test.describe('Invite user to groups', () => {
   test.describe('UI', () => {
     test.use({ storageState: superUserStorageState });
 
-    test('invites a user into two groups via the Manage Groups tab', async ({ page }) => {
+    const inviteUrl = '/index.php?module=GroupPermissions&action=index&idSite=1&period=day&date=yesterday&show=groups#?groupView=invite';
+    const form = (page: Page) => page.locator('.groupPermissionsInviteUser');
+    const loginInput = (page: Page) => form(page).locator('input[name="groupPermissionsInviteLogin"]');
+    const emailInput = (page: Page) => form(page).locator('input[name="groupPermissionsInviteEmail"]');
+    const groupCheckbox = (page: Page, idGroup: number) => form(page).locator(`input[name="groupPermissionsInviteGroup${idGroup}"]`);
+    /** Toggles a group checkbox by clicking its label (materialize hides the real checkbox). */
+    const toggleGroup = async (page: Page, idGroup: number, checked: boolean) => {
+      await form(page).locator('label', { has: page.locator(`input[name="groupPermissionsInviteGroup${idGroup}"]`) }).click();
+      await (checked ? expect(groupCheckbox(page, idGroup)).toBeChecked() : expect(groupCheckbox(page, idGroup)).not.toBeChecked());
+    };
+    const inviteButton = (page: Page) => saveButton(form(page), 'groupPermissionsSendInvite');
+
+    test('invites a user into two groups from the group list', async ({ page }) => {
       const login = `invited_ui_${RUN_ID}`;
       const email = `${login}@example.org`;
 
       await openGroupPermissions(page, 'groups');
-      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
-      await expect(card.locator('h2')).toHaveText('Invite a new user to groups');
+      await page.locator('.groupPermissionsInviteUserButton').click();
+      await expect(form(page).locator('.card-title')).toHaveText('Invite a new user to groups');
+      await expect(inviteButton(page)).toBeDisabled();
+      await screenshot(form(page), 'invite-user-empty');
 
-      const inviteButton = card.locator('input[type=button][value="Invite User"]');
-      await expect(inviteButton).toBeDisabled();
-      await screenshot(card, 'invite-user-empty');
-
-      await card.locator('label', { hasText: 'Username' }).locator('input').fill(login);
-      await card.locator('label', { hasText: 'Email' }).locator('input').fill(email);
+      await fillField(loginInput(page), login);
+      await fillField(emailInput(page), email);
       // still disabled: no group selected
-      await expect(inviteButton).toBeDisabled();
+      await expect(inviteButton(page)).toBeDisabled();
 
-      const groupSelect = card.locator('.multiselect');
-      await multiselectPick(groupSelect, marketing.name);
-      await multiselectPick(groupSelect, sales.name);
-      await multiselectClose(groupSelect);
-      await expect(groupSelect.locator('.multiselect__tag')).toHaveCount(2);
-      await expect(inviteButton).toBeEnabled();
-      await screenshot(card, 'invite-user-filled');
+      // the checkboxes list all groups sorted by name
+      const labels = (await form(page).locator('.groupPermissionsCheckboxList label > span').allInnerTexts()).map((t) => t.trim());
+      const allGroups: string[] = (await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 })).map((g: any) => g.name);
+      expect(labels).toEqual([...allGroups].sort((a, b) => a.localeCompare(b)));
 
-      await inviteButton.click();
+      await toggleGroup(page, marketing.idGroup, true);
+      await toggleGroup(page, sales.idGroup, true);
+      await expect(inviteButton(page)).toBeEnabled();
+      await screenshot(form(page), 'invite-user-filled');
+
+      await inviteButton(page).click();
       await page.locator('.confirm-password-modal.open input[type=password]').pressSequentially(SUPERUSER.password);
       await screenshot(page, 'invite-user-password-confirmation');
       await page.locator('.confirm-password-modal.open .modal-footer .modal-close.btn').click();
 
-      const toast = page.locator('.notification', { hasText: `The user '${login}' has been invited` });
-      await expect(toast).toBeVisible();
+      await expect(toast(page, `The user '${login}' has been invited`).first()).toBeVisible();
+      // back to the list, the member counts are updated
+      await expect(page.locator('.groupPermissionsGroupsTable')).toBeVisible();
       await screenshot(page, 'invite-user-success');
-
-      // the form is reset
-      await expect(card.locator('label', { hasText: 'Username' }).locator('input')).toHaveValue('');
-      await expect(inviteButton).toBeDisabled();
 
       // backend state
       expect(await su.members(marketing.idGroup)).toContain(login);
@@ -87,55 +97,48 @@ test.describe('Invite user to groups', () => {
       expect(mail.HTML).toContain(`Marketing Site ${RUN_ID}`);
     });
 
-    test('member list of the selected group is refreshed after inviting', async ({ page }) => {
+    test('inviting from a group preselects it and returns to its member list', async ({ page }) => {
       const login = `invited_refresh_${RUN_ID}`;
+      await openGroupEditor(page, marketing.idGroup);
+      await expect(memberRow(page, login)).toHaveCount(0);
 
-      await openGroupPermissions(page, 'groups', `&idGroup=${marketing.idGroup}`);
-      const manageCard = page.locator('.card', { hasText: 'Manage group members' });
-      await expect(manageCard.locator('td.login', { hasText: login })).toHaveCount(0);
-
-      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
-      await card.locator('label', { hasText: 'Username' }).locator('input').fill(login);
-      await card.locator('label', { hasText: 'Email' }).locator('input').fill(`${login}@example.org`);
-      await multiselectPick(card.locator('.multiselect'), marketing.name);
-      await multiselectClose(card.locator('.multiselect'));
-      await card.locator('input[type=button][value="Invite User"]').click();
-
+      await page.locator('.groupPermissionsInviteIntoGroup').click();
+      await expect(groupCheckbox(page, marketing.idGroup)).toBeChecked();
+      await expect(groupCheckbox(page, sales.idGroup)).not.toBeChecked();
+      await fillField(loginInput(page), login);
+      await fillField(emailInput(page), `${login}@example.org`);
+      await inviteButton(page).click();
       await confirmPassword(page, SUPERUSER.password);
 
-      await expect(manageCard.locator('td.login', { hasText: login })).toBeVisible();
-      await waitForIdle(page);
-      await screenshot(manageCard, 'invite-user-member-list-refreshed');
+      await expect(groupEditor(page).locator('.card-title').first()).toHaveText(`Edit group '${marketing.name}'`);
+      await expect(memberRow(page, login)).toBeVisible();
+      await expect(memberRow(page, login).locator('td.status')).toHaveText('Pending');
+      await screenshot(groupEditor(page), 'invite-user-member-list-refreshed');
     });
 
     test('the invite button needs a non-blank username, an email and a group', async ({ page }) => {
-      await openGroupPermissions(page, 'groups');
-      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
-      const button = card.locator('input[type=button][value="Invite User"]');
-      const userInput = card.locator('label', { hasText: 'Username' }).locator('input');
-      const emailInput = card.locator('label', { hasText: 'Email' }).locator('input');
-
-      await multiselectPick(card.locator('.multiselect'), sales.name);
-      await multiselectClose(card.locator('.multiselect'));
-      await userInput.fill('   ');
-      await emailInput.fill(`blank_${RUN_ID}@example.org`);
-      await expect(button).toBeDisabled();
-      await userInput.fill(`blank_${RUN_ID}`);
-      await expect(button).toBeEnabled();
-      await emailInput.fill('  ');
-      await expect(button).toBeDisabled();
+      await page.goto(inviteUrl);
+      await toggleGroup(page, sales.idGroup, true);
+      await fillField(loginInput(page), '   ');
+      await fillField(emailInput(page), `blank_${RUN_ID}@example.org`);
+      await expect(inviteButton(page)).toBeDisabled();
+      await fillField(loginInput(page), `blank_${RUN_ID}`);
+      await expect(inviteButton(page)).toBeEnabled();
+      await fillField(emailInput(page), '  ');
+      await expect(inviteButton(page)).toBeDisabled();
+      await fillField(emailInput(page), `blank_${RUN_ID}@example.org`);
+      await toggleGroup(page, sales.idGroup, false);
+      await expect(inviteButton(page)).toBeDisabled();
     });
 
     test('cancelling or a wrong password does not invite anybody', async ({ page }) => {
       const login = `invited_cancel_${RUN_ID}`;
-      await openGroupPermissions(page, 'groups');
-      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
-      await card.locator('label', { hasText: 'Username' }).locator('input').fill(login);
-      await card.locator('label', { hasText: 'Email' }).locator('input').fill(`${login}@example.org`);
-      await multiselectPick(card.locator('.multiselect'), sales.name);
-      await multiselectClose(card.locator('.multiselect'));
+      await page.goto(inviteUrl);
+      await fillField(loginInput(page), login);
+      await fillField(emailInput(page), `${login}@example.org`);
+      await toggleGroup(page, sales.idGroup, true);
 
-      await card.locator('input[type=button][value="Invite User"]').click();
+      await inviteButton(page).click();
       const modal = page.locator('.confirm-password-modal.open');
       await expect(modal).toBeVisible();
       await modal.locator('.modal-footer .modal-no').click();
@@ -143,63 +146,33 @@ test.describe('Invite user to groups', () => {
       await waitForIdle(page);
       expect(await su.call('UsersManager.userExists', { userLogin: login })).toEqual({ value: false });
 
-      await card.locator('input[type=button][value="Invite User"]').click();
+      await inviteButton(page).click();
       await confirmPassword(page, 'wrongPassword1!');
       await expect(page.locator('#ajaxErrorInviteUser')).toContainText(/password/i);
       expect(await su.call('UsersManager.userExists', { userLogin: login })).toEqual({ value: false });
       expect(await su.members(sales.idGroup)).not.toContain(login);
       // the form keeps its values for a retry
-      await expect(card.locator('label', { hasText: 'Username' }).locator('input')).toHaveValue(login);
+      await expect(loginInput(page)).toHaveValue(login);
     });
 
-    test('the group list of the invite form follows created, renamed and deleted groups', async ({ page }) => {
-      await openGroupPermissions(page, 'groups');
-      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
-      const inviteGroups = card.locator('.multiselect');
-
-      // created
-      const created = `Invite list ${RUN_ID}`;
-      const createCard = page.locator('.card', { hasText: 'Create a new group' });
-      await createCard.locator('input[type=text]').fill(created);
-      await createCard.locator('input[type=button]').click();
-      await expect(page.locator('.card', { has: page.locator('h2', { hasText: /^Manage group$/ }) }).locator('.multiselect__single')).toHaveText(created);
-      expect(await multiselectOptions(inviteGroups)).toContain(created);
-
-      // selected in the invite form, then renamed
-      await multiselectPick(inviteGroups, created);
-      await multiselectClose(inviteGroups);
-      const renamed = `${created} renamed`;
-      const manage = page.locator('.card', { has: page.locator('h2', { hasText: /^Manage group$/ }) });
-      await manage.locator('h3', { hasText: 'Rename this group' }).locator('xpath=following-sibling::div[1]').locator('input[type=text]').fill(renamed);
-      await manage.locator('input[type=button][value="Rename Group"]').click();
-      await clickModalButton(page, 'Yes');
-      await expect(manage.locator('.multiselect__single')).toHaveText(renamed);
-      expect(await multiselectOptions(inviteGroups)).toContain(renamed);
-
-      // deleted: also removed from the selection of the invite form
-      await manage.locator('input[type=button][value="Delete Group"]').click();
-      await clickModalButton(page, 'Yes');
-      await waitForIdle(page);
-      expect(await multiselectOptions(inviteGroups)).not.toContain(renamed);
-      await expect(inviteGroups.locator('.multiselect__tag')).toHaveCount(0);
-      await expect(card.locator('input[type=button][value="Invite User"]')).toBeDisabled();
+    test('cancel returns to the group list', async ({ page }) => {
+      await page.goto(inviteUrl);
+      await form(page).locator('.entityCancelLink').click();
+      await expect(page.locator('.groupPermissionsGroupsTable')).toBeVisible();
     });
 
     test('shows the error of a failed invitation', async ({ page }) => {
       const existing = await su.createUser('existing_invite');
 
-      await openGroupPermissions(page, 'groups');
-      const card = page.locator('.card', { has: page.locator('.groupPermissionsInviteUser') });
-      await card.locator('label', { hasText: 'Username' }).locator('input').fill(existing);
-      await card.locator('label', { hasText: 'Email' }).locator('input').fill(`other_${RUN_ID}@example.org`);
-      await multiselectPick(card.locator('.multiselect'), sales.name);
-      await multiselectClose(card.locator('.multiselect'));
-      await card.locator('input[type=button][value="Invite User"]').click();
-
+      await page.goto(inviteUrl);
+      await fillField(loginInput(page), existing);
+      await fillField(emailInput(page), `other_${RUN_ID}@example.org`);
+      await toggleGroup(page, sales.idGroup, true);
+      await inviteButton(page).click();
       await confirmPassword(page, SUPERUSER.password);
 
       await expect(page.locator('#ajaxErrorInviteUser')).toContainText(/already exists|already in use/i);
-      await screenshot(card, 'invite-user-error');
+      await screenshot(form(page), 'invite-user-error');
       expect(await su.members(sales.idGroup)).not.toContain(existing);
     });
   });

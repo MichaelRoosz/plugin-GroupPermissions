@@ -65,8 +65,22 @@ class GroupPermissions extends Plugin {
      * @param array<string> $translations
      */
     public function getClientSideTranslationKeys(array &$translations): void {
+        $translations[] = 'Dashboard_DashboardCopied';
+        $translations[] = 'General_Actions';
+        $translations[] = 'General_Cancel';
+        $translations[] = 'General_Edit';
+        $translations[] = 'General_Help';
+        $translations[] = 'General_No';
+        $translations[] = 'General_Save';
+        $translations[] = 'General_Settings';
+        $translations[] = 'General_Username';
+        $translations[] = 'General_Website';
+        $translations[] = 'General_Yes';
+        $translations[] = 'GroupPermissions_AccessUpdated';
         $translations[] = 'GroupPermissions_AddUserToGroup';
         $translations[] = 'GroupPermissions_AddUserToGroupButton';
+        $translations[] = 'GroupPermissions_AllWebsitesNote';
+        $translations[] = 'GroupPermissions_BackToGroups';
         $translations[] = 'GroupPermissions_ChangeAccessToAllSitesConfirm';
         $translations[] = 'GroupPermissions_CreateNewGroup';
         $translations[] = 'GroupPermissions_CreateNewGroupButton';
@@ -74,46 +88,55 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_DeleteGroup';
         $translations[] = 'GroupPermissions_DeleteGroupButton';
         $translations[] = 'GroupPermissions_DeleteGroupConfirm';
+        $translations[] = 'GroupPermissions_DeleteGroupDescription';
         $translations[] = 'GroupPermissions_DescriptionAccessTab';
         $translations[] = 'GroupPermissions_DescriptionGroupsTab';
-        $translations[] = 'GroupPermissions_ExceptionGroupDoesExist';
+        $translations[] = 'GroupPermissions_EditGroup';
         $translations[] = 'GroupPermissions_ExceptionGroupDoesNotExist';
-        $translations[] = 'GroupPermissions_ExceptionNoGroupSelected';
-        $translations[] = 'GroupPermissions_ExceptionUserAlreadyInGroup';
+        $translations[] = 'GroupPermissions_GiveAccess';
+        $translations[] = 'GroupPermissions_GiveAccessButton';
         $translations[] = 'GroupPermissions_Group';
+        $translations[] = 'GroupPermissions_GroupCreated';
+        $translations[] = 'GroupPermissions_GroupDeleted';
+        $translations[] = 'GroupPermissions_GroupName';
+        $translations[] = 'GroupPermissions_GroupNameHelp';
+        $translations[] = 'GroupPermissions_GroupRenamed';
         $translations[] = 'GroupPermissions_Groups';
-        $translations[] = 'GroupPermissions_GroupPermissions';
         $translations[] = 'GroupPermissions_InviteUser';
         $translations[] = 'GroupPermissions_InviteUserButton';
         $translations[] = 'GroupPermissions_InviteUserDescription';
+        $translations[] = 'GroupPermissions_InviteUserIntoGroup';
         $translations[] = 'GroupPermissions_InviteUserSuccess';
-        $translations[] = 'GroupPermissions_ManageAccess';
-        $translations[] = 'GroupPermissions_ManageGroup';
-        $translations[] = 'GroupPermissions_ManageGroupMembers';
         $translations[] = 'GroupPermissions_ManageGroups';
-        $translations[] = 'GroupPermissions_MenuGroupPermissions';
+        $translations[] = 'GroupPermissions_MemberAdded';
+        $translations[] = 'GroupPermissions_MemberRemoved';
+        $translations[] = 'GroupPermissions_Members';
+        $translations[] = 'GroupPermissions_NoGroups';
+        $translations[] = 'GroupPermissions_NoGroupsFound';
+        $translations[] = 'GroupPermissions_NoMembers';
+        $translations[] = 'GroupPermissions_NoUsersFound';
+        $translations[] = 'GroupPermissions_NoWebsiteAccess';
+        $translations[] = 'GroupPermissions_RemoveAccess';
+        $translations[] = 'GroupPermissions_RemoveAccessConfirm';
         $translations[] = 'GroupPermissions_RemoveFromGroup';
         $translations[] = 'GroupPermissions_RemoveFromGroupConfirm';
         $translations[] = 'GroupPermissions_RenameGroup';
-        $translations[] = 'GroupPermissions_RenameGroupButton';
-        $translations[] = 'GroupPermissions_RenameGroupConfirm';
-        $translations[] = 'GroupPermissions_SelectGroups';
+        $translations[] = 'GroupPermissions_RolesOfGroupsFor';
+        $translations[] = 'GroupPermissions_SearchGroups';
         $translations[] = 'GroupPermissions_SelectNewUser';
+        $translations[] = 'GroupPermissions_SelectWebsite';
         $translations[] = 'GroupPermissions_Users';
-
+        $translations[] = 'GroupPermissions_WebsiteAccess';
+        $translations[] = 'GroupPermissions_Websites';
+        $translations[] = 'UsersManager_Active';
         $translations[] = 'UsersManager_ApplyToAllWebsites';
-        $translations[] = 'UsersManager_PrivNone';
-        $translations[] = 'UsersManager_PrivView';
-        $translations[] = 'UsersManager_PrivWrite';
-        $translations[] = 'UsersManager_PrivAdmin';
-
         $translations[] = 'UsersManager_Email';
-
-        $translations[] = 'Dashboard_DashboardCopied';
-
-        $translations[] = 'General_Username';
-        $translations[] = 'General_Yes';
-        $translations[] = 'General_No';
+        $translations[] = 'UsersManager_Expired';
+        $translations[] = 'UsersManager_InviteNewUser';
+        $translations[] = 'UsersManager_Pending';
+        $translations[] = 'UsersManager_PrivNone';
+        $translations[] = 'UsersManager_Role';
+        $translations[] = 'UsersManager_Status';
     }
 
     /**
