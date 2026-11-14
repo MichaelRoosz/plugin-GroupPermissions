@@ -185,6 +185,57 @@ class API extends \Piwik\Plugin\API {
         $this->model->addUserToGroup($idGroup, $login);
     }
 
+    /**
+     * Invites a new user by email and directly adds them to the given groups.
+     *
+     * Matomo core requires an initial website when inviting a user. This method picks a website the
+     * selected groups have access to (so the invitation email mentions a relevant site), invites the
+     * user via UsersManager.inviteUser, then removes that direct website access again so the user's
+     * permissions come only from the groups.
+     *
+     * @param string $userLogin Login name for the invited user.
+     * @param string $email Email address for the invited user.
+     * @param array<int|string>|string $idGroups Group IDs, as an array or comma separated string.
+     * @param int|null $expiryInDays Number of days before the invite expires. Uses the configured default when empty.
+     * @param string|null $passwordConfirmation Current user's password confirmation when required by session auth.
+     */
+    public function inviteUserToGroups(
+        string $userLogin,
+        string $email,
+        $idGroups,
+        $expiryInDays = null,
+        #[\SensitiveParameter]
+        ?string $passwordConfirmation = null
+    ): void {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $idGroups = $this->parseIdGroups($idGroups);
+        if (!$idGroups) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionNoGroupSelected'));
+        }
+
+        foreach ($idGroups as $idGroup) {
+            $group = $this->model->getGroupWithId($idGroup);
+            if (empty($group['idgroup'])) {
+                throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
+            }
+        }
+
+        $initialIdSite = $this->getInitialIdSiteForGroups($idGroups);
+
+        $usersManagerApi = UsersManagerAPI::getInstance();
+        $usersManagerApi->inviteUser($userLogin, $email, $initialIdSite, $expiryInDays, $passwordConfirmation);
+
+        // permissions are granted through the groups only, remove the initial direct access again
+        $usersManagerApi->setUserAccess($userLogin, 'noaccess', $initialIdSite);
+
+        foreach ($idGroups as $idGroup) {
+            $this->model->addUserToGroup($idGroup, $userLogin);
+        }
+
+        Access::getInstance()->reloadAccess();
+    }
+
     public function removeUserFromGroup(int $idGroup, string $login): void {
         Piwik::checkUserHasSuperUserAccess();
 
@@ -320,6 +371,59 @@ class API extends \Piwik\Plugin\API {
         $this->model->removeAllUsersOfGroup($idGroup);
 
         $this->model->deleteGroup($idGroup);
+    }
+
+    /**
+     * @param mixed $idGroups
+     *
+     * @return array<int>
+     */
+    private function parseIdGroups($idGroups): array {
+        if (is_string($idGroups)) {
+            $idGroups = $idGroups === '' ? [] : explode(',', $idGroups);
+        } elseif (is_int($idGroups)) {
+            $idGroups = [$idGroups];
+        }
+
+        if (!is_array($idGroups)) {
+            throw new Exception('Invalid group ID in &idGroups=');
+        }
+
+        $parsed = [];
+        foreach ($idGroups as $idGroup) {
+            if (is_string($idGroup)) {
+                $idGroup = trim($idGroup);
+            }
+            if (!is_numeric($idGroup) || (int) $idGroup <= 0) {
+                throw new Exception('Invalid group ID in &idGroups=');
+            }
+            $parsed[] = (int) $idGroup;
+        }
+
+        return array_values(array_unique($parsed));
+    }
+
+    /**
+     * Returns a website one of the groups has access to, or any existing website as fallback.
+     *
+     * @param array<int> $idGroups
+     */
+    private function getInitialIdSiteForGroups(array $idGroups): int {
+        foreach ($idGroups as $idGroup) {
+            foreach ($this->model->getPermissionsOfGroup($idGroup) as $permission) {
+                if ($permission['idsite'] > 0) {
+                    return $permission['idsite'];
+                }
+            }
+        }
+
+        foreach (SitesManagerAPI::getInstance()->getAllSitesId() as $idSite) {
+            if (is_numeric($idSite) && (int) $idSite > 0) {
+                return (int) $idSite;
+            }
+        }
+
+        throw new Exception(Piwik::translate('UsersManager_AddUserNoInitialAccessError'));
     }
 
     private function checkAccessType(string $access): void {

@@ -1,5 +1,8 @@
 
 # Changelog
+## Unreleased
+  - Invite new users directly into groups (Manage Groups tab / `GroupPermissions.inviteUserToGroups` API), no initial website access needed
+
 ## 5.2.1
   - Fix plugin version in plugin.json
 

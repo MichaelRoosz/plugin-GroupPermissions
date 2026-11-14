@@ -5,6 +5,11 @@
         @group-created="onGroupCreated($event)"
     ></CreateGroup>
 
+    <InviteUser
+        :groups="groups"
+        @user-invited="onUserInvited($event)"
+    ></InviteUser>
+
     <div class="card">
         <div class="card-content" style="width: 600px">
             <h2>{{ translate('GroupPermissions_ManageGroup') }}</h2>
@@ -18,6 +23,7 @@
 
             <ManageGroup
                 v-if="selectedGroup"
+                :key="`${selectedGroup.idGroup}-${membersVersion}`"
                 :group="selectedGroup"
                 @group-renamed="onGroupRenamed($event)"
                 @group-deleted="onGroupDeleted($event)"
@@ -41,6 +47,7 @@ import {
 } from 'CoreHome';
 import Multiselect from 'vue-multiselect';
 import CreateGroup from './CreateGroup.vue';
+import InviteUser from './InviteUser.vue';
 import ManageGroup from './ManageGroup.vue';
 
 export interface Group {
@@ -53,6 +60,7 @@ export default defineComponent({
     ActivityIndicator,
     Multiselect,
     CreateGroup,
+    InviteUser,
     ManageGroup,
   },
   data() {
@@ -61,6 +69,7 @@ export default defineComponent({
       selectedGroup: undefined as Group | undefined,
       isLoadingGroups: false,
       isLoadingDefaultGroup: false,
+      membersVersion: 0,
     };
   },
   mounted() {
@@ -117,6 +126,12 @@ export default defineComponent({
       this.groups.push(group);
       this.sortGroups();
       this.selectedGroup = group;
+    },
+    onUserInvited(event: { login: string, idGroups: number[] }) {
+      // reload the member list if the invited user was added to the currently shown group
+      if (this.selectedGroup && event.idGroups.includes(this.selectedGroup.idGroup)) {
+        this.membersVersion += 1;
+      }
     },
     onGroupRenamed(group: Group) {
       const groupIndex = this.groups.findIndex(

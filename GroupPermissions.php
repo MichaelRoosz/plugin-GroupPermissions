@@ -65,9 +65,14 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_DescriptionGroupsTab';
         $translations[] = 'GroupPermissions_ExceptionGroupDoesExist';
         $translations[] = 'GroupPermissions_ExceptionGroupDoesNotExist';
+        $translations[] = 'GroupPermissions_ExceptionNoGroupSelected';
         $translations[] = 'GroupPermissions_ExceptionUserAlreadyInGroup';
         $translations[] = 'GroupPermissions_Group';
         $translations[] = 'GroupPermissions_GroupPermissions';
+        $translations[] = 'GroupPermissions_InviteUser';
+        $translations[] = 'GroupPermissions_InviteUserButton';
+        $translations[] = 'GroupPermissions_InviteUserDescription';
+        $translations[] = 'GroupPermissions_InviteUserSuccess';
         $translations[] = 'GroupPermissions_ManageAccess';
         $translations[] = 'GroupPermissions_ManageGroup';
         $translations[] = 'GroupPermissions_ManageGroupMembers';
@@ -78,6 +83,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_RenameGroup';
         $translations[] = 'GroupPermissions_RenameGroupButton';
         $translations[] = 'GroupPermissions_RenameGroupConfirm';
+        $translations[] = 'GroupPermissions_SelectGroups';
         $translations[] = 'GroupPermissions_SelectNewUser';
 
         $translations[] = 'UsersManager_ApplyToAllWebsites';
@@ -85,6 +91,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'UsersManager_PrivView';
         $translations[] = 'UsersManager_PrivWrite';
         $translations[] = 'UsersManager_PrivAdmin';
+
+        $translations[] = 'UsersManager_Email';
 
         $translations[] = 'General_Username';
         $translations[] = 'General_Yes';

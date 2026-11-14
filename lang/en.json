@@ -12,9 +12,14 @@
         "DescriptionGroupsTab": "Here you can take a look at the members of each group. Superusers may edit the groups.",
         "ExceptionGroupDoesExist": "Group already exists",
         "ExceptionGroupDoesNotExist": "Group does not exists",
+        "ExceptionNoGroupSelected": "Please select at least one group.",
         "ExceptionUserAlreadyInGroup": "User is already in group",
         "Group": "Group",
         "GroupPermissions": "Group Permissions",
+        "InviteUser": "Invite a new user to groups",
+        "InviteUserButton": "Invite User",
+        "InviteUserDescription": "Invite a new user by email and add them directly to the selected groups. The user gets access to websites through these groups only.",
+        "InviteUserSuccess": "The user '%s' has been invited and added to the selected groups.",
         "ManageAccess": "Manage Access",
         "ManageGroup": "Manage group",
         "ManageGroupMembers": "Manage group members",
@@ -25,6 +30,7 @@
         "RenameGroup": "Rename this group",
         "RenameGroupButton": "Rename Group",
         "RenameGroupConfirm": "Are you sure you want to rename the group '%1$s' to '%2$s'?",
+        "SelectGroups": "Select groups",
         "SelectNewUser": "Select a new user"
     }
 }

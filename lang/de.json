@@ -12,9 +12,14 @@
         "DescriptionGroupsTab": "Hier können die Mitglieder der Gruppen eingesehen werden. Hauptadministratoren können die Mitglieder verwalten.",
         "ExceptionGroupDoesExist": "Gruppe existiert bereits",
         "ExceptionGroupDoesNotExist": "Gruppe existiert nicht",
+        "ExceptionNoGroupSelected": "Bitte wählen Sie mindestens eine Gruppe aus.",
         "ExceptionUserAlreadyInGroup": "Der Nutzer ist bereits in der Gruppe",
         "Group": "Gruppe",
         "GroupPermissions": "Gruppenrechte",
+        "InviteUser": "Neuen Benutzer in Gruppen einladen",
+        "InviteUserButton": "Benutzer einladen",
+        "InviteUserDescription": "Laden Sie einen neuen Benutzer per E-Mail ein und fügen Sie ihn direkt den ausgewählten Gruppen hinzu. Der Benutzer erhält Zugriff auf Webseiten ausschließlich über diese Gruppen.",
+        "InviteUserSuccess": "Der Benutzer „%s“ wurde eingeladen und den ausgewählten Gruppen hinzugefügt.",
         "ManageAccess": "Rechte verwalten",
         "ManageGroup": "Gruppe verwalten",
         "ManageGroupMembers": "Mitglieder verwalten",
@@ -25,6 +30,7 @@
         "RenameGroup": "Diese Gruppe umbenennen",
         "RenameGroupButton": "Gruppe umbenennen",
         "RenameGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe „%1$s“ in „%2$s“ umbenennen wollen?",
+        "SelectGroups": "Gruppen auswählen",
         "SelectNewUser": "Wählen Sie einen neuen Benutzer"
     }
 }
