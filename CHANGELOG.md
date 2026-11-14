@@ -1,6 +1,7 @@
 
 # Changelog
 ## Unreleased
+  - Security: `GroupPermissions.getAllGroups` and `GroupPermissions.getGroupWithId` now require admin access (previously any user could read group names, members and permissions); `setGroupAccess` checks admin access up front
   - Copy dashboards to all members of a group via the "Copy dashboard to user" dialog (`GroupPermissions.copyDashboardToGroup` API)
   - Invite new users directly into groups (Manage Groups tab / `GroupPermissions.inviteUserToGroups` API), no initial website access needed
 
