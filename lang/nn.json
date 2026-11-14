@@ -1,1 +1,30 @@
-{}
+{
+    "GroupPermissions": {
+        "AddUserToGroup": "Legg til eit nytt medlem i denne gruppa",
+        "AddUserToGroupButton": "Legg til medlem",
+        "ChangeAccessToAllSitesConfirm": "Er du sikker på at du vil gi tilgangen «%s» til gruppa «%s» for alle nettstadene?",
+        "CreateNewGroup": "Opprett ei ny gruppe",
+        "CreateNewGroupButton": "Opprett gruppe",
+        "DeleteGroup": "Slett denne gruppa",
+        "DeleteGroupButton": "Slett gruppe",
+        "DeleteGroupConfirm": "Er du sikker på at du vil slette gruppa «%s»?",
+        "DescriptionAccessTab": "Bestem kva grupper som har tilgang til nettstadene dine. Du kan òg gi tilgang til alle nettstadene på ein gong ved å velje «Bruk for alle nettstader» i nettstadveljaren.",
+        "DescriptionGroupsTab": "Her kan du sjå medlemmene i kvar gruppe. Superbrukarar kan redigere gruppene.",
+        "ExceptionGroupDoesExist": "Gruppa finst allereie",
+        "ExceptionGroupDoesNotExist": "Gruppa finst ikkje",
+        "ExceptionUserAlreadyInGroup": "Brukaren er allereie i gruppa",
+        "Group": "Gruppe",
+        "GroupPermissions": "Grupperettar",
+        "ManageAccess": "Administrer tilgang",
+        "ManageGroup": "Administrer gruppa",
+        "ManageGroupMembers": "Administrer gruppemedlemmer",
+        "ManageGroups": "Administrer grupper",
+        "MenuGroupPermissions": "Grupperettar",
+        "RemoveFromGroup": "Fjern",
+        "RemoveFromGroupConfirm": "Er du sikker på at du vil fjerne brukaren «%1$s» frå gruppa «%2$s»?",
+        "RenameGroup": "Endre namn på denne gruppa",
+        "RenameGroupButton": "Endre namn på gruppa",
+        "RenameGroupConfirm": "Er du sikker på at du vil endre namnet på gruppa «%1$s» til «%2$s»?",
+        "SelectNewUser": "Vel ein ny brukar"
+    }
+}

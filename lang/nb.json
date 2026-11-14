@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "AddUserToGroup": "Legg til et nytt medlem i denne gruppen",
         "AddUserToGroupButton": "Legg til medlem",
+        "ChangeAccessToAllSitesConfirm": "Er du sikker på at du vil gi tilgangen «%s» til gruppen «%s» for alle nettstedene?",
         "CreateNewGroup": "Opprett en ny gruppe",
         "CreateNewGroupButton": "Opprett gruppe",
         "DeleteGroup": "Slett denne gruppen",
