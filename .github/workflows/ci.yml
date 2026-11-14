@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: ['5.x']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (php-cs-fixer)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - name: Install php-cs-fixer
+        run: composer install --working-dir=linting --no-interaction --no-progress
+      - name: Check code style
+        run: composer lint
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - name: Cache composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+      - name: Install dependencies (incl. Matomo for analysis)
+        run: composer install --no-interaction --no-progress
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=2G
+
+  e2e:
+    name: End-to-end tests (Matomo ${{ matrix.matomo }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # oldest version the plugin is developed against + latest 5.x
+        matomo: ['5.1.2', '5']
+    env:
+      MATOMO_VERSION: ${{ matrix.matomo }}
+      CI: 'true'
+    defaults:
+      run:
+        working-directory: tests/e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/e2e/package-lock.json
+      - name: Typecheck specs
+        run: npm ci --no-audit --no-fund && npm run typecheck
+      - name: Run tests in docker
+        run: ./bin/run.sh
+      - name: Matomo logs
+        if: failure()
+        run: docker compose logs matomo
+      - name: Upload screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-matomo-${{ matrix.matomo }}
+          path: |
+            tests/e2e/screenshots
+            tests/e2e/playwright-report
+            tests/e2e/test-results
+          retention-days: 14
+      - name: Tear down
+        if: always()
+        run: ./bin/teardown.sh

@@ -111,6 +111,19 @@ npm install
 # build steps depend on your environment; compiled assets are committed in vue/dist
 ```
 
+### Test instance and tests
+
+A Docker based Matomo test instance and Playwright end-to-end tests live in `tests/e2e` (see [tests/e2e/README.md](tests/e2e/README.md)):
+
+```bash
+tests/e2e/bin/start.sh      # Matomo with the plugin and demo data on http://localhost:8089
+tests/e2e/bin/run.sh        # run all tests in docker, screenshots end up in tests/e2e/screenshots
+tests/e2e/bin/teardown.sh   # stop everything
+```
+
+Linting and static analysis: `composer lint` (after `composer install --working-dir=linting`) and `composer phpstan`.
+GitHub Actions runs linting, PHPStan and the end-to-end tests for every push and pull request.
+
 Contributions are welcome via pull requests on the repository homepage.
 
 ## Support

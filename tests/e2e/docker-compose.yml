@@ -1,0 +1,67 @@
+# End-to-end test environment for the GroupPermissions plugin.
+# Usage: see tests/e2e/README.md (or simply run tests/e2e/bin/run.sh)
+name: grouppermissions-e2e
+
+services:
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: matomo
+      MARIADB_USER: matomo
+      MARIADB_PASSWORD: matomo
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    tmpfs:
+      - /var/lib/mysql
+
+  mail:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_PORT:-8025}:8025"
+
+  matomo:
+    image: matomo:${MATOMO_VERSION:-5.1.2}-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MATOMO_DATABASE_HOST: db
+      MATOMO_DATABASE_ADAPTER: mysql
+      MATOMO_DATABASE_TABLES_PREFIX: matomo_
+      MATOMO_DATABASE_USERNAME: matomo
+      MATOMO_DATABASE_PASSWORD: matomo
+      MATOMO_DATABASE_DBNAME: matomo
+    ports:
+      - "${MATOMO_PORT:-8089}:80"
+    # The plugin is mounted read-only and copied into plugins/GroupPermissions by bin/setup.sh
+    # (only runtime files are copied, the repo's vendor/ contains a full Matomo copy used by phpstan).
+    volumes:
+      - ../..:/plugin-src:ro
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/www/html/matomo.php"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.49.1-noble
+    profiles: ["test"]
+    depends_on:
+      matomo:
+        condition: service_healthy
+    working_dir: /e2e
+    environment:
+      MATOMO_URL: http://matomo
+      MAILPIT_URL: http://mail:8025
+      CI: ${CI:-}
+    volumes:
+      - .:/e2e
+      - e2e_node_modules:/e2e/node_modules
+    ipc: host
+
+volumes:
+  e2e_node_modules:
