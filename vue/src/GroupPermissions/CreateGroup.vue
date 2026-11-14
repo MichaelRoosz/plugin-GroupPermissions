@@ -12,6 +12,7 @@
                 <input
                   type="button"
                   :value="translate('GroupPermissions_CreateNewGroupButton')"
+                  :disabled="isCreatingGroup || !groupName.trim()"
                   style="padding: 8px;"
                   @click="createGroup(groupName)"
                 />

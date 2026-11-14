@@ -46,6 +46,7 @@
         type="button"
         @click="addMember()"
         :value="translate('GroupPermissions_AddUserToGroupButton')"
+        :disabled="isAddingMember || !selectedLoginToAdd"
         style="padding: 8px; margin-top: 8px;"/>
     </div>
   </div>
@@ -151,7 +152,8 @@ export default defineComponent({
       {
         errorElement: '#ajaxErrorLoadLogins',
       }).then((response) => {
-        this.logins = response;
+        // the anonymous user cannot be member of a group
+        this.logins = response.filter((login: string) => login !== 'anonymous');
         this.logins.sort();
       }).finally(() => {
         this.isLoadingLogins = false;

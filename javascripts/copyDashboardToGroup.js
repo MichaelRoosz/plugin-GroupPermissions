@@ -80,6 +80,9 @@ $(function () {
             });
             render();
         });
+        // API errors ({"result":"error"}) would otherwise call neither the callback nor the error callback,
+        // leaving the dialog without any users
+        groupsRequest.useRegularCallbackInCaseOfError = true;
         groupsRequest.setErrorCallback(function () {
             groups = [];
             render();

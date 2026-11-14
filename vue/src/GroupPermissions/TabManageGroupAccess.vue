@@ -8,6 +8,7 @@
 
       <div class="sites_autocomplete">
         <SiteSelector
+          v-if="isInitialSiteResolved"
           :default-to-first-site="true"
           :show-selected-site="true"
           :show-all-sites-item="hasSuperUserAccess"
@@ -96,9 +97,15 @@ import {
   ActivityIndicator,
   AjaxHelper,
   Matomo,
+  MatomoUrl,
   SiteSelector,
   translate,
 } from 'CoreHome';
+
+interface SelectedSite {
+  id: number|string;
+  name: string;
+}
 
 export default defineComponent({
   components: {
@@ -107,17 +114,57 @@ export default defineComponent({
   },
   data() {
     return {
-      site: {
-        id: Matomo.idSite,
-        name: Matomo.currentSiteName,
-      },
+      site: undefined as SelectedSite|undefined,
+      isInitialSiteResolved: false,
       groupAccess: new Map<string, string>(),
       isLoading: false,
       confirmUpdateAccessToAllSitesText: '',
     };
   },
+  mounted() {
+    this.resolveInitialSite();
+  },
   methods: {
+    /**
+     * Starts with the website of the URL if the user administers it. Otherwise the site selector
+     * falls back to the first website the user administers.
+     */
+    resolveInitialSite() {
+      const idSite = parseInt(String(MatomoUrl.getSearchParam('idSite') || Matomo.idSite || ''), 10);
+      if (!idSite) {
+        this.isInitialSiteResolved = true;
+        return;
+      }
+
+      this.isLoading = true;
+      AjaxHelper.fetch<Array<number|string>>({
+        method: 'SitesManager.getSitesIdWithAdminAccess',
+        filter_limit: -1,
+      }).then((adminSiteIds) => {
+        if (!adminSiteIds.map((id) => parseInt(String(id), 10)).includes(idSite)) {
+          return undefined;
+        }
+        return AjaxHelper.fetch<{ name: string }>({
+          method: 'SitesManager.getSiteFromId',
+          idSite,
+        });
+      }).then((siteInfo) => {
+        if (siteInfo) {
+          this.site = { id: idSite, name: siteInfo.name };
+          this.updateGroupAccessList();
+        }
+      })
+        // on errors the site selector falls back to the first website
+        .catch(() => undefined)
+        .finally(() => {
+          this.isLoading = false;
+          this.isInitialSiteResolved = true;
+        });
+    },
     onSetAccessClicked(event: MouseEvent, groupName: string, access: string) {
+      if (!this.site) {
+        return;
+      }
       const idSite = this.site.id;
 
       if (idSite === 'all') {
@@ -150,9 +197,14 @@ export default defineComponent({
       });
     },
     updateGroupAccessList() {
+      if (!this.site) {
+        return;
+      }
       this.isLoading = true;
 
       const idSite = this.site.id;
+      // ignore responses of a website that is no longer selected (e.g. when switching quickly)
+      const isStale = () => !this.site || this.site.id !== idSite;
 
       if (idSite === 'all') {
         AjaxHelper.post({
@@ -165,6 +217,9 @@ export default defineComponent({
         {
           errorElement: '#ajaxErrorAccessGroupMember',
         }).then((response) => {
+          if (isStale()) {
+            return;
+          }
           this.groupAccess.clear();
 
           const groupAccessTmp: string[] = [];
@@ -191,6 +246,9 @@ export default defineComponent({
         {
           errorElement: '#ajaxErrorAccessGroupMember',
         }).then((response) => {
+          if (isStale()) {
+            return;
+          }
           this.groupAccess.clear();
 
           Object.keys(response).sort().forEach((group) => {

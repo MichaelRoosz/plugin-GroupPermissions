@@ -12,6 +12,7 @@ namespace Piwik\Plugins\GroupPermissions;
 
 use Exception;
 use Piwik\Access;
+use Piwik\Common;
 use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
 use Piwik\API\Request;
@@ -83,6 +84,9 @@ class API extends \Piwik\Plugin\API {
     public function getGroupAccessFromSite(int $idSite): array {
         Piwik::checkUserHasAdminAccess($idSite);
 
+        // throws for websites that do not exist (super users pass the access check for any id)
+        new Site($idSite);
+
         $groups = $this->model->getAllGroups();
         $groupAccess = $this->model->getPermissionsOfSite($idSite);
 
@@ -102,9 +106,12 @@ class API extends \Piwik\Plugin\API {
             $data[$ga['idgroup']]['access'] = $ga['access'];
         }
 
+        // names are stored sanitized (e.g. `&` as `&amp;`); the API response only unsanitizes values, not keys,
+        // so return the original name here. Otherwise the name shown and sent back by the UI would not match
+        // the group anymore (setGroupAccess sanitizes it again).
         $return = [];
         foreach ($data as $group) {
-            $return[$group['name']] = $group['access'];
+            $return[Common::unsanitizeInputValue($group['name'])] = $group['access'];
         }
 
         return $return;
@@ -174,6 +181,10 @@ class API extends \Piwik\Plugin\API {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
         }
         $idGroup = $group['idgroup'];
+
+        if ($login === 'anonymous') {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionAnonymousNotAllowed'));
+        }
 
         $usersManagerApi = UsersManagerAPI::getInstance();
         if (!$usersManagerApi->userExists($login)) {
@@ -324,6 +335,8 @@ class API extends \Piwik\Plugin\API {
     public function createGroup(string $groupName): array {
         Piwik::checkUserHasSuperUserAccess();
 
+        $this->checkGroupName($groupName);
+
         try {
             $existingGroup = $this->model->getGroupWithName($groupName);
         } catch (Exception $e) {
@@ -347,6 +360,8 @@ class API extends \Piwik\Plugin\API {
 
     public function renameGroup(int $idGroup, string $newName): void {
         Piwik::checkUserHasSuperUserAccess();
+
+        $this->checkGroupName($newName);
 
         $group = $this->model->getGroupWithId($idGroup);
         if (empty($group['idgroup'])) {
@@ -501,6 +516,16 @@ class API extends \Piwik\Plugin\API {
         }
 
         throw new Exception(Piwik::translate('UsersManager_AddUserNoInitialAccessError'));
+    }
+
+    /**
+     * Group names are stored in a VARCHAR column, longer names would be truncated silently.
+     * Note: the length is checked on the sanitized value Matomo stores (e.g. `"` is stored as `&quot;`).
+     */
+    private function checkGroupName(string $name): void {
+        if (mb_strlen($name) > Dao\Group::NAME_MAX_LENGTH) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupNameTooLong', [Dao\Group::NAME_MAX_LENGTH]));
+        }
     }
 
     private function checkAccessType(string $access): void {

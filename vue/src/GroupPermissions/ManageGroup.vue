@@ -15,6 +15,7 @@
             <input
                 type="button"
                 :value="translate('GroupPermissions_RenameGroupButton')"
+                :disabled="isRenaming || !newGroupName.trim() || newGroupName === group.name"
                 style="padding: 8px;"
                 @click="confirmRenameGroup()"
             />

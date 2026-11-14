@@ -19,6 +19,9 @@ use Exception;
 class Group {
     public const TABLE = 'gpermissions_group';
 
+    /** Length of the `name` column */
+    public const NAME_MAX_LENGTH = 64;
+
     /** @var string $tablePrefixed */
     private $tablePrefixed = '';
 

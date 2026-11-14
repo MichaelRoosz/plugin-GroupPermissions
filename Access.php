@@ -31,6 +31,12 @@ class Access extends \Piwik\Access {
             ];
         }, Rows::list(Db::fetchAll($sql, [$login])));
 
+        // groups never grant access to the anonymous user (core only allows "view" for anonymous, a group could
+        // grant "admin" to every visitor)
+        if ($login === 'anonymous') {
+            return $userRights;
+        }
+
         $model = new Model();
         $groupRights = $model->getPermissionsOfUser($login);
 
