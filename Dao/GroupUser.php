@@ -54,12 +54,11 @@ class GroupUser {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        $members = $this->getDb()->fetchAll("SELECT login FROM $table WHERE idgroup = ?", [$idGroup]);
-        if (!$members) {
-            return [];
-        }
+        $rows = Rows::list($this->getDb()->fetchAll("SELECT login FROM $table WHERE idgroup = ?", [$idGroup]));
 
-        return $members;
+        return array_map(static function (array $row): array {
+            return ['login' => Rows::string($row, 'login')];
+        }, $rows);
     }
 
     public function isUserInGroup(string $login, int $idGroup): bool {
@@ -77,12 +76,11 @@ class GroupUser {
     public function getGroupsOfUser(string $login): array {
         $table = $this->tablePrefixed;
 
-        $groups = $this->getDb()->fetchAll("SELECT idgroup FROM $table WHERE login = ?", [$login]);
-        if (!$groups) {
-            return [];
-        }
+        $rows = Rows::list($this->getDb()->fetchAll("SELECT idgroup FROM $table WHERE login = ?", [$login]));
 
-        return $groups;
+        return array_map(static function (array $row): array {
+            return ['idgroup' => Rows::int($row, 'idgroup')];
+        }, $rows);
     }
 
     public function removeUserFromGroup(int $idGroup, string $login): void {

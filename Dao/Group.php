@@ -58,12 +58,9 @@ class Group {
     public function getAllGroups(): array {
         $table = $this->tablePrefixed;
 
-        $groups = $this->getDb()->fetchAll("SELECT * FROM $table");
-        if (!$groups) {
-            return [];
-        }
+        $rows = Rows::list($this->getDb()->fetchAll("SELECT * FROM $table"));
 
-        return $groups;
+        return array_map([$this, 'mapGroup'], $rows);
     }
 
     /**
@@ -76,12 +73,12 @@ class Group {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        $group = $this->getDb()->fetchRow("SELECT * FROM $table WHERE idgroup = ?", [$idGroup]);
+        $group = Rows::row($this->getDb()->fetchRow("SELECT * FROM $table WHERE idgroup = ?", [$idGroup]));
         if (!$group) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
         }
 
-        return $group;
+        return $this->mapGroup($group);
     }
 
     /**
@@ -93,12 +90,12 @@ class Group {
     public function getGroupWithName(string $name): array {
         $table = $this->tablePrefixed;
 
-        $group = $this->getDb()->fetchRow("SELECT * FROM $table WHERE name = ?", [$name]);
+        $group = Rows::row($this->getDb()->fetchRow("SELECT * FROM $table WHERE name = ?", [$name]));
         if (!$group) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $name));
         }
 
-        return $group;
+        return $this->mapGroup($group);
     }
 
     public function renameGroup(int $idGroup, string $newName): void {
@@ -117,6 +114,21 @@ class Group {
         $query = "DELETE FROM $table WHERE idgroup = ?";
         $bind = [intval($idGroup)];
         $this->getDb()->query($query, $bind);
+    }
+
+    /**
+     * @param array<mixed> $row
+     *
+     * @return array{
+     *   idgroup: int,
+     *   name: string
+     * }
+     */
+    private function mapGroup(array $row): array {
+        return [
+            'idgroup' => Rows::int($row, 'idgroup'),
+            'name' => Rows::string($row, 'name'),
+        ];
     }
 
     /**

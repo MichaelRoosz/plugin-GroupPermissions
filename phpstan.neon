@@ -1,10 +1,10 @@
 parameters:
-    level: 9
+    level: max
     paths:
         - .
     excludePaths:
         - vendor
-        - node_modules
+        - node_modules (?)
         - linting
     bootstrapFiles:
         - phpstan-bootstrap.php

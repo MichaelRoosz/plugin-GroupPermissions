@@ -1,6 +1,4 @@
 vendor
-composer.lock
 node_modules
-package-lock.json
 .php-cs-fixer.cache
 .DS_Store

@@ -92,6 +92,9 @@ class API extends \Piwik\Plugin\API {
         }
 
         foreach ($groupAccess as $ga) {
+            if (!isset($data[$ga['idgroup']])) {
+                continue;
+            }
             $data[$ga['idgroup']]['access'] = $ga['access'];
         }
 
@@ -219,6 +222,14 @@ class API extends \Piwik\Plugin\API {
         else {
             $idSites = Site::getIdSitesFromIdSitesString($idSites);
         }
+
+        $idSites = array_map(static function ($idSite): int {
+            if (!is_numeric($idSite)) {
+                throw new Exception('Invalid website ID in &idSites=');
+            }
+
+            return (int) $idSite;
+        }, $idSites);
 
         if (!$idSites) {
             throw new Exception('Specify at least one website ID in &idSites=');

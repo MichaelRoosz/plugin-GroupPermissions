@@ -39,12 +39,14 @@ class MultiTable {
                 ON ga.idgroup = gu.idgroup 
                 WHERE gu.login = ?";
 
-        $permissions = $this->getDb()->fetchAll($sql, [$login]);
-        if (!$permissions) {
-            return [];
-        }
+        $rows = Rows::list($this->getDb()->fetchAll($sql, [$login]));
 
-        return $permissions;
+        return array_map(static function (array $row): array {
+            return [
+                'idsite' => Rows::int($row, 'idsite'),
+                'access' => Rows::string($row, 'access'),
+            ];
+        }, $rows);
     }
 
     /**

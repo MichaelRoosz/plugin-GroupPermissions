@@ -11,6 +11,7 @@
 namespace Piwik\Plugins\GroupPermissions;
 
 use Piwik\Db;
+use Piwik\Plugins\GroupPermissions\Dao\Rows;
 
 class Access extends \Piwik\Access {
     /**
@@ -23,7 +24,12 @@ class Access extends \Piwik\Access {
      */
     public function getRawSitesWithSomeViewAccess($login) {
         $sql = self::getSqlAccessSite('access, t2.idsite');
-        $userRights = Db::fetchAll($sql, [$login]);
+        $userRights = array_map(static function (array $row): array {
+            return [
+                'idsite' => Rows::int($row, 'idsite'),
+                'access' => Rows::string($row, 'access'),
+            ];
+        }, Rows::list(Db::fetchAll($sql, [$login])));
 
         $model = new Model();
         $groupRights = $model->getPermissionsOfUser($login);

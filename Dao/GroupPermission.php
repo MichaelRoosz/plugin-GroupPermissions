@@ -61,12 +61,14 @@ class GroupPermission {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        $permissions = $this->getDb()->fetchAll("SELECT idsite, access FROM $table WHERE idgroup = ?", [$idGroup]);
-        if (!$permissions) {
-            return [];
-        }
+        $rows = Rows::list($this->getDb()->fetchAll("SELECT idsite, access FROM $table WHERE idgroup = ?", [$idGroup]));
 
-        return $permissions;
+        return array_map(static function (array $row): array {
+            return [
+                'idsite' => Rows::int($row, 'idsite'),
+                'access' => Rows::string($row, 'access'),
+            ];
+        }, $rows);
     }
 
     /**
@@ -79,12 +81,14 @@ class GroupPermission {
         $idSite = intval($idSite);
         $table = $this->tablePrefixed;
 
-        $permissions = $this->getDb()->fetchAll("SELECT idgroup, access FROM $table WHERE idsite = ?", [$idSite]);
-        if (!$permissions) {
-            return [];
-        }
+        $rows = Rows::list($this->getDb()->fetchAll("SELECT idgroup, access FROM $table WHERE idsite = ?", [$idSite]));
 
-        return $permissions;
+        return array_map(static function (array $row): array {
+            return [
+                'idgroup' => Rows::int($row, 'idgroup'),
+                'access' => Rows::string($row, 'access'),
+            ];
+        }, $rows);
     }
 
     public function removePermission(int $idGroup, int $idSite): void {
