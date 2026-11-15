@@ -1,5 +1,10 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "törlés"
+        "Pattern": "Egyezési minta",
+        "RemoveFromGroup": "törlés",
+        "Segment": "szegmens",
+        "Segments": "Szegmensek",
+        "Users": "Felhasználók",
+        "Websites": "Weboldalak"
     }
 }
