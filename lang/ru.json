@@ -5,6 +5,12 @@
         "CreateNewGroupButton": "Создать группу",
         "DeleteGroup": "Удалить эту группу",
         "DeleteGroupButton": "Удалить группу",
-        "RemoveFromGroup": "Удалить"
+        "MatchTypeUrl": "URL веб-сайта",
+        "Pattern": "Шаблон",
+        "RemoveFromGroup": "Удалить",
+        "Segment": "Сегмент",
+        "Segments": "Сегменты",
+        "Users": "Пользователи",
+        "Websites": "Сайты"
     }
 }
