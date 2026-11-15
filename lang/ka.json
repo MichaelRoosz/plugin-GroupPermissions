@@ -1,1 +1,7 @@
-{}
+{
+    "GroupPermissions": {
+        "Pattern": "ნიმუში",
+        "Users": "მომხმარებლები",
+        "Websites": "ვებ საიტები"
+    }
+}
