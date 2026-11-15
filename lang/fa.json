@@ -1,5 +1,10 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "حذف کردن"
+        "MatchTypeUrl": "آدرس وبسایت",
+        "Pattern": "الگو",
+        "RemoveFromGroup": "حذف کردن",
+        "Segment": "سگمنت",
+        "Users": "کاربران",
+        "Websites": "وب سایت ها"
     }
 }
