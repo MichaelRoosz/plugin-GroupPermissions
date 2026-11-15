@@ -10,6 +10,8 @@
 
 namespace Piwik\Plugins\GroupPermissions;
 
+use Piwik\Access\RolesProvider;
+use Piwik\Container\StaticContainer;
 use Piwik\Db;
 use Piwik\Plugins\GroupPermissions\Dao\Rows;
 
@@ -39,44 +41,56 @@ class Access extends \Piwik\Access {
 
         $model = new Model();
         $groupRights = $model->getPermissionsOfUser($login);
-
-        if (!$userRights) {
-            return $groupRights;
-        }
-
         if (!$groupRights) {
             return $userRights;
         }
+        $groupCapabilities = $model->getCapabilitiesOfUser($login);
 
-        $rights = [];
+        // the access table contains roles (view, write, admin) and capabilities (e.g. tagmanager_write), each
+        // as a separate row. Combine them: per website the highest role wins, capabilities are added up.
+        $roles = [];
+        $capabilities = [];
         foreach ($userRights as $userRight) {
-
-            if (!isset($rights[$userRight['idsite']])) {
-                $rights[$userRight['idsite']] = $userRight['access'];
-
-                continue;
+            $idSite = $userRight['idsite'];
+            if ($this->isRole($userRight['access'])) {
+                $roles[$idSite] = isset($roles[$idSite])
+                    ? $this->getHigherPermission($roles[$idSite], $userRight['access'])
+                    : $userRight['access'];
+            } else {
+                $capabilities[$idSite][$userRight['access']] = true;
             }
-
-            $rights[$userRight['idsite']] = $this->getHigherPermission($rights[$userRight['idsite']], $userRight['access']);
         }
 
         foreach ($groupRights as $groupRight) {
+            $idSite = $groupRight['idsite'];
+            $roles[$idSite] = isset($roles[$idSite])
+                ? $this->getHigherPermission($roles[$idSite], $groupRight['access'])
+                : $groupRight['access'];
+        }
 
-            if (!isset($rights[$groupRight['idsite']])) {
-                $rights[$groupRight['idsite']] = $groupRight['access'];
-
-                continue;
-            }
-
-            $rights[$groupRight['idsite']] = $this->getHigherPermission($rights[$groupRight['idsite']], $groupRight['access']);
+        foreach ($groupCapabilities as $groupCapability) {
+            $capabilities[$groupCapability['idsite']][$groupCapability['capability']] = true;
         }
 
         $sites = [];
-        foreach ($rights as $idsite => $access) {
+        foreach ($roles as $idSite => $access) {
             $sites[] = [
-                'idsite' => $idsite,
+                'idsite' => $idSite,
                 'access' => $access,
             ];
+        }
+
+        // like in Matomo core, a capability only applies to websites the user has a role for
+        foreach ($capabilities as $idSite => $siteCapabilities) {
+            if (!isset($roles[$idSite])) {
+                continue;
+            }
+            foreach (array_keys($siteCapabilities) as $capability) {
+                $sites[] = [
+                    'idsite' => $idSite,
+                    'access' => (string) $capability,
+                ];
+            }
         }
 
         return $sites;
@@ -92,5 +106,14 @@ class Access extends \Piwik\Access {
         } else {
             return '';
         }
+    }
+
+    private function isRole(string $access): bool {
+        $roleProvider = StaticContainer::get(RolesProvider::class);
+        if ($roleProvider instanceof RolesProvider) {
+            return $roleProvider->isValidRole($access);
+        }
+
+        return in_array($access, ['view', 'write', 'admin'], true);
     }
 }

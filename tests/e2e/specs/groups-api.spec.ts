@@ -77,8 +77,8 @@ test.describe('Group management API', () => {
     const name = async (idSite: number) => (await su.call('SitesManager.getSiteFromId', { idSite })).name;
 
     expect(await su.call('GroupPermissions.getSitesAccessFromGroup', { idGroup: group.idGroup })).toEqual([
-      { idSite: alpha, name: await name(alpha), access: 'view' },
-      { idSite: zeta, name: await name(zeta), access: 'admin' },
+      { idSite: alpha, name: await name(alpha), access: 'view', capabilities: [] },
+      { idSite: zeta, name: await name(zeta), access: 'admin', capabilities: [] },
     ]);
     expect(await su.call('GroupPermissions.getSitesAccessFromGroup', { idGroup: (await su.createGroup('No sites')).idGroup })).toEqual([]);
     expect(await su.expectError('GroupPermissions.getSitesAccessFromGroup', { idGroup: 999999 })).toMatch(/Group does not exist/);

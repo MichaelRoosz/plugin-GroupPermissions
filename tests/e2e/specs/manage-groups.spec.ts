@@ -331,7 +331,7 @@ test.describe('Manage Groups tab', () => {
 
     // the row order follows the website names
     const sites = await su.call('GroupPermissions.getSitesAccessFromGroup', { idGroup: group.idGroup });
-    expect(sites).toEqual([{ idSite: existing, name: existingName, access: 'view' }]);
+    expect(sites).toEqual([{ idSite: existing, name: existingName, access: 'view', capabilities: [] }]);
   });
 
   test('website access: "Apply to all websites" asks for confirmation', async ({ page }) => {

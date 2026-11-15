@@ -140,6 +140,48 @@
       }
     }
 
+    // capabilities as chips (styles of Matomo's capabilitiesEdit), the chips of the role are not removable
+    td.capabilities-cell {
+      .capabilitiesEdit {
+        margin-top: 4px;
+      }
+
+      // core floats the close icon below the name in narrow columns, keep it inside the chip
+      div.chip {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+
+        span.icon-close {
+          float: none;
+          margin: 0 0 0 2px;
+        }
+      }
+
+      .chip.includedInRole {
+        opacity: .75;
+      }
+
+      .addCapability .select-wrapper {
+        max-width: 200px;
+
+        input.select-dropdown {
+          box-sizing: border-box;
+          width: 100%;
+        }
+
+        // core places the caret right of the (content-box) input, keep it inside the pill
+        .caret {
+          right: 6px;
+        }
+      }
+
+      .addCapability .form-group,
+      .addCapability .input-field {
+        margin: 0;
+      }
+    }
+
     tr.groupPermissionsEmpty td {
       padding: 24px 20px;
       color: @theme-color-text-light;
@@ -379,6 +421,31 @@
 
       td.access-cell {
         min-width: 120px;
+      }
+
+      // long capability names wrap inside their chips instead of widening the table
+      td.capabilities-cell {
+        .capabilitiesEdit {
+          display: block;
+        }
+
+        div.chip {
+          height: auto;
+          line-height: 1.4;
+          padding-top: 4px;
+          padding-bottom: 4px;
+          white-space: normal;
+          overflow-wrap: anywhere;
+        }
+
+        .addCapability {
+          display: block;
+          max-width: 100%;
+
+          .select-wrapper {
+            max-width: 120px;
+          }
+        }
       }
     }
 

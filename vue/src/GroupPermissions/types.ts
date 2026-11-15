@@ -19,6 +19,7 @@ export interface SiteAccess {
   idSite: number;
   name: string;
   access: string;
+  capabilities: string[];
 }
 
 export interface MatomoUser {
@@ -36,4 +37,18 @@ export interface RoleOption {
   key: string;
   value: string;
   description?: string;
+}
+
+
+export interface GroupSitePermission extends Group {
+  access: string;
+  capabilities: string[];
+}
+
+export interface CapabilityOption {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  includedInRoles: string[];
 }

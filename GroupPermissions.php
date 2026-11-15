@@ -77,10 +77,13 @@ class GroupPermissions extends Plugin {
         $translations[] = 'General_Website';
         $translations[] = 'General_Yes';
         $translations[] = 'GroupPermissions_AccessUpdated';
+        $translations[] = 'GroupPermissions_AddCapability';
         $translations[] = 'GroupPermissions_AddUserToGroup';
         $translations[] = 'GroupPermissions_AddUserToGroupButton';
         $translations[] = 'GroupPermissions_AllWebsitesNote';
         $translations[] = 'GroupPermissions_BackToGroups';
+        $translations[] = 'GroupPermissions_CapabilityAdded';
+        $translations[] = 'GroupPermissions_CapabilityRemoved';
         $translations[] = 'GroupPermissions_ChangeAccessToAllSitesConfirm';
         $translations[] = 'GroupPermissions_CreateNewGroup';
         $translations[] = 'GroupPermissions_CreateNewGroupButton';
@@ -102,6 +105,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_GroupNameHelp';
         $translations[] = 'GroupPermissions_GroupRenamed';
         $translations[] = 'GroupPermissions_Groups';
+        $translations[] = 'GroupPermissions_IncludedInGroupRole';
         $translations[] = 'GroupPermissions_InviteUser';
         $translations[] = 'GroupPermissions_InviteUserButton';
         $translations[] = 'GroupPermissions_InviteUserDescription';
@@ -118,6 +122,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_NoWebsiteAccess';
         $translations[] = 'GroupPermissions_RemoveAccess';
         $translations[] = 'GroupPermissions_RemoveAccessConfirm';
+        $translations[] = 'GroupPermissions_RemoveCapability';
+        $translations[] = 'GroupPermissions_RemoveCapabilityConfirm';
         $translations[] = 'GroupPermissions_RemoveFromGroup';
         $translations[] = 'GroupPermissions_RemoveFromGroupConfirm';
         $translations[] = 'GroupPermissions_RenameGroup';
@@ -130,6 +136,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_Websites';
         $translations[] = 'UsersManager_Active';
         $translations[] = 'UsersManager_ApplyToAllWebsites';
+        $translations[] = 'UsersManager_Capabilities';
+        $translations[] = 'UsersManager_CapabilitiesHelp';
         $translations[] = 'UsersManager_Email';
         $translations[] = 'UsersManager_Expired';
         $translations[] = 'UsersManager_InviteNewUser';
@@ -145,6 +153,7 @@ class GroupPermissions extends Plugin {
     public function deleteSite(int $idSite): void {
         $model = new Model();
         $model->removeAllPermissionsForSite($idSite);
+        $model->removeAllCapabilitiesForSite($idSite);
     }
 
     /**

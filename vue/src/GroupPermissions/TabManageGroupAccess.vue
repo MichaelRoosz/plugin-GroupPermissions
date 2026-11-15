@@ -71,23 +71,30 @@
                 @click="showRolesHelp = !showRolesHelp"
               ></span>
             </th>
+            <th class="capabilities_header" v-if="showCapabilities">
+              {{ translate('UsersManager_Capabilities') }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="showRolesHelp" class="groupPermissionsRolesHelp">
-            <td colspan="2">
+            <td :colspan="columnCount">
               <ul>
                 <li v-for="role in roles" :key="role.key">
                   <strong>{{ role.value }}:</strong> {{ role.description }}
+                </li>
+                <li v-if="showCapabilities">
+                  <strong>{{ translate('UsersManager_Capabilities') }}:</strong>
+                  {{ translate('UsersManager_CapabilitiesHelp') }}
                 </li>
               </ul>
             </td>
           </tr>
           <tr v-if="isLoading && !groupAccess.size">
-            <td colspan="2"><ActivityIndicator :loading="true" /></td>
+            <td :colspan="columnCount"><ActivityIndicator :loading="true" /></td>
           </tr>
           <tr v-else-if="!groupAccess.size && !isLoading" class="groupPermissionsEmpty">
-            <td colspan="2">
+            <td :colspan="columnCount">
               {{ translate('GroupPermissions_NoGroups') }}
               <a
                 v-if="hasSuperUserAccess"
@@ -96,22 +103,35 @@
             </td>
           </tr>
           <tr v-else-if="!filteredGroupAccess.length" class="groupPermissionsEmpty">
-            <td colspan="2">{{ translate('GroupPermissions_NoGroupsFound') }}</td>
+            <td :colspan="columnCount">{{ translate('GroupPermissions_NoGroupsFound') }}</td>
           </tr>
           <tr
-            v-for="[groupName, access] in filteredGroupAccess"
-            :key="groupName"
+            v-for="group in filteredGroupAccess"
+            :key="group.name"
             class="groupPermissionsAccessRow"
           >
-            <td class="groupName">{{ groupName }}</td>
+            <td class="groupName">{{ group.name }}</td>
             <td class="access-cell">
               <Field
-                :key="`${groupName}-${rowVersions[groupName] || 0}`"
+                :key="`${group.name}-${rowVersions[group.name] || 0}`"
                 uicontrol="select"
-                :name="`groupPermissionsAccess${rowIndex(groupName)}`"
-                :model-value="access"
-                @update:model-value="onRoleSelected(groupName, $event)"
+                :name="`groupPermissionsAccess${rowIndex(group.name)}`"
+                :model-value="group.access"
+                @update:model-value="onRoleSelected(group.name, $event)"
                 :options="roleOptions"
+              />
+            </td>
+            <td class="capabilities-cell" v-if="showCapabilities && site">
+              <GroupCapabilitiesEdit
+                :id-group="group.idGroup"
+                :group-name="group.name"
+                :id-site="Number(site.id)"
+                :site-name="site.name"
+                :role="group.access"
+                :capabilities="group.capabilities"
+                :available-capabilities="capabilities"
+                error-element="#ajaxErrorAccessGroupMember"
+                @change="group.capabilities = $event"
               />
             </td>
           </tr>
@@ -145,8 +165,20 @@ import {
   translate,
 } from 'CoreHome';
 import { Field } from 'CorePluginsAdmin';
-import { RoleOption, SelectedSite } from './types';
-import { loadRoles, noAccessOption, roleName } from './roles';
+import GroupCapabilitiesEdit from './GroupCapabilitiesEdit.vue';
+import {
+  CapabilityOption,
+  Group,
+  GroupSitePermission,
+  RoleOption,
+  SelectedSite,
+} from './types';
+import {
+  loadCapabilities,
+  loadRoles,
+  noAccessOption,
+  roleName,
+} from './roles';
 
 import { notifySuccess } from './notify';
 
@@ -155,6 +187,7 @@ export default defineComponent({
     ActivityIndicator,
     ContentBlock,
     Field,
+    GroupCapabilitiesEdit,
     Notification,
     SiteSelector,
   },
@@ -165,9 +198,10 @@ export default defineComponent({
     return {
       site: undefined as SelectedSite|undefined,
       isInitialSiteResolved: false,
-      groupAccess: new Map<string, string>(),
+      groupAccess: new Map<string, GroupSitePermission>(),
       rowVersions: {} as Record<string, number>,
       roles: [] as RoleOption[],
+      capabilities: [] as CapabilityOption[],
       searchTerm: '',
       showRolesHelp: false,
       isLoading: false,
@@ -178,6 +212,9 @@ export default defineComponent({
     loadRoles().then((roles) => {
       this.roles = roles;
     });
+    loadCapabilities().then((capabilities) => {
+      this.capabilities = capabilities;
+    });
     this.resolveInitialSite();
   },
   computed: {
@@ -187,16 +224,23 @@ export default defineComponent({
     isAllWebsites(): boolean {
       return !!this.site && this.site.id === 'all';
     },
+    showCapabilities(): boolean {
+      // capabilities need a role of the group for the website, which "all websites" does not show
+      return this.capabilities.length > 0 && !this.isAllWebsites;
+    },
+    columnCount(): number {
+      return this.showCapabilities ? 3 : 2;
+    },
     roleOptions(): RoleOption[] {
       return [noAccessOption(), ...this.roles];
     },
     groupNames(): string[] {
       return [...this.groupAccess.keys()];
     },
-    filteredGroupAccess(): Array<[string, string]> {
+    filteredGroupAccess(): GroupSitePermission[] {
       const term = this.searchTerm.trim().toLowerCase();
-      return [...this.groupAccess.entries()]
-        .filter(([name]) => !term || name.toLowerCase().includes(term));
+      return [...this.groupAccess.values()]
+        .filter((group) => !term || group.name.toLowerCase().includes(term));
     },
     accessTableTitle(): string {
       if (!this.site) {
@@ -288,7 +332,16 @@ export default defineComponent({
       }, {
         errorElement: '#ajaxErrorAccessGroupMember',
       }).then(() => {
-        this.groupAccess.set(groupName, access);
+        const group = this.groupAccess.get(groupName);
+        if (group) {
+          group.access = access;
+          // like the server: capabilities need a role, and the ones included in the new role
+          // are redundant
+          group.capabilities = access === 'noaccess' ? [] : group.capabilities.filter((id) => {
+            const capability = this.capabilities.find((c) => c.id === id);
+            return !capability || !capability.includedInRoles.includes(access);
+          });
+        }
         notifySuccess(
           'groupPermissionsAccessUpdated',
           'GroupPermissions_AccessUpdated',
@@ -324,17 +377,22 @@ export default defineComponent({
             return;
           }
           this.groupAccess.clear();
-          response.map((group: { name: string }) => group.name)
-            .sort((a: string, b: string) => a.localeCompare(b))
-            .forEach((group: string) => {
-              this.groupAccess.set(group, 'noaccess');
+          (response as Group[])
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach((group) => {
+              this.groupAccess.set(group.name, {
+                idGroup: group.idGroup,
+                name: group.name,
+                access: 'noaccess',
+                capabilities: [],
+              });
             });
         }).finally(() => {
           this.isLoading = false;
         });
       } else {
         AjaxHelper.post({
-          method: 'GroupPermissions.getGroupAccessFromSite',
+          method: 'GroupPermissions.getGroupPermissionsFromSite',
         }, {
           idSite,
           filter_limit: -1,
@@ -345,9 +403,11 @@ export default defineComponent({
             return;
           }
           this.groupAccess.clear();
-          Object.keys(response).sort((a, b) => a.localeCompare(b)).forEach((group) => {
-            this.groupAccess.set(group, response[group]);
-          });
+          (response as GroupSitePermission[])
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach((group) => {
+              this.groupAccess.set(group.name, group);
+            });
         }).finally(() => {
           this.isLoading = false;
         });

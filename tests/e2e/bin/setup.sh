@@ -26,7 +26,7 @@ compose exec -T matomo bash -c '
     dest=/var/www/html/plugins/GroupPermissions
     rm -rf "$dest" && mkdir -p "$dest/vue"
     cd /plugin-src
-    cp -r API.php Access.php Controller.php GroupPermissions.php Menu.php Model.php plugin.json \
+    cp -r API.php Access.php Controller.php GroupPermissions.php Menu.php Model.php plugin.json Updates \
         Dao config javascripts lang stylesheets templates "$dest/"
     cp -r vue/dist "$dest/vue/dist"
     chown -R www-data:www-data "$dest"
@@ -87,6 +87,9 @@ mexec ./console config:set --section=General --key=enable_update_users_email --v
 
 # track one visit, otherwise the dashboard shows the "no data tracked yet" onboarding page
 mexec curl -fsS -o /dev/null 'http://localhost/matomo.php?idsite=1&rec=1&url=https%3A%2F%2Fone.example.org%2F&action_name=Home'
+
+echo "==> Activating TagManager (provides the capabilities groups can get)"
+mexec ./console plugin:activate TagManager
 
 echo "==> Activating GroupPermissions"
 mexec ./console plugin:activate GroupPermissions

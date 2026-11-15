@@ -1,6 +1,8 @@
 
 # Changelog
 ## Unreleased
+  - Capabilities per group, e.g. the Tag Manager capabilities `tagmanager_write`, `tagmanager_publish_live_container` and `tagmanager_use_custom_templates` (any capability provided by a plugin is supported): new "Capabilities" column on the Manage Access tab and in the group editor, new API methods `GroupPermissions.addGroupCapabilities`, `GroupPermissions.removeGroupCapabilities` and `GroupPermissions.getGroupPermissionsFromSite`; `getSitesAccessFromGroup` also returns the capabilities. Requires a database update (new table `gpermissions_capability`)
+  - Fix: capabilities users got directly (e.g. Tag Manager "Publish Live Container") were lost as soon as the user was also a member of a group with access to any website
   - New admin UI aligned with Matomo's own admin screens: group list with search and member/website counts, group editor (members with email and status, website access with role selects, settings), role selects with Matomo's role descriptions on the Manage Access tab, toasts after changes, empty states, deep links (`#?idGroup=…&groupTab=…`)
   - New API methods `GroupPermissions.getGroupsOverview` and `GroupPermissions.getSitesAccessFromGroup` (super user only)
   - Security: `GroupPermissions.getAllGroups` and `GroupPermissions.getGroupWithId` now require admin access (previously any user could read group names, members and permissions); `setGroupAccess` checks admin access up front

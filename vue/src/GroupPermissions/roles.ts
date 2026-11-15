@@ -6,7 +6,7 @@
  */
 
 import { AjaxHelper, translate } from 'CoreHome';
-import { RoleOption } from './types';
+import { CapabilityOption, RoleOption } from './types';
 
 interface Role {
   id: string;
@@ -33,6 +33,24 @@ export function loadRoles(): Promise<RoleOption[]> {
       });
   }
   return rolesPromise;
+}
+
+let capabilitiesPromise: Promise<CapabilityOption[]>|null = null;
+
+/**
+ * Capabilities a group can get in addition to its role (e.g. Tag Manager capabilities),
+ * loaded once per page.
+ */
+export function loadCapabilities(): Promise<CapabilityOption[]> {
+  if (!capabilitiesPromise) {
+    capabilitiesPromise = AjaxHelper.fetch<CapabilityOption[]>({
+      method: 'UsersManager.getAvailableCapabilities',
+    }).catch((e) => {
+      capabilitiesPromise = null;
+      throw e;
+    });
+  }
+  return capabilitiesPromise;
 }
 
 export function noAccessOption(): RoleOption {

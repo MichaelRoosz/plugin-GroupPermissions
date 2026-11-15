@@ -11,6 +11,7 @@
 namespace Piwik\Plugins\GroupPermissions;
 
 use Piwik\Plugins\GroupPermissions\Dao\Group;
+use Piwik\Plugins\GroupPermissions\Dao\GroupCapability;
 use Piwik\Plugins\GroupPermissions\Dao\GroupPermission;
 use Piwik\Plugins\GroupPermissions\Dao\GroupUser;
 use Piwik\Plugins\GroupPermissions\Dao\MultiTable;
@@ -25,6 +26,9 @@ class Model {
 
         $user = new GroupUser();
         $user->install();
+
+        $capability = new GroupCapability();
+        $capability->install();
     }
 
     public function uninstall(): void {
@@ -36,6 +40,9 @@ class Model {
 
         $user = new GroupUser();
         $user->uninstall();
+
+        $capability = new GroupCapability();
+        $capability->uninstall();
     }
 
     // Group
@@ -203,6 +210,50 @@ class Model {
         $permission->removeAllPermissionsForSite($idSite);
     }
 
+    // GroupCapability
+    public function addCapability(int $idGroup, int $idSite, string $capability): void {
+        $groupCapability = new GroupCapability();
+        $groupCapability->addCapability($idGroup, $idSite, $capability);
+    }
+
+    public function removeCapability(int $idGroup, int $idSite, string $capability): void {
+        $groupCapability = new GroupCapability();
+        $groupCapability->removeCapability($idGroup, $idSite, $capability);
+    }
+
+    /**
+     * @return array<int, array<string>> capabilities by website id
+     */
+    public function getCapabilitiesOfGroup(int $idGroup): array {
+        $groupCapability = new GroupCapability();
+
+        return $groupCapability->getCapabilitiesOfGroup($idGroup);
+    }
+
+    /**
+     * @return array<int, array<string>> capabilities by group id
+     */
+    public function getCapabilitiesOfSite(int $idSite): array {
+        $groupCapability = new GroupCapability();
+
+        return $groupCapability->getCapabilitiesOfSite($idSite);
+    }
+
+    public function removeAllCapabilitiesOfGroupForSite(int $idGroup, int $idSite): void {
+        $groupCapability = new GroupCapability();
+        $groupCapability->removeAllCapabilitiesOfGroupForSite($idGroup, $idSite);
+    }
+
+    public function removeAllCapabilitiesOfGroup(int $idGroup): void {
+        $groupCapability = new GroupCapability();
+        $groupCapability->removeAllCapabilitiesOfGroup($idGroup);
+    }
+
+    public function removeAllCapabilitiesForSite(int $idSite): void {
+        $groupCapability = new GroupCapability();
+        $groupCapability->removeAllCapabilitiesForSite($idSite);
+    }
+
     // MultiTable
     /**
      * @return array<array{
@@ -214,5 +265,17 @@ class Model {
         $multiTable = new MultiTable();
 
         return $multiTable->getPermissionsOfUser($login);
+    }
+
+    /**
+     * @return array<array{
+     *   idsite: int,
+     *   capability: string
+     * }>
+     */
+    public function getCapabilitiesOfUser(string $login): array {
+        $multiTable = new MultiTable();
+
+        return $multiTable->getCapabilitiesOfUser($login);
     }
 }

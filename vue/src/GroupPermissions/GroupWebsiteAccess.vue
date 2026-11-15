@@ -60,24 +60,31 @@
               @click="showRolesHelp = !showRolesHelp"
             ></span>
           </th>
+          <th class="capabilities_header" v-if="hasCapabilities">
+            {{ translate('UsersManager_Capabilities') }}
+          </th>
           <th class="actions-cell-header">{{ translate('General_Actions') }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="showRolesHelp" class="groupPermissionsRolesHelp">
-          <td colspan="3">
+          <td :colspan="columnCount">
             <ul>
               <li v-for="role in roles" :key="role.key">
                 <strong>{{ role.value }}:</strong> {{ role.description }}
+              </li>
+              <li v-if="hasCapabilities">
+                <strong>{{ translate('UsersManager_Capabilities') }}:</strong>
+                {{ translate('UsersManager_CapabilitiesHelp') }}
               </li>
             </ul>
           </td>
         </tr>
         <tr v-if="isLoading && !sites.length">
-          <td colspan="3"><ActivityIndicator :loading="true" /></td>
+          <td :colspan="columnCount"><ActivityIndicator :loading="true" /></td>
         </tr>
         <tr v-else-if="!sites.length" class="groupPermissionsEmpty">
-          <td colspan="3">{{ translate('GroupPermissions_NoWebsiteAccess') }}</td>
+          <td :colspan="columnCount">{{ translate('GroupPermissions_NoWebsiteAccess') }}</td>
         </tr>
         <tr
           v-for="site in sites"
@@ -93,6 +100,19 @@
               :model-value="site.access"
               @update:model-value="setAccess(site.idSite, site.name, $event)"
               :options="roles"
+            />
+          </td>
+          <td class="capabilities-cell" v-if="hasCapabilities">
+            <GroupCapabilitiesEdit
+              :id-group="group.idGroup"
+              :group-name="group.name"
+              :id-site="site.idSite"
+              :site-name="site.name"
+              :role="site.access"
+              :capabilities="site.capabilities || []"
+              :available-capabilities="capabilities"
+              error-element="#ajaxErrorGroupWebsiteAccess"
+              @change="site.capabilities = $event"
             />
           </td>
           <td class="center actions-cell">
@@ -132,13 +152,15 @@ import {
   translate,
 } from 'CoreHome';
 import { Field, SaveButton } from 'CorePluginsAdmin';
+import GroupCapabilitiesEdit from './GroupCapabilitiesEdit.vue';
 import {
+  CapabilityOption,
   Group,
   RoleOption,
   SelectedSite,
   SiteAccess,
 } from './types';
-import { loadRoles, roleName } from './roles';
+import { loadCapabilities, loadRoles, roleName } from './roles';
 
 import { notifySuccess } from './notify';
 
@@ -146,6 +168,7 @@ export default defineComponent({
   components: {
     ActivityIndicator,
     Field,
+    GroupCapabilitiesEdit,
     SaveButton,
     SiteSelector,
   },
@@ -163,6 +186,7 @@ export default defineComponent({
     return {
       sites: [] as SiteAccess[],
       roles: [] as RoleOption[],
+      capabilities: [] as CapabilityOption[],
       siteToAdd: null as SelectedSite|null,
       roleToAdd: 'view',
       confirmText: '',
@@ -175,7 +199,18 @@ export default defineComponent({
     loadRoles().then((roles) => {
       this.roles = roles;
     });
+    loadCapabilities().then((capabilities) => {
+      this.capabilities = capabilities;
+    });
     this.loadSites();
+  },
+  computed: {
+    hasCapabilities(): boolean {
+      return this.capabilities.length > 0;
+    },
+    columnCount(): number {
+      return this.hasCapabilities ? 4 : 3;
+    },
   },
   methods: {
     loadSites() {

@@ -13,6 +13,7 @@ namespace Piwik\Plugins\GroupPermissions;
 use Exception;
 use Piwik\Access;
 use Piwik\Common;
+use Piwik\Access\CapabilitiesProvider;
 use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
 use Piwik\API\Request;
@@ -37,6 +38,11 @@ class API extends \Piwik\Plugin\API {
     private $roleProvider;
 
     /**
+     * @var CapabilitiesProvider $capabilityProvider
+     */
+    private $capabilityProvider;
+
+    /**
      * @var ?self $instance
      */
     private static $instance = null;
@@ -49,6 +55,12 @@ class API extends \Piwik\Plugin\API {
             throw new Exception('RolesProvider must inherit Access\RolesProvider');
         }
         $this->roleProvider = $roleProvider;
+
+        $capabilityProvider = StaticContainer::get(CapabilitiesProvider::class);
+        if (!($capabilityProvider instanceof CapabilitiesProvider)) {
+            throw new Exception('CapabilitiesProvider must inherit Access\CapabilitiesProvider');
+        }
+        $this->capabilityProvider = $capabilityProvider;
     }
 
     /**
@@ -118,6 +130,48 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
+     * Returns all groups sorted by name, with their role and capabilities for a website.
+     *
+     * @return array<array{
+     *   idGroup: int,
+     *   name: string,
+     *   access: string,
+     *   capabilities: array<string>
+     * }>
+     */
+    public function getGroupPermissionsFromSite(int $idSite): array {
+        Piwik::checkUserHasAdminAccess($idSite);
+
+        // throws for websites that do not exist (super users pass the access check for any id)
+        new Site($idSite);
+
+        $access = [];
+        foreach ($this->model->getPermissionsOfSite($idSite) as $permission) {
+            $access[$permission['idgroup']] = $permission['access'];
+        }
+        $capabilities = $this->model->getCapabilitiesOfSite($idSite);
+
+        $groups = [];
+        foreach ($this->model->getAllGroups() as $group) {
+            $role = $access[$group['idgroup']] ?? 'noaccess';
+            $groups[] = [
+                'idGroup' => $group['idgroup'],
+                'name' => $group['name'],
+                'access' => $role,
+                'capabilities' => $role === 'noaccess'
+                    ? []
+                    : $this->filterCapabilities($capabilities[$group['idgroup']] ?? [], $role),
+            ];
+        }
+
+        usort($groups, static function (array $a, array $b): int {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        return $groups;
+    }
+
+    /**
      * @return array<array{
      *   idGroup: int,
      *   name: string
@@ -181,7 +235,8 @@ class API extends \Piwik\Plugin\API {
      * @return array<array{
      *   idSite: int,
      *   name: string,
-     *   access: string
+     *   access: string,
+     *   capabilities: array<string>
      * }>
      */
     public function getSitesAccessFromGroup(int $idGroup): array {
@@ -191,6 +246,8 @@ class API extends \Piwik\Plugin\API {
         if (empty($group['idgroup'])) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
         }
+
+        $capabilities = $this->model->getCapabilitiesOfGroup($group['idgroup']);
 
         $sites = [];
         foreach ($this->model->getPermissionsOfGroup($group['idgroup']) as $permission) {
@@ -203,6 +260,10 @@ class API extends \Piwik\Plugin\API {
                 'idSite' => $permission['idsite'],
                 'name' => $site['name'],
                 'access' => $permission['access'],
+                'capabilities' => $this->filterCapabilities(
+                    $capabilities[$permission['idsite']] ?? [],
+                    $permission['access']
+                ),
             ];
         }
 
@@ -352,33 +413,7 @@ class API extends \Piwik\Plugin\API {
         }
         $idGroup = $group['idgroup'];
 
-        // in case idSites is all we grant access to all the websites on which the current connected user has an 'admin' access
-        if ($idSites === 'all') {
-            $idSites = SitesManagerAPI::getInstance()->getSitesIdWithAdminAccess();
-        } // in case the idSites is an integer we build an array
-        else {
-            $idSites = Site::getIdSitesFromIdSitesString($idSites);
-        }
-
-        $idSites = array_map(static function ($idSite): int {
-            if (!is_numeric($idSite)) {
-                throw new Exception('Invalid website ID in &idSites=');
-            }
-
-            return (int) $idSite;
-        }, $idSites);
-
-        if (!$idSites) {
-            throw new Exception('Specify at least one website ID in &idSites=');
-        }
-        // it is possible to set user access on websites only for the websites admin
-        // basically an admin can give the view or the admin access to any user for the websites he manages
-        Piwik::checkUserHasAdminAccess($idSites);
-
-        // super users pass the access check above for any id, make sure the websites exist
-        foreach ($idSites as $idSite) {
-            new Site($idSite);
-        }
+        $idSites = $this->getIdSitesCheckAdminAccess($idSites);
 
         foreach ($idSites as $idSite) {
             $this->model->removePermission($idGroup, $idSite);
@@ -391,6 +426,8 @@ class API extends \Piwik\Plugin\API {
                 $this->model->createPermission($idGroup, $idSite, $access);
             }
         }
+
+        $this->removeCapabilitiesNotApplyingToRole($idGroup, $idSites, $access);
 
         // we reload the access list which doesn't yet take in consideration this new user access
         Access::getInstance()->reloadAccess();
@@ -462,10 +499,84 @@ class API extends \Piwik\Plugin\API {
         }
         $idGroup = $group['idgroup'];
 
+        $this->model->removeAllCapabilitiesOfGroup($idGroup);
         $this->model->removeAllPermissionsOfGroup($idGroup);
         $this->model->removeAllUsersOfGroup($idGroup);
 
         $this->model->deleteGroup($idGroup);
+    }
+
+    /**
+     * Adds capabilities (e.g. `tagmanager_write`) to a group for the given websites.
+     *
+     * Works like UsersManager.addCapabilities: the group needs a role for each website, and capabilities that
+     * the group's role already includes are not stored. To fetch the available capabilities call
+     * "UsersManager.getAvailableCapabilities".
+     *
+     * @param int $idGroup
+     * @param string|array<string> $capabilities One capability ID or a list of capability IDs
+     * @param string $idSites Website ID, comma separated list of website IDs or "all"
+     */
+    public function addGroupCapabilities(int $idGroup, $capabilities, string $idSites): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $capabilities = $this->parseCapabilities($capabilities);
+        $group = $this->getGroupOrFail($idGroup);
+        $idSites = $this->getIdSitesCheckAdminAccess($idSites);
+
+        $roles = [];
+        foreach ($this->model->getPermissionsOfGroup($group['idgroup']) as $permission) {
+            $roles[$permission['idsite']] = $permission['access'];
+        }
+
+        foreach ($idSites as $idSite) {
+            if (!isset($roles[$idSite])) {
+                throw new Exception(Piwik::translate(
+                    'GroupPermissions_ExceptionNoCapabilitiesWithoutRole',
+                    [Common::unsanitizeInputValue($group['name']), $idSite]
+                ));
+            }
+        }
+
+        foreach ($capabilities as $capabilityId) {
+            $capability = $this->capabilityProvider->getCapability($capabilityId);
+
+            foreach ($idSites as $idSite) {
+                // the role already grants this capability
+                if ($capability && $capability->hasRoleCapability($roles[$idSite])) {
+                    continue;
+                }
+
+                $this->model->addCapability($group['idgroup'], $idSite, $capabilityId);
+            }
+        }
+
+        Access::getInstance()->reloadAccess();
+        Cache::deleteTrackerCache();
+    }
+
+    /**
+     * Removes capabilities from a group for the given websites.
+     *
+     * @param int $idGroup
+     * @param string|array<string> $capabilities One capability ID or a list of capability IDs
+     * @param string $idSites Website ID, comma separated list of website IDs or "all"
+     */
+    public function removeGroupCapabilities(int $idGroup, $capabilities, string $idSites): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $capabilities = $this->parseCapabilities($capabilities);
+        $group = $this->getGroupOrFail($idGroup);
+        $idSites = $this->getIdSitesCheckAdminAccess($idSites);
+
+        foreach ($capabilities as $capabilityId) {
+            foreach ($idSites as $idSite) {
+                $this->model->removeCapability($group['idgroup'], $idSite, $capabilityId);
+            }
+        }
+
+        Access::getInstance()->reloadAccess();
+        Cache::deleteTrackerCache();
     }
 
     /**
@@ -534,6 +645,141 @@ class API extends \Piwik\Plugin\API {
         }
 
         return $copiedTo;
+    }
+
+    /**
+     * @return array{
+     *   idgroup: int,
+     *   name: string
+     * }
+     */
+    private function getGroupOrFail(int $idGroup): array {
+        $group = $this->model->getGroupWithId($idGroup);
+        if (empty($group['idgroup'])) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
+        }
+
+        return $group;
+    }
+
+    /**
+     * Resolves the `idSites` parameter ("all" means all websites the current user administers) and checks that
+     * the current user administers all of them and that they exist.
+     *
+     * @return array<int>
+     */
+    private function getIdSitesCheckAdminAccess(string $idSites): array {
+        if ($idSites === 'all') {
+            $idSites = SitesManagerAPI::getInstance()->getSitesIdWithAdminAccess();
+        } else {
+            $idSites = Site::getIdSitesFromIdSitesString($idSites);
+        }
+
+        $idSites = array_map(static function ($idSite): int {
+            if (!is_numeric($idSite)) {
+                throw new Exception('Invalid website ID in &idSites=');
+            }
+
+            return (int) $idSite;
+        }, $idSites);
+
+        if (!$idSites) {
+            throw new Exception('Specify at least one website ID in &idSites=');
+        }
+
+        // it is possible to set group access on websites only for the websites admin
+        Piwik::checkUserHasAdminAccess($idSites);
+
+        // super users pass the access check above for any id, make sure the websites exist
+        foreach ($idSites as $idSite) {
+            new Site($idSite);
+        }
+
+        return $idSites;
+    }
+
+    /**
+     * @param mixed $capabilities
+     *
+     * @return array<string>
+     */
+    private function parseCapabilities($capabilities): array {
+        if (is_string($capabilities)) {
+            $capabilities = [$capabilities];
+        }
+
+        if (!is_array($capabilities)) {
+            throw new Exception('Invalid capability in &capabilities=');
+        }
+
+        $parsed = [];
+        foreach ($capabilities as $capability) {
+            if (!is_string($capability)) {
+                throw new Exception('Invalid capability in &capabilities=');
+            }
+            $capability = trim($capability);
+            // not using CapabilitiesProvider::checkValidCapability(), its error message is broken in Matomo 5
+            if (!$this->capabilityProvider->isValidCapability($capability)) {
+                throw new Exception(Piwik::translate('UsersManager_ExceptionAccessValues', [
+                    implode(', ', $this->capabilityProvider->getAllCapabilityIds()),
+                    $capability,
+                ]));
+            }
+            $parsed[] = $capability;
+        }
+
+        if (!$parsed) {
+            throw new Exception('Specify at least one capability in &capabilities=');
+        }
+
+        return array_values(array_unique($parsed));
+    }
+
+    /**
+     * Returns the capabilities that apply in addition to a role: unknown capabilities (e.g. of a deactivated
+     * plugin) and capabilities the role already includes are left out.
+     *
+     * @param array<string> $capabilities
+     *
+     * @return array<string>
+     */
+    private function filterCapabilities(array $capabilities, string $role): array {
+        $result = [];
+        foreach ($capabilities as $capabilityId) {
+            $capability = $this->capabilityProvider->getCapability($capabilityId);
+            if ($capability && !$capability->hasRoleCapability($role)) {
+                $result[] = $capabilityId;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * After the role of a group changed: capabilities never apply without a role, and the ones included in the
+     * new role are redundant. Other capabilities are kept (unlike UsersManager.setUserAccess), so changing the
+     * role from "view" to "write" does not lose e.g. the Tag Manager publish capability.
+     *
+     * @param array<int> $idSites
+     */
+    private function removeCapabilitiesNotApplyingToRole(int $idGroup, array $idSites, string $access): void {
+        if ($access === 'noaccess') {
+            foreach ($idSites as $idSite) {
+                $this->model->removeAllCapabilitiesOfGroupForSite($idGroup, $idSite);
+            }
+
+            return;
+        }
+
+        $capabilitiesBySite = $this->model->getCapabilitiesOfGroup($idGroup);
+        foreach ($idSites as $idSite) {
+            foreach ($capabilitiesBySite[$idSite] ?? [] as $capabilityId) {
+                $capability = $this->capabilityProvider->getCapability($capabilityId);
+                if ($capability && $capability->hasRoleCapability($access)) {
+                    $this->model->removeCapability($idGroup, $idSite, $capabilityId);
+                }
+            }
+        }
     }
 
     /**

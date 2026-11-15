@@ -31,6 +31,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Manage access by groups instead of per-user.
 - Assign users to one or more groups.
 - Grant or revoke site access for entire groups, including applying to all sites you administer.
+- Grant capabilities to groups per website, e.g. the Tag Manager capabilities (write, publish live container, use custom templates).
 - Two clear tabs: Manage Access and Manage Groups.
 
 ## Compatibility
@@ -61,6 +62,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Choose a website in the website selector (the page opens with the website of the URL if you administer it). Super users can also choose "Apply to all websites".
 - The table lists every group with a role select (`No access`, `View`, `Write`, `Admin`, or other roles provided by Matomo). A change is saved immediately and confirmed by a notification; changes for all websites ask for confirmation first.
 - The help icon next to "Role" explains the roles, the search field filters the groups by name.
+- If plugins provide capabilities (e.g. the Tag Manager: Write, Publish Live Container, Use Custom Templates), the "Capabilities" column shows them for each group with a role. Capabilities included in the group's role are shown greyed out; add more with the capability select and remove them with the × icon. (Not available for "Apply to all websites".)
 
 ### Manage Groups tab
 
@@ -68,7 +70,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - "Create a new group" asks for a name (at most 64 characters) and opens the new group.
 - The group editor has three sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
   - **Members**: members with email and invitation status. Add existing users with the searchable user picker, remove members with the delete icon, or invite a new user directly into the group. A user can be in multiple groups; the anonymous user cannot be added to groups.
-  - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access.
+  - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access. Capabilities (e.g. Tag Manager) can be added per website, like on the Manage Access tab.
   - **Settings**: rename or delete the group. Deleting a group removes the access its members got through it; the users themselves are kept.
 - "Invite a new user" invites a user by email directly into one or more groups.
 
@@ -76,7 +78,9 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 
 - Managing groups (create/rename/delete groups, add/remove members, invite users to groups, the group editor) requires Super User access.
 - Changing the access of groups requires Admin access on the selected website(s).
-- Members get the highest role of all their groups and their own permissions for each website.
+- Changing the capabilities of groups requires Admin access on the selected website(s) as well.
+- Members get the highest role of all their groups and their own permissions for each website, plus all capabilities of their groups and their own capabilities.
+- Like in Matomo core, a capability only applies while the group has a role for the website: removing the role removes the group's capabilities for it, and capabilities included in a new role are dropped (others are kept when the role changes).
 
 ## API
 
@@ -94,13 +98,22 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
   ```text
   index.php?module=API&method=GroupPermissions.getGroupsOverview&format=JSON&token_auth=YOUR_TOKEN
   ```
-- Get the websites a group can access with its role (super user):
+- Get the websites a group can access with its role and capabilities (super user):
   ```text
   index.php?module=API&method=GroupPermissions.getSitesAccessFromGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
   ```
 - Get the role of every group for a website:
   ```text
   index.php?module=API&method=GroupPermissions.getGroupAccessFromSite&idSite=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Get every group with its id, role and capabilities for a website:
+  ```text
+  index.php?module=API&method=GroupPermissions.getGroupPermissionsFromSite&idSite=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Add or remove capabilities of a group (the group needs a role for the websites; see `UsersManager.getAvailableCapabilities` for the capability IDs):
+  ```text
+  index.php?module=API&method=GroupPermissions.addGroupCapabilities&idGroup=1&capabilities[]=tagmanager_write&capabilities[]=tagmanager_publish_live_container&idSites=1,2&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.removeGroupCapabilities&idGroup=1&capabilities=tagmanager_write&idSites=1&format=JSON&token_auth=YOUR_TOKEN
   ```
 - Invite a new user directly into groups (super user):
   ```text

@@ -2,6 +2,7 @@
 # Tests the plugin lifecycle on the running test instance (started by setup.sh / run.sh / start.sh):
 #   deactivate -> group permissions no longer apply, data is kept
 #   activate   -> group permissions apply again
+#   update     -> updating from 5.2.1 creates the capability table
 #   uninstall  -> plugin tables are dropped
 #   reinstall  -> empty tables, everything works again
 # Destructive for the plugin data of the instance; run.sh runs it after the Playwright specs.
@@ -76,9 +77,17 @@ mexec ./console plugin:activate GroupPermissions >/dev/null
 check "group access applies again" "$id_site" "$(member_sites)"
 check "group still has its member" "1" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$member\"")"
 
+echo "==> Updating from version 5.2.1 (without the capability table)"
+sql "DROP TABLE matomo_gpermissions_capability"
+sql "UPDATE matomo_option SET option_value = '5.2.1' WHERE option_name = 'version_GroupPermissions'"
+mexec ./console core:update --yes >/dev/null
+check "capability table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_capability'" | wc -l)"
+check "plugin version is updated" "5.3.0" "$(sql "SELECT option_value FROM matomo_option WHERE option_name = 'version_GroupPermissions'")"
+check "group access still applies after the update" "$id_site" "$(member_sites)"
+
 echo "==> Uninstalling the plugin"
 tables_before=$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)
-check "plugin tables exist while installed" "3" "$tables_before"
+check "plugin tables exist while installed" "4" "$tables_before"
 mexec ./console plugin:deactivate GroupPermissions >/dev/null
 mexec ./console plugin:uninstall GroupPermissions >/dev/null
 check "plugin tables are dropped" "0" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
@@ -86,7 +95,7 @@ check "member has no access" "" "$(member_sites)"
 
 echo "==> Reinstalling the plugin"
 ./bin/setup.sh >/dev/null
-check "plugin tables are created again" "3" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
+check "plugin tables are created again" "4" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
 su_token=$(token_for "$SUPERUSER_LOGIN" "$SUPERUSER_PASSWORD")
 check "no groups after reinstall" "[]" "$(su GroupPermissions.getAllGroups)"
 check "member has no access after reinstall" "" "$(member_sites)"

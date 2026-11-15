@@ -76,7 +76,7 @@ test.describe('Manage Access tab', () => {
     for (const [name, access] of Object.entries(groups)) {
       await expectAccess(accessRow(page, name), access as any);
     }
-    await expect(page.locator('.groupPermissionsAccessTable thead th')).toHaveText(['Group', 'Role'], { ignoreCase: true });
+    await expect(page.locator('.groupPermissionsAccessTable thead th')).toHaveText(['Group', 'Role', 'Capabilities'], { ignoreCase: true });
   });
 
   test('every role can be selected, is saved immediately and confirmed by a toast', async ({ page }) => {
@@ -170,7 +170,7 @@ test.describe('Manage Access tab', () => {
 
     await openForSite(page, 1);
     // delay the access list of the slow website
-    await page.route(/method=GroupPermissions\.getGroupAccessFromSite/, async (route) => {
+    await page.route(/method=GroupPermissions\.getGroupPermissionsFromSite/, async (route) => {
       if ((route.request().postData() || '').includes(`idSite=${slowSite}`)) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
@@ -238,7 +238,7 @@ test.describe('Manage Access tab', () => {
   });
 
   test('without groups an empty state links to Manage Groups', async ({ page }) => {
-    await page.route(/method=GroupPermissions\.getGroupAccessFromSite/, (route) =>
+    await page.route(/method=GroupPermissions\.getGroupPermissionsFromSite/, (route) =>
       route.fulfill({ contentType: 'application/json', body: '[]' }));
     await openForSite(page, 1);
     const empty = page.locator('.groupPermissionsAccessTable tr.groupPermissionsEmpty');

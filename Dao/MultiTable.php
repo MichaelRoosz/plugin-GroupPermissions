@@ -20,9 +20,13 @@ class MultiTable {
     /** @var string $tablePrefixedGroupUser */
     private $tablePrefixedGroupUser = '';
 
+    /** @var string $tablePrefixedGroupCapability */
+    private $tablePrefixedGroupCapability = '';
+
     public function __construct() {
         $this->tablePrefixedGroupPermission = Common::prefixTable(GroupPermission::TABLE);
         $this->tablePrefixedGroupUser = Common::prefixTable(GroupUser::TABLE);
+        $this->tablePrefixedGroupCapability = Common::prefixTable(GroupCapability::TABLE);
     }
 
     /**
@@ -45,6 +49,34 @@ class MultiTable {
             return [
                 'idsite' => Rows::int($row, 'idsite'),
                 'access' => Rows::string($row, 'access'),
+            ];
+        }, $rows);
+    }
+
+    /**
+     * Capabilities the groups of a user grant. Only capabilities of groups that also have a role for the
+     * website are returned (a capability never applies without a role).
+     *
+     * @return array<array{
+     *   idsite: int,
+     *   capability: string
+     * }>
+     */
+    public function getCapabilitiesOfUser(string $login): array {
+        $tableCapability = $this->tablePrefixedGroupCapability;
+        $tablePermission = $this->tablePrefixedGroupPermission;
+        $tableUser = $this->tablePrefixedGroupUser;
+        $sql = "SELECT DISTINCT gc.idsite, gc.capability FROM $tableCapability AS gc
+                INNER JOIN $tableUser AS gu ON gc.idgroup = gu.idgroup
+                INNER JOIN $tablePermission AS ga ON ga.idgroup = gc.idgroup AND ga.idsite = gc.idsite
+                WHERE gu.login = ?";
+
+        $rows = Rows::list(Db::fetchAll($sql, [$login]));
+
+        return array_map(static function (array $row): array {
+            return [
+                'idsite' => Rows::int($row, 'idsite'),
+                'capability' => Rows::string($row, 'capability'),
             ];
         }, $rows);
     }
