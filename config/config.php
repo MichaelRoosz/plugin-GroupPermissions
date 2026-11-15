@@ -10,4 +10,6 @@
 
 return [
     'Piwik\Access' => DI\get('Piwik\Plugins\GroupPermissions\Access'),
+    // shared ownership of scheduled reports within a group, see ScheduledReportsApi
+    'Piwik\Plugins\ScheduledReports\API' => DI\autowire('Piwik\Plugins\GroupPermissions\ScheduledReportsApi'),
 ];

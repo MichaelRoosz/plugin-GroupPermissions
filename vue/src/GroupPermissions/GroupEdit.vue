@@ -60,6 +60,10 @@
           v-else-if="activeTab === 'segments'"
           :group="group"
         />
+        <GroupReports
+          v-else-if="activeTab === 'reports'"
+          :group="group"
+        />
         <GroupSettings
           v-else-if="activeTab === 'settings'"
           :group="group"
@@ -78,6 +82,7 @@ import GroupMembers from './GroupMembers.vue';
 import GroupWebsiteAccess from './GroupWebsiteAccess.vue';
 import GroupAutoAccess from './GroupAutoAccess.vue';
 import GroupSegments from './GroupSegments.vue';
+import GroupReports from './GroupReports.vue';
 import GroupSettings from './GroupSettings.vue';
 import { GroupOverview } from './types';
 
@@ -88,6 +93,7 @@ export default defineComponent({
     GroupWebsiteAccess,
     GroupAutoAccess,
     GroupSegments,
+    GroupReports,
     GroupSettings,
   },
   props: {
@@ -108,6 +114,7 @@ export default defineComponent({
         { tab: 'access', title: translate('GroupPermissions_WebsiteAccess'), count: this.group.siteCount },
         { tab: 'autoaccess', title: translate('GroupPermissions_AutoAccess') },
         { tab: 'segments', title: translate('GroupPermissions_Segments') },
+        { tab: 'reports', title: translate('GroupPermissions_ScheduledReports') },
         { tab: 'settings', title: translate('General_Settings') },
       ];
     },

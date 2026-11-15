@@ -62,6 +62,15 @@ export class MatomoApi {
     return MatomoApi.raw(method, { ...params, token_auth: this.tokenAuth });
   }
 
+  /** Calls an API method whose response is not JSON, e.g. a rendered report. */
+  fetchRaw(method: string, params: Params = {}): Promise<Response> {
+    return fetch(`${MATOMO_URL}/index.php?module=API&method=${method}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: encode({ ...params, token_auth: this.tokenAuth }),
+    });
+  }
+
   /** Returns the error message of a call that is expected to fail. */
   async expectError(method: string, params: Params = {}): Promise<string> {
     try {

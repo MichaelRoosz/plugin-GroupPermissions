@@ -1,0 +1,18 @@
+<?php
+
+namespace Piwik;
+
+/**
+ * Corrects phpdoc types of Matomo core for PHPStan (the core documents the callback as the non-existent type
+ * "callback").
+ */
+class Access {
+    /**
+     * @template T
+     *
+     * @param callable(): T $function
+     *
+     * @return T
+     */
+    public static function doAsSuperUser($function) {}
+}

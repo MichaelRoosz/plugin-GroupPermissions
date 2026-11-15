@@ -71,3 +71,14 @@ export interface GroupSegment {
   enabledAllUsers: boolean;
   isShared: boolean;
 }
+
+export interface GroupReport {
+  idReport: number;
+  description: string;
+  login: string;
+  idSite: number;
+  siteName: string;
+  type: string;
+  period: string;
+  isShared: boolean;
+}

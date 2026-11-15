@@ -21,6 +21,7 @@ use Piwik\Piwik;
 use Piwik\Plugin\Manager as PluginManager;
 use Piwik\Plugins\Dashboard\Dashboard;
 use Piwik\Plugins\Dashboard\Model as DashboardModel;
+use Piwik\Plugins\ScheduledReports\API as CoreScheduledReportsAPI;
 use Piwik\Plugins\SegmentEditor\Model as SegmentEditorModel;
 use Piwik\Site;
 use Piwik\Tracker\Cache;
@@ -487,6 +488,7 @@ class API extends \Piwik\Plugin\API {
 
         $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
         $this->model->removeAllSegmentSharesOfGroup($idGroup);
+        $this->model->removeAllReportSharesOfGroup($idGroup);
         $this->model->removeAllCapabilitiesOfGroup($idGroup);
         $this->model->removeAllPermissionsOfGroup($idGroup);
         $this->model->removeAllUsersOfGroup($idGroup);
@@ -884,6 +886,139 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
+     * Shares a scheduled email report with a group (shared ownership).
+     *
+     * Members of the group can see, edit, send, download and delete the report like their own as long as they
+     * have view access to its website, e.g. to change the recipients while the creator is absent. Changes are made
+     * with the member's own account; the report keeps its creator. Only email reports can be shared.
+     * Super users can share any report, users with admin access to at least one website their own reports.
+     */
+    public function shareReportWithGroup(int $idReport, int $idGroup): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $report = $this->getReportOrFailForSharing($idReport);
+        $group = $this->getGroupOrFail($idGroup);
+
+        if ($report['type'] !== ReportSharing::REPORT_TYPE) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionReportTypeNotShareable'));
+        }
+
+        $this->model->shareReport($group['idgroup'], $report['idreport']);
+    }
+
+    /**
+     * Stops sharing a scheduled report with a group. Same permissions as `shareReportWithGroup`.
+     */
+    public function unshareReportFromGroup(int $idReport, int $idGroup): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $report = $this->getReportOrFailForSharing($idReport);
+        $group = $this->getGroupOrFail($idGroup);
+
+        $this->model->unshareReport($group['idgroup'], $report['idreport']);
+    }
+
+    /**
+     * Returns the groups a scheduled report is shared with, sorted by name. Same permissions as
+     * `shareReportWithGroup`.
+     *
+     * @return array<array{
+     *   idGroup: int,
+     *   name: string
+     * }>
+     */
+    public function getGroupsOfReport(int $idReport): array {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $report = $this->getReportOrFailForSharing($idReport);
+        $idGroups = array_flip($this->model->getGroupsOfReport($report['idreport']));
+
+        $groups = [];
+        foreach ($this->model->getAllGroups() as $group) {
+            if (isset($idGroups[$group['idgroup']])) {
+                $groups[] = ['idGroup' => $group['idgroup'], 'name' => $group['name']];
+            }
+        }
+
+        usort($groups, static function (array $a, array $b): int {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        return $groups;
+    }
+
+    /**
+     * Returns the scheduled email reports of all users sorted by description, with whether they are shared with
+     * the group. Reports of other types are only returned if they are shared with the group (sharing does not
+     * apply to them, but they can be unshared).
+     *
+     * @return array<array{
+     *   idReport: int,
+     *   description: string,
+     *   login: string,
+     *   idSite: int,
+     *   siteName: string,
+     *   type: string,
+     *   period: string,
+     *   isShared: bool
+     * }>
+     */
+    public function getReportsForGroup(int $idGroup): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        if (!ReportSharing::isScheduledReportsActivated()) {
+            return [];
+        }
+
+        $shared = array_flip($this->model->getReportsOfGroup($group['idgroup']));
+        $siteNames = [];
+
+        // super users get the reports of all users
+        $reports = CoreScheduledReportsAPI::getInstance()->getReports();
+
+        $result = [];
+        foreach ($reports as $report) {
+            if (!is_array($report) || !is_numeric($report['idreport'] ?? null) || !is_numeric($report['idsite'] ?? null)) {
+                continue;
+            }
+
+            $idReport = (int) $report['idreport'];
+            $type = is_string($report['type'] ?? null) ? $report['type'] : '';
+            if ($type !== ReportSharing::REPORT_TYPE && !isset($shared[$idReport])) {
+                continue;
+            }
+
+            $idSite = (int) $report['idsite'];
+            if (!isset($siteNames[$idSite])) {
+                try {
+                    $siteNames[$idSite] = Site::getNameFor($idSite);
+                } catch (Exception $e) {
+                    $siteNames[$idSite] = (string) $idSite;
+                }
+            }
+
+            $result[] = [
+                'idReport' => $idReport,
+                'description' => is_string($report['description'] ?? null) ? $report['description'] : '',
+                'login' => is_string($report['login'] ?? null) ? $report['login'] : '',
+                'idSite' => $idSite,
+                'siteName' => $siteNames[$idSite],
+                'type' => $type,
+                'period' => is_string($report['period'] ?? null) ? $report['period'] : '',
+                'isShared' => isset($shared[$idReport]),
+            ];
+        }
+
+        usort($result, static function (array $a, array $b): int {
+            return strcasecmp($a['description'], $b['description']) ?: $a['idReport'] <=> $b['idReport'];
+        });
+
+        return $result;
+    }
+
+    /**
      * Returns a stored segment the current user may share: super users any segment, other users their own.
      *
      * @return array{
@@ -907,6 +1042,34 @@ class API extends \Piwik\Plugin\API {
         return [
             'idsegment' => $idSegment,
             'login' => $login,
+        ];
+    }
+
+    /**
+     * Returns a scheduled report the current user may share: super users any report, other users their own.
+     *
+     * @return array{
+     *   idreport: int,
+     *   login: string,
+     *   type: string
+     * }
+     */
+    private function getReportOrFailForSharing(int $idReport): array {
+        if (!ReportSharing::isScheduledReportsActivated()) {
+            throw new Exception('The ScheduledReports plugin is not activated.');
+        }
+
+        $report = ReportSharing::getStoredReport($idReport);
+
+        // same error for reports that do not exist and reports of other users, to not reveal report ids
+        if ($report === null || (!Piwik::hasUserSuperUserAccess() && $report['login'] !== Piwik::getCurrentUserLogin())) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionReportNotFound', $idReport));
+        }
+
+        return [
+            'idreport' => $report['idreport'],
+            'login' => $report['login'],
+            'type' => $report['type'],
         ];
     }
 

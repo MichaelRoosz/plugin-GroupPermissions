@@ -11,4 +11,6 @@ parameters:
         - linting
     bootstrapFiles:
         - phpstan-bootstrap.php
+    stubFiles:
+        - phpstan-stubs/Access.stub
     treatPhpDocTypesAsCertain: false

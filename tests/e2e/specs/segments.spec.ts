@@ -93,7 +93,9 @@ test.describe('Share segments with groups', () => {
     // member of the group, but no access to the website of the segment
     expect(await visibleTo(memberWithoutSiteAccess)).not.toContain(idSegment);
     expect(await visibleTo(memberWithoutSiteAccess, otherSite)).not.toContain(idSegment);
-    await expect(api[memberWithoutSiteAccess].expectError('SegmentEditor.get', { idSegment })).resolves.toContain('You can only edit and delete');
+    // Matomo 5.1 reports the missing permission for the segment, later versions the missing website access
+    await expect(api[memberWithoutSiteAccess].expectError('SegmentEditor.get', { idSegment }))
+      .resolves.toMatch(/You can only edit and delete|requires 'view' access/);
 
     // members cannot edit or delete it
     await expect(api[member].expectError('SegmentEditor.update', {
@@ -175,7 +177,10 @@ test.describe('Share segments with groups', () => {
     await share(api[owner], idSegment);
 
     // without any visit Matomo shows the tracking code instead of the reports
-    const track = await fetch(`${MATOMO_URL}/matomo.php?idsite=${idSite}&rec=1&url=${encodeURIComponent('https://segments.example.org/')}`);
+    // with a browser user agent: newer Matomo versions silently drop tracking requests of bots (e.g. Node's fetch)
+    const track = await fetch(`${MATOMO_URL}/matomo.php?idsite=${idSite}&rec=1&url=${encodeURIComponent('https://segments.example.org/')}`, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36' },
+    });
     expect(track.ok).toBe(true);
 
     const page = await pageAs(browser, member);

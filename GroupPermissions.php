@@ -13,7 +13,9 @@ namespace Piwik\Plugins\GroupPermissions;
 use Piwik\Access\CapabilitiesProvider;
 use Piwik\Container\StaticContainer;
 use Piwik\Log\LoggerInterface;
+use Piwik\Piwik;
 use Piwik\Plugin;
+use Piwik\Plugins\UsersManager\Model as UsersModel;
 
 class GroupPermissions extends Plugin {
     public function install(): void {
@@ -29,7 +31,7 @@ class GroupPermissions extends Plugin {
     /**
      * @see Piwik\Plugin::registerEvents
      *
-     * @return array<string, string>
+     * @return array<string, string|array{function: string, after?: bool, before?: bool}>
      */
     public function registerEvents(): array {
         return [
@@ -38,9 +40,11 @@ class GroupPermissions extends Plugin {
             'API.Request.intercept'                  => 'interceptApiRequest',
             'API.SegmentEditor.getAll.end'           => 'addSharedSegments',
             'API.SegmentEditor.delete.end'           => 'deleteSegment',
+            'ScheduledReports.getReportRecipients'   => ['function' => 'fixReportRecipients', 'after' => true],
             'SitesManager.addSite.end'               => 'addSite',
             'SitesManager.deleteSite.end'            => 'deleteSite',
-            'UsersManager.deleteUser'                => 'deleteUser',
+            // before the ScheduledReports plugin deletes the reports of the user
+            'UsersManager.deleteUser'                => ['function' => 'deleteUser', 'before' => true],
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
         ];
     }
@@ -141,6 +145,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_NoGroups';
         $translations[] = 'GroupPermissions_NoGroupsFound';
         $translations[] = 'GroupPermissions_NoMembers';
+        $translations[] = 'GroupPermissions_NoSharedReports';
         $translations[] = 'GroupPermissions_NoSharedSegments';
         $translations[] = 'GroupPermissions_NoUsersFound';
         $translations[] = 'GroupPermissions_NoWebsiteAccess';
@@ -156,7 +161,12 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_RemoveFromGroup';
         $translations[] = 'GroupPermissions_RemoveFromGroupConfirm';
         $translations[] = 'GroupPermissions_RenameGroup';
+        $translations[] = 'GroupPermissions_ReportShared';
+        $translations[] = 'GroupPermissions_ReportUnshared';
         $translations[] = 'GroupPermissions_RolesOfGroupsFor';
+        $translations[] = 'GroupPermissions_ScheduledReport';
+        $translations[] = 'GroupPermissions_ScheduledReports';
+        $translations[] = 'GroupPermissions_ScheduledReportsDescription';
         $translations[] = 'GroupPermissions_SearchGroups';
         $translations[] = 'GroupPermissions_Segment';
         $translations[] = 'GroupPermissions_SegmentShared';
@@ -165,8 +175,12 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_SegmentsDescription';
         $translations[] = 'GroupPermissions_SelectNewUser';
         $translations[] = 'GroupPermissions_SelectWebsite';
+        $translations[] = 'GroupPermissions_ShareReport';
+        $translations[] = 'GroupPermissions_ShareReportButton';
         $translations[] = 'GroupPermissions_ShareSegment';
         $translations[] = 'GroupPermissions_ShareSegmentButton';
+        $translations[] = 'GroupPermissions_UnshareReport';
+        $translations[] = 'GroupPermissions_UnshareReportConfirm';
         $translations[] = 'GroupPermissions_UnshareSegment';
         $translations[] = 'GroupPermissions_UnshareSegmentConfirm';
         $translations[] = 'GroupPermissions_Users';
@@ -256,6 +270,42 @@ class GroupPermissions extends Plugin {
     }
 
     /**
+     * Matomo lists the current user as the recipient of "Send report to me", but the report is sent to its creator.
+     * Lists the creator for reports of other users, e.g. reports shared with a group of the current user.
+     *
+     * @param mixed $recipients
+     * @param mixed $reportType
+     * @param mixed $report
+     */
+    public function fixReportRecipients(&$recipients, $reportType, $report): void {
+        if ($reportType !== ReportSharing::REPORT_TYPE || !is_array($recipients) || !is_array($report)) {
+            return;
+        }
+
+        $login = is_string($report['login'] ?? null) ? $report['login'] : '';
+        $parameters = is_array($report['parameters'] ?? null) ? $report['parameters'] : [];
+        if ($login === '' || $login === Piwik::getCurrentUserLogin() || empty($parameters['emailMe'])) {
+            return;
+        }
+
+        // the core adds the email of the current user first
+        $index = array_search(Piwik::getCurrentUserEmail(), $recipients, true);
+        if ($index === false) {
+            return;
+        }
+
+        $creator = (new UsersModel())->getUser($login);
+        $creatorEmail = is_array($creator) && is_string($creator['email'] ?? null) ? $creator['email'] : '';
+
+        if ($creatorEmail !== '') {
+            $recipients[$index] = $creatorEmail;
+        } else {
+            unset($recipients[$index]);
+            $recipients = array_values($recipients);
+        }
+    }
+
+    /**
      * Delete group preferences associated with a particular site
      */
     public function deleteSite(int $idSite): void {
@@ -269,6 +319,7 @@ class GroupPermissions extends Plugin {
      */
     public function deleteUser(string $login): void {
         $model = new Model();
+        (new ReportSharing($model))->transferReportsOfDeletedUser($login);
         $model->removeUserFromAllGroups($login);
     }
 }

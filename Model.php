@@ -14,6 +14,7 @@ use Piwik\Plugins\GroupPermissions\Dao\Group;
 use Piwik\Plugins\GroupPermissions\Dao\GroupAutoAccess;
 use Piwik\Plugins\GroupPermissions\Dao\GroupCapability;
 use Piwik\Plugins\GroupPermissions\Dao\GroupPermission;
+use Piwik\Plugins\GroupPermissions\Dao\GroupReport;
 use Piwik\Plugins\GroupPermissions\Dao\GroupSegment;
 use Piwik\Plugins\GroupPermissions\Dao\GroupUser;
 use Piwik\Plugins\GroupPermissions\Dao\MultiTable;
@@ -37,6 +38,9 @@ class Model {
 
         $segment = new GroupSegment();
         $segment->install();
+
+        $report = new GroupReport();
+        $report->install();
     }
 
     public function uninstall(): void {
@@ -57,6 +61,9 @@ class Model {
 
         $segment = new GroupSegment();
         $segment->uninstall();
+
+        $report = new GroupReport();
+        $report->uninstall();
     }
 
     // Group
@@ -382,6 +389,80 @@ class Model {
     public function removeAllSharesOfSegment(int $idSegment): void {
         $groupSegment = new GroupSegment();
         $groupSegment->removeAllSharesOfSegment($idSegment);
+    }
+
+    // GroupReport
+    public function shareReport(int $idGroup, int $idReport): void {
+        $groupReport = new GroupReport();
+        $groupReport->shareReport($idGroup, $idReport);
+    }
+
+    public function unshareReport(int $idGroup, int $idReport): void {
+        $groupReport = new GroupReport();
+        $groupReport->unshareReport($idGroup, $idReport);
+    }
+
+    /**
+     * @return array<int> report ids
+     */
+    public function getReportsOfGroup(int $idGroup): array {
+        $groupReport = new GroupReport();
+
+        return $groupReport->getReportsOfGroup($idGroup);
+    }
+
+    /**
+     * @return array<int> group ids
+     */
+    public function getGroupsOfReport(int $idReport): array {
+        $groupReport = new GroupReport();
+
+        return $groupReport->getGroupsOfReport($idReport);
+    }
+
+    /**
+     * @return array<int> report ids
+     */
+    public function getReportsSharedWithUser(string $login, string $reportType): array {
+        $groupReport = new GroupReport();
+
+        return $groupReport->getReportsSharedWithUser($login, $reportType);
+    }
+
+    /**
+     * @return array<array{
+     *   idreport: int,
+     *   idsite: int
+     * }>
+     */
+    public function getSharedReportsOfUser(string $login, string $reportType): array {
+        $groupReport = new GroupReport();
+
+        return $groupReport->getSharedReportsOfUser($login, $reportType);
+    }
+
+    /**
+     * @return array<string> logins
+     */
+    public function getMembersOfGroupsOfReport(int $idReport): array {
+        $groupReport = new GroupReport();
+
+        return $groupReport->getMembersOfGroupsOfReport($idReport);
+    }
+
+    public function setReportOwner(int $idReport, string $login): void {
+        $groupReport = new GroupReport();
+        $groupReport->setReportOwner($idReport, $login);
+    }
+
+    public function removeAllReportSharesOfGroup(int $idGroup): void {
+        $groupReport = new GroupReport();
+        $groupReport->removeAllSharesOfGroup($idGroup);
+    }
+
+    public function removeAllSharesOfReport(int $idReport): void {
+        $groupReport = new GroupReport();
+        $groupReport->removeAllSharesOfReport($idReport);
     }
 
     // MultiTable
