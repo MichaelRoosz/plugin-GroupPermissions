@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "Jeni i sigurt se doni t’i jepet “%s” hyrje te grupi '%s' për krejt sajtet?",
         "CreateNewGroup": "Krijoni grup të ri",
         "CreateNewGroupButton": "Krijoni Grup",
+        "CreatedBy": "Krijuar nga",
         "DeleteGroup": "Fshije këtë grup",
         "DeleteGroupButton": "Fshije Grupin",
         "DeleteGroupConfirm": "Jeni i sigurt se doni të fshihet grupi “%s”?",
@@ -19,12 +20,18 @@
         "ManageGroup": "Administroni grup",
         "ManageGroupMembers": "Administroni anëtarë grupi",
         "ManageGroups": "Administroni Grupe",
+        "MatchTypeUrl": "URL sajti",
         "MenuGroupPermissions": "Leje Grupi",
+        "Pattern": "Mostër",
         "RemoveFromGroup": "Hiqe",
         "RemoveFromGroupConfirm": "Jeni i sigurt se doni të hiqet përdoruesi “%1$s” nga grupi “%2$s”?",
         "RenameGroup": "Riemërtojeni këtë grup",
         "RenameGroupButton": "Riemërtoje Grupin",
         "RenameGroupConfirm": "Jeni i sigurt se doni të riemërtoni grupin “%1$s” si “%2$s”?",
-        "SelectNewUser": "Përzgjidhni përdorues të ri"
+        "Segments": "Segmente",
+        "SelectNewUser": "Përzgjidhni përdorues të ri",
+        "SelectWebsite": "Përzgjidhni një sajt",
+        "Users": "Përdorues",
+        "Websites": "Sajte"
     }
 }
