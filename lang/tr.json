@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "Tüm siteler için '%s' iznini '%s' grubuna vermek istediğinize emin misiniz?",
         "CreateNewGroup": "Yeni bir grup ekler",
         "CreateNewGroupButton": "Grup ekle",
+        "CreatedBy": "Oluşturan",
         "DeleteGroup": "Bu grubu siler",
         "DeleteGroupButton": "Grubu sil",
         "DeleteGroupConfirm": "'%s' grubunu silmek istediğinize emin misiniz?",
@@ -19,12 +20,19 @@
         "ManageGroup": "Grup yönetimi",
         "ManageGroupMembers": "Grup üyeleri yönetimi",
         "ManageGroups": "Grup yönetimi",
+        "MatchTypeUrl": "Site adresi",
         "MenuGroupPermissions": "Grup izinleri",
+        "Pattern": "Model",
         "RemoveFromGroup": "Sil",
         "RemoveFromGroupConfirm": "'%1$s' kullanıcısını '%2$s' grubundan silmek istediğinize emin misiniz?",
         "RenameGroup": "Bu grubu yeniden adlandırır",
         "RenameGroupButton": "Grubu yeniden adlandır",
         "RenameGroupConfirm": "'%1$s' grubunun adını '%2$s' olarak değiştirmek istediğinize emin misiniz?",
-        "SelectNewUser": "Yeni bir kullanıcı seçin"
+        "Segment": "Dilim",
+        "Segments": "Dilimler",
+        "SelectNewUser": "Yeni bir kullanıcı seçin",
+        "SelectWebsite": "Bir site seçin",
+        "Users": "Kullanıcılar",
+        "Websites": "Web siteleri"
     }
 }
