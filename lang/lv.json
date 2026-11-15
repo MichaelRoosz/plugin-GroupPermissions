@@ -1,5 +1,11 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Noņemt"
+        "Pattern": "Modelis",
+        "RemoveFromGroup": "Noņemt",
+        "Segment": "Segments",
+        "Segments": "Segmenti",
+        "SelectWebsite": "Izvēlieties vietni",
+        "Users": "Lietotāji",
+        "Websites": "Tīmekļa vietnes"
     }
 }
