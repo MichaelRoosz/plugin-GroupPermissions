@@ -1,5 +1,7 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Sil"
+        "RemoveFromGroup": "Sil",
+        "Users": "İstifadəçilər",
+        "Websites": "Veb saytlar"
     }
 }
