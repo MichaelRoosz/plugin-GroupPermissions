@@ -21,6 +21,7 @@
         "ChangeAccessToAllSitesConfirm": "Sind Sie sicher, dass Sie „%s“-Zugriff auf die Gruppe „%s“ für alle Webseiten gewähren möchten?",
         "CreateNewGroup": "Neue Gruppe erstellen",
         "CreateNewGroupButton": "Gruppe erstellen",
+        "CreatedBy": "Erstellt von",
         "DeleteGroup": "Diese Gruppe löschen",
         "DeleteGroupButton": "Gruppe löschen",
         "DeleteGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe „%s“ löschen wollen?",
@@ -89,12 +90,15 @@
         "RenameGroupConfirm": "Sind Sie sicher, dass Sie die Gruppe „%1$s“ in „%2$s“ umbenennen wollen?",
         "RolesOfGroupsFor": "Rollen der Gruppen für '%s'",
         "SearchGroups": "Gruppen durchsuchen",
+        "Segment": "Segment",
+        "Segments": "Segmente",
         "SelectGroups": "Gruppen auswählen",
         "SelectNewUser": "Wählen Sie einen neuen Benutzer",
         "SelectWebsite": "Website auswählen",
         "SiteFormGroupAccess": "Gruppenzugriff",
         "SiteFormGroupAccessHelp": "Rollen der Gruppen für diese Website. Mitglieder einer Gruppe erhalten deren Rolle. Nicht aufgeführte Gruppen haben keinen Zugriff über Gruppen. Gruppen können auch automatisch Zugriff erhalten, über die Regeln im Gruppen-Editor.",
         "SiteFormGroupAccessInvalid": "Ungültiger Gruppenzugriff.",
+        "Users": "Benutzer",
         "WebsiteAccess": "Website-Zugriff",
         "Websites": "Websites"
     }
