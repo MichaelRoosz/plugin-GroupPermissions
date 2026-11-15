@@ -1,6 +1,12 @@
 {
     "GroupPermissions": {
         "ManageGroups": "Zarządzaj grupami",
-        "RemoveFromGroup": "Usuń"
+        "MatchTypeUrl": "URL portalu",
+        "Pattern": "Wzorzec",
+        "RemoveFromGroup": "Usuń",
+        "Segment": "Segment",
+        "Segments": "Grypy użytkowników",
+        "Users": "Użytkownicy",
+        "Websites": "Serwisy internetowe"
     }
 }
