@@ -20,11 +20,14 @@
         "ManageGroupMembers": "Administrer gruppemedlemmer",
         "ManageGroups": "Administrer grupper",
         "MenuGroupPermissions": "Grupperettar",
+        "Pattern": "Mønster",
         "RemoveFromGroup": "Fjern",
         "RemoveFromGroupConfirm": "Er du sikker på at du vil fjerne brukaren «%1$s» frå gruppa «%2$s»?",
         "RenameGroup": "Endre namn på denne gruppa",
         "RenameGroupButton": "Endre namn på gruppa",
         "RenameGroupConfirm": "Er du sikker på at du vil endre namnet på gruppa «%1$s» til «%2$s»?",
-        "SelectNewUser": "Vel ein ny brukar"
+        "SelectNewUser": "Vel ein ny brukar",
+        "Users": "Brukarar",
+        "Websites": "Nettstadar"
     }
 }
