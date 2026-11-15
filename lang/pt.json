@@ -18,12 +18,19 @@
         "ManageGroup": "Gerenciar grupo",
         "ManageGroupMembers": "Gerenciar membros do grupo",
         "ManageGroups": "Gerenciar Grupos",
+        "MatchTypeUrl": "URL do site",
         "MenuGroupPermissions": "Permissões de Grupo",
+        "Pattern": "Padrão",
         "RemoveFromGroup": "Remover",
         "RemoveFromGroupConfirm": "Tem certeza de que deseja remover o usuário '%1$s' do grupo '%2$s'?",
         "RenameGroup": "Renomear este grupo",
         "RenameGroupButton": "Renomear Grupo",
         "RenameGroupConfirm": "Tem certeza de que deseja renomear o grupo '%1$s' para '%2$s'?",
-        "SelectNewUser": "Selecione um novo usuário"
+        "Segment": "Segmento",
+        "Segments": "Segmentos",
+        "SelectNewUser": "Selecione um novo usuário",
+        "SelectWebsite": "Selecionar um site da Web",
+        "Users": "Utilizadores",
+        "Websites": "Sites"
     }
 }
