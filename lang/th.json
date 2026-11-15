@@ -1,5 +1,8 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "ลบออก"
+        "Pattern": "แบบแผน",
+        "RemoveFromGroup": "ลบออก",
+        "Users": "ผู้ใช้",
+        "Websites": "เว็บไซต์"
     }
 }
