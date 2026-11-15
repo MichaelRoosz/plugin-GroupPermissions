@@ -21,6 +21,7 @@ use Piwik\Piwik;
 use Piwik\Plugin\Manager as PluginManager;
 use Piwik\Plugins\Dashboard\Dashboard;
 use Piwik\Plugins\Dashboard\Model as DashboardModel;
+use Piwik\Plugins\SegmentEditor\Model as SegmentEditorModel;
 use Piwik\Site;
 use Piwik\Tracker\Cache;
 use Piwik\Plugins\UsersManager\API as UsersManagerAPI;
@@ -485,6 +486,7 @@ class API extends \Piwik\Plugin\API {
         $idGroup = $group['idgroup'];
 
         $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
+        $this->model->removeAllSegmentSharesOfGroup($idGroup);
         $this->model->removeAllCapabilitiesOfGroup($idGroup);
         $this->model->removeAllPermissionsOfGroup($idGroup);
         $this->model->removeAllUsersOfGroup($idGroup);
@@ -752,6 +754,160 @@ class API extends \Piwik\Plugin\API {
         }
 
         return $copiedTo;
+    }
+
+    /**
+     * Shares a stored segment with a group.
+     *
+     * Members of the group see the segment in the segment selector (and in `SegmentEditor.getAll` /
+     * `SegmentEditor.get`) as long as they have view access to the website the segment is restricted to.
+     * Like segments shared with all users, only the creator and super users can edit or delete the segment.
+     * Super users can share any segment, users with admin access to at least one website their own segments.
+     */
+    public function shareSegmentWithGroup(int $idSegment, int $idGroup): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $segment = $this->getSegmentOrFailForSharing($idSegment);
+        $group = $this->getGroupOrFail($idGroup);
+
+        $this->model->shareSegment($group['idgroup'], $segment['idsegment']);
+    }
+
+    /**
+     * Stops sharing a stored segment with a group. Same permissions as `shareSegmentWithGroup`.
+     */
+    public function unshareSegmentFromGroup(int $idSegment, int $idGroup): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $segment = $this->getSegmentOrFailForSharing($idSegment);
+        $group = $this->getGroupOrFail($idGroup);
+
+        $this->model->unshareSegment($group['idgroup'], $segment['idsegment']);
+    }
+
+    /**
+     * Returns the groups a stored segment is shared with, sorted by name. Same permissions as
+     * `shareSegmentWithGroup`.
+     *
+     * @return array<array{
+     *   idGroup: int,
+     *   name: string
+     * }>
+     */
+    public function getGroupsOfSegment(int $idSegment): array {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $segment = $this->getSegmentOrFailForSharing($idSegment);
+        $idGroups = array_flip($this->model->getGroupsOfSegment($segment['idsegment']));
+
+        $groups = [];
+        foreach ($this->model->getAllGroups() as $group) {
+            if (isset($idGroups[$group['idgroup']])) {
+                $groups[] = ['idGroup' => $group['idgroup'], 'name' => $group['name']];
+            }
+        }
+
+        usort($groups, static function (array $a, array $b): int {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        return $groups;
+    }
+
+    /**
+     * Returns all stored segments sorted by name, with whether they are shared with the group.
+     * `idSite` is 0 for segments available on all websites.
+     *
+     * @return array<array{
+     *   idSegment: int,
+     *   name: string,
+     *   definition: string,
+     *   login: string,
+     *   idSite: int,
+     *   siteName: string,
+     *   enabledAllUsers: bool,
+     *   isShared: bool
+     * }>
+     */
+    public function getSegmentsForGroup(int $idGroup): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        if (!SegmentSharing::isSegmentEditorActivated()) {
+            return [];
+        }
+
+        $shared = array_flip($this->model->getSegmentsOfGroup($group['idgroup']));
+        $siteNames = [];
+
+        $segments = (new SegmentEditorModel())->getAllSegmentsForAllUsers();
+        if (!is_array($segments)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($segments as $segment) {
+            if (!is_array($segment) || !is_numeric($segment['idsegment'] ?? null)) {
+                continue;
+            }
+
+            $idSegment = (int) $segment['idsegment'];
+            $idSite = is_numeric($segment['enable_only_idsite'] ?? null) ? (int) $segment['enable_only_idsite'] : 0;
+
+            if ($idSite && !isset($siteNames[$idSite])) {
+                try {
+                    $siteNames[$idSite] = Site::getNameFor($idSite);
+                } catch (Exception $e) {
+                    // segment of a deleted website
+                    $siteNames[$idSite] = (string) $idSite;
+                }
+            }
+
+            $result[] = [
+                'idSegment' => $idSegment,
+                'name' => is_string($segment['name'] ?? null) ? $segment['name'] : '',
+                'definition' => is_string($segment['definition'] ?? null) ? $segment['definition'] : '',
+                'login' => is_string($segment['login'] ?? null) ? $segment['login'] : '',
+                'idSite' => $idSite,
+                'siteName' => $idSite ? $siteNames[$idSite] : '',
+                'enabledAllUsers' => !empty($segment['enable_all_users']),
+                'isShared' => isset($shared[$idSegment]),
+            ];
+        }
+
+        usort($result, static function (array $a, array $b): int {
+            return strcasecmp($a['name'], $b['name']) ?: $a['idSegment'] <=> $b['idSegment'];
+        });
+
+        return $result;
+    }
+
+    /**
+     * Returns a stored segment the current user may share: super users any segment, other users their own.
+     *
+     * @return array{
+     *   idsegment: int,
+     *   login: string
+     * }
+     */
+    private function getSegmentOrFailForSharing(int $idSegment): array {
+        if (!SegmentSharing::isSegmentEditorActivated()) {
+            throw new Exception('The SegmentEditor plugin is not activated.');
+        }
+
+        $segment = SegmentSharing::getStoredSegment($idSegment);
+        $login = is_string($segment['login'] ?? null) ? $segment['login'] : '';
+
+        // same error for segments that do not exist and segments of other users, to not reveal segment ids
+        if ($segment === null || (!Piwik::hasUserSuperUserAccess() && $login !== Piwik::getCurrentUserLogin())) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionSegmentNotFound', $idSegment));
+        }
+
+        return [
+            'idsegment' => $idSegment,
+            'login' => $login,
+        ];
     }
 
     /**

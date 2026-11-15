@@ -14,6 +14,7 @@ use Piwik\Plugins\GroupPermissions\Dao\Group;
 use Piwik\Plugins\GroupPermissions\Dao\GroupAutoAccess;
 use Piwik\Plugins\GroupPermissions\Dao\GroupCapability;
 use Piwik\Plugins\GroupPermissions\Dao\GroupPermission;
+use Piwik\Plugins\GroupPermissions\Dao\GroupSegment;
 use Piwik\Plugins\GroupPermissions\Dao\GroupUser;
 use Piwik\Plugins\GroupPermissions\Dao\MultiTable;
 
@@ -33,6 +34,9 @@ class Model {
 
         $autoAccess = new GroupAutoAccess();
         $autoAccess->install();
+
+        $segment = new GroupSegment();
+        $segment->install();
     }
 
     public function uninstall(): void {
@@ -50,6 +54,9 @@ class Model {
 
         $autoAccess = new GroupAutoAccess();
         $autoAccess->uninstall();
+
+        $segment = new GroupSegment();
+        $segment->uninstall();
     }
 
     // Group
@@ -327,6 +334,54 @@ class Model {
     public function removeAllAutoAccessRulesOfGroup(int $idGroup): void {
         $autoAccess = new GroupAutoAccess();
         $autoAccess->removeAllRulesOfGroup($idGroup);
+    }
+
+    // GroupSegment
+    public function shareSegment(int $idGroup, int $idSegment): void {
+        $groupSegment = new GroupSegment();
+        $groupSegment->shareSegment($idGroup, $idSegment);
+    }
+
+    public function unshareSegment(int $idGroup, int $idSegment): void {
+        $groupSegment = new GroupSegment();
+        $groupSegment->unshareSegment($idGroup, $idSegment);
+    }
+
+    /**
+     * @return array<int> segment ids
+     */
+    public function getSegmentsOfGroup(int $idGroup): array {
+        $groupSegment = new GroupSegment();
+
+        return $groupSegment->getSegmentsOfGroup($idGroup);
+    }
+
+    /**
+     * @return array<int> group ids
+     */
+    public function getGroupsOfSegment(int $idSegment): array {
+        $groupSegment = new GroupSegment();
+
+        return $groupSegment->getGroupsOfSegment($idSegment);
+    }
+
+    /**
+     * @return array<int> segment ids
+     */
+    public function getSegmentsSharedWithUser(string $login): array {
+        $groupSegment = new GroupSegment();
+
+        return $groupSegment->getSegmentsSharedWithUser($login);
+    }
+
+    public function removeAllSegmentSharesOfGroup(int $idGroup): void {
+        $groupSegment = new GroupSegment();
+        $groupSegment->removeAllSharesOfGroup($idGroup);
+    }
+
+    public function removeAllSharesOfSegment(int $idSegment): void {
+        $groupSegment = new GroupSegment();
+        $groupSegment->removeAllSharesOfSegment($idSegment);
     }
 
     // MultiTable

@@ -57,6 +57,7 @@ The database lives on tmpfs, so `teardown.sh` discards all data.
 | `specs/invite-user.spec.ts` | inviting users into groups (UI, API, invitation email) |
 | `specs/manage-access.spec.ts` | Manage Access tab: site selection, all access levels, "Apply to all websites", errors, site admins |
 | `specs/manage-groups.spec.ts` | Manage Groups tab: group selection/URL, create, rename, delete, members, confirmations, errors |
+| `specs/segments.spec.ts` | sharing segments with groups: visibility for members, permissions, cleanup, group editor |
 | `specs/special-characters.spec.ts` | group names with HTML, quotes, `&`, unicode: stored as-is, rendered as text (no XSS) |
 | `specs/translations.spec.ts` | all used translation keys exist and are registered, placeholders match, German UI has no raw keys |
 | `specs/overview.spec.ts` | menu entry, main group workflow, overview screenshots |

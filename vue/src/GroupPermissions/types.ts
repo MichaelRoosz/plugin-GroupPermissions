@@ -60,3 +60,14 @@ export interface AutoAccessRule {
   access: string;
   capabilities: string[];
 }
+
+export interface GroupSegment {
+  idSegment: number;
+  name: string;
+  definition: string;
+  login: string;
+  idSite: number;
+  siteName: string;
+  enabledAllUsers: boolean;
+  isShared: boolean;
+}

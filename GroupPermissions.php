@@ -35,6 +35,9 @@ class GroupPermissions extends Plugin {
         return [
             'AssetManager.getJavaScriptFiles'        => 'getJavaScriptFiles',
             'AssetManager.getStylesheetFiles'        => 'getStylesheetFiles',
+            'API.Request.intercept'                  => 'interceptApiRequest',
+            'API.SegmentEditor.getAll.end'           => 'addSharedSegments',
+            'API.SegmentEditor.delete.end'           => 'deleteSegment',
             'SitesManager.addSite.end'               => 'addSite',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             'UsersManager.deleteUser'                => 'deleteUser',
@@ -101,6 +104,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_ChangeAccessToAllSitesConfirm';
         $translations[] = 'GroupPermissions_CreateNewGroup';
         $translations[] = 'GroupPermissions_CreateNewGroupButton';
+        $translations[] = 'GroupPermissions_CreatedBy';
         $translations[] = 'GroupPermissions_DashboardCopiedToGroup';
         $translations[] = 'GroupPermissions_DeleteGroup';
         $translations[] = 'GroupPermissions_DeleteGroupButton';
@@ -137,6 +141,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_NoGroups';
         $translations[] = 'GroupPermissions_NoGroupsFound';
         $translations[] = 'GroupPermissions_NoMembers';
+        $translations[] = 'GroupPermissions_NoSharedSegments';
         $translations[] = 'GroupPermissions_NoUsersFound';
         $translations[] = 'GroupPermissions_NoWebsiteAccess';
         $translations[] = 'GroupPermissions_Pattern';
@@ -153,12 +158,22 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_RenameGroup';
         $translations[] = 'GroupPermissions_RolesOfGroupsFor';
         $translations[] = 'GroupPermissions_SearchGroups';
+        $translations[] = 'GroupPermissions_Segment';
+        $translations[] = 'GroupPermissions_SegmentShared';
+        $translations[] = 'GroupPermissions_SegmentUnshared';
+        $translations[] = 'GroupPermissions_Segments';
+        $translations[] = 'GroupPermissions_SegmentsDescription';
         $translations[] = 'GroupPermissions_SelectNewUser';
         $translations[] = 'GroupPermissions_SelectWebsite';
+        $translations[] = 'GroupPermissions_ShareSegment';
+        $translations[] = 'GroupPermissions_ShareSegmentButton';
+        $translations[] = 'GroupPermissions_UnshareSegment';
+        $translations[] = 'GroupPermissions_UnshareSegmentConfirm';
         $translations[] = 'GroupPermissions_Users';
         $translations[] = 'GroupPermissions_WebsiteAccess';
         $translations[] = 'GroupPermissions_Websites';
         $translations[] = 'UsersManager_Active';
+        $translations[] = 'UsersManager_AllWebsites';
         $translations[] = 'UsersManager_ApplyToAllWebsites';
         $translations[] = 'UsersManager_Capabilities';
         $translations[] = 'UsersManager_CapabilitiesHelp';
@@ -190,6 +205,53 @@ class GroupPermissions extends Plugin {
                     ['idSite' => $idSite, 'message' => $e->getMessage()]
                 );
             }
+        }
+    }
+
+    /**
+     * Lets `SegmentEditor.get` return segments shared with a group of the current user
+     *
+     * @param mixed $returnedValue
+     * @param array<string, mixed> $finalParameters
+     */
+    public function interceptApiRequest(&$returnedValue, $finalParameters, string $pluginName, string $methodName): void {
+        if ($returnedValue !== null || $pluginName !== 'SegmentEditor' || $methodName !== 'get') {
+            return;
+        }
+
+        $segment = (new SegmentSharing(new Model()))->getSharedSegment($finalParameters['idSegment'] ?? null);
+        if ($segment !== null) {
+            $returnedValue = $segment;
+        }
+    }
+
+    /**
+     * Adds the segments shared with a group of the current user to the result of `SegmentEditor.getAll`
+     *
+     * @param mixed $segments
+     * @param array<string, mixed> $extraInfo
+     */
+    public function addSharedSegments(&$segments, $extraInfo): void {
+        $parameters = is_array($extraInfo['parameters'] ?? null) ? $extraInfo['parameters'] : [];
+
+        (new SegmentSharing(new Model()))->addSharedSegmentsToList($segments, $parameters['idSite'] ?? false);
+    }
+
+    /**
+     * Removes the group shares of a deleted segment. Not done on "SegmentEditor.deactivate", as other plugins
+     * (e.g. ScheduledReports) may still prevent the deletion there. Shares of deleted segments are ignored
+     * anyway, this only cleans up.
+     *
+     * @param mixed $result
+     * @param array<string, mixed> $extraInfo
+     */
+    public function deleteSegment(&$result, $extraInfo): void {
+        $parameters = is_array($extraInfo['parameters'] ?? null) ? $extraInfo['parameters'] : [];
+        $idSegment = $parameters['idSegment'] ?? null;
+
+        if ($result === true && is_numeric($idSegment) && SegmentSharing::getStoredSegment((int) $idSegment) === null) {
+            $model = new Model();
+            $model->removeAllSharesOfSegment((int) $idSegment);
         }
     }
 

@@ -34,6 +34,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Grant or revoke site access for entire groups, including applying to all sites you administer.
 - Grant capabilities to groups per website, e.g. the Tag Manager capabilities (write, publish live container, use custom templates).
 - Give groups access to new websites automatically, based on the Matomo website group or the URL of the new website.
+- Share stored segments with groups: the members see them in the segment selector.
 - Set the group access directly in Matomo's website create/edit form.
 - Two clear tabs: Manage Access and Manage Groups.
 
@@ -71,10 +72,11 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 
 - The group list shows every group with its number of members and websites. Search by name, open a group by its name or the edit icon, or delete it with the delete icon.
 - "Create a new group" asks for a name (at most 64 characters) and opens the new group.
-- The group editor has four sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
+- The group editor has five sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
   - **Members**: members with email and invitation status. Add existing users with the searchable user picker, remove members with the delete icon, or invite a new user directly into the group. A user can be in multiple groups; the anonymous user cannot be added to groups.
   - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access. Capabilities (e.g. Tag Manager) can be added per website, like on the Manage Access tab.
   - **Automatic access**: rules that give the group a role for every website created from now on that is in a matching Matomo website group or has a matching URL (main URL or alias URL). Patterns are case-insensitive and `*` matches any characters; a URL pattern without `/` is compared with the host only (e.g. `*.example.com`), one with `/` with host and path (e.g. `example.com/shop*`). A rule can also give capabilities (e.g. Tag Manager) in addition to its role. If several rules match, the highest role wins and a role the group already has is never downgraded. Existing websites are only changed when you apply a rule to them with the refresh icon ("Apply to existing websites"); removing a rule keeps the access it already gave.
+  - **Segments**: stored segments shared with the group. Members of the group see a shared segment in the segment selector (in the "Shared with you" part if there is one) as long as they have access to the website the segment is restricted to. Like segments shared with all users, only the creator and super users can edit or delete it. Segments already shared with all users are not offered. Deleting the segment or the group removes the share.
   - **Settings**: rename or delete the group. Deleting a group removes the access its members got through it; the users themselves are kept.
 - "Invite a new user" invites a user by email directly into one or more groups.
 
@@ -90,6 +92,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Changing the access of groups requires Admin access on the selected website(s).
 - Changing the capabilities of groups requires Admin access on the selected website(s) as well.
 - Managing the automatic access rules of groups requires Super User access. The rules apply to every new website, no matter who creates it.
+- Sharing segments with groups: super users can share any segment, users with Admin access to at least one website their own segments (via the API). Matomo itself does not restrict which segment definitions a user may apply, so sharing controls which stored segments are listed, not which data can be seen.
 - Members get the highest role of all their groups and their own permissions for each website, plus all capabilities of their groups and their own capabilities.
 - Like in Matomo core, a capability only applies while the group has a role for the website: removing the role removes the group's capabilities for it, and capabilities included in a new role are dropped (others are kept when the role changes).
 
@@ -137,6 +140,17 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
   ```text
   index.php?module=API&method=GroupPermissions.applyAutoAccessRule&idGroup=1&idRule=1&format=JSON&token_auth=YOUR_TOKEN
   ```
+- Share a stored segment with a group, stop sharing it, list the groups of a segment (super users: any segment, users with admin access: their own segments):
+  ```text
+  index.php?module=API&method=GroupPermissions.shareSegmentWithGroup&idSegment=1&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.unshareSegmentFromGroup&idSegment=1&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.getGroupsOfSegment&idSegment=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+  All segments with whether they are shared with a group (super user):
+  ```text
+  index.php?module=API&method=GroupPermissions.getSegmentsForGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+  Members of the group get the shared segments from `SegmentEditor.getAll` and `SegmentEditor.get`. Scheduled reports of members cannot use a segment shared with a group (Matomo's ScheduledReports plugin checks the segment directly, not through the API).
 - Invite a new user directly into groups (super user):
   ```text
   index.php?module=API&method=GroupPermissions.inviteUserToGroups&userLogin=jane&email=jane@example.org&idGroups=1,2&format=JSON&token_auth=YOUR_TOKEN

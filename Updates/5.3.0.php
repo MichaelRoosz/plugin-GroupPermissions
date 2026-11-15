@@ -12,6 +12,7 @@ namespace Piwik\Plugins\GroupPermissions;
 
 use Piwik\Plugins\GroupPermissions\Dao\GroupAutoAccess;
 use Piwik\Plugins\GroupPermissions\Dao\GroupCapability;
+use Piwik\Plugins\GroupPermissions\Dao\GroupSegment;
 use Piwik\Updater;
 use Piwik\Updater\Migration;
 use Piwik\Updater\Migration\Factory as MigrationFactory;
@@ -19,7 +20,7 @@ use Piwik\Updates as PiwikUpdates;
 
 /**
  * Adds the tables storing the capabilities of groups (e.g. Tag Manager capabilities) and the rules giving
- * groups access to new websites.
+ * groups access to new websites, and the table storing the segments shared with groups.
  */
 class Updates_5_3_0 extends PiwikUpdates {
     /**
@@ -38,6 +39,7 @@ class Updates_5_3_0 extends PiwikUpdates {
         return [
             $this->migration->db->createTable(GroupCapability::TABLE, GroupCapability::COLUMNS, GroupCapability::PRIMARY_KEY),
             $this->migration->db->createTable(GroupAutoAccess::TABLE, GroupAutoAccess::COLUMNS, GroupAutoAccess::PRIMARY_KEY),
+            $this->migration->db->createTable(GroupSegment::TABLE, GroupSegment::COLUMNS, GroupSegment::PRIMARY_KEY),
         ];
     }
 

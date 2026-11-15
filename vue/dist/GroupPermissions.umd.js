@@ -1015,26 +1015,26 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
 TabManageGroupAccessvue_type_script_lang_ts.render = render
 
 /* harmony default export */ var TabManageGroupAccess = (TabManageGroupAccessvue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=0b43f4ef
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=333f24ba
 
-var TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_1 = {
+var TabManageGroupsvue_type_template_id_333f24ba_hoisted_1 = {
   class: "groupPermissionsManageGroups"
 };
-var TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_2 = {
+var TabManageGroupsvue_type_template_id_333f24ba_hoisted_2 = {
   class: "groupPermissionsIntro"
 };
 
-var TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_3 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
+var TabManageGroupsvue_type_template_id_333f24ba_hoisted_3 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
   id: "ajaxErrorManageGroups"
 }, null, -1);
 
-var TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_4 = {
+var TabManageGroupsvue_type_template_id_333f24ba_hoisted_4 = {
   class: "ui-confirm",
   ref: "confirmDeleteGroup"
 };
-var TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_5 = ["value"];
-var TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_6 = ["value"];
-function TabManageGroupsvue_type_template_id_0b43f4ef_render(_ctx, _cache, $props, $setup, $data, $options) {
+var TabManageGroupsvue_type_template_id_333f24ba_hoisted_5 = ["value"];
+var TabManageGroupsvue_type_template_id_333f24ba_hoisted_6 = ["value"];
+function TabManageGroupsvue_type_template_id_333f24ba_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_GroupList = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("GroupList");
 
   var _component_GroupCreate = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("GroupCreate");
@@ -1045,7 +1045,7 @@ function TabManageGroupsvue_type_template_id_0b43f4ef_render(_ctx, _cache, $prop
 
   var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
 
-  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_2, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_DescriptionGroupsTab')), 1), TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_3, _ctx.view === 'list' ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_GroupList, {
+  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", TabManageGroupsvue_type_template_id_333f24ba_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", TabManageGroupsvue_type_template_id_333f24ba_hoisted_2, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_DescriptionGroupsTab')), 1), TabManageGroupsvue_type_template_id_333f24ba_hoisted_3, _ctx.view === 'list' ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_GroupList, {
     key: 0,
     groups: _ctx.groups,
     "is-loading": _ctx.isLoadingGroups,
@@ -1116,17 +1116,17 @@ function TabManageGroupsvue_type_template_id_0b43f4ef_render(_ctx, _cache, $prop
   }, null, 8, ["group", "active-tab"])) : (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_ActivityIndicator, {
     key: 4,
     loading: _ctx.isLoadingGroups
-  }, null, 8, ["loading"])), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmDeleteGroupText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_DeleteGroupDescription')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+  }, null, 8, ["loading"])), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", TabManageGroupsvue_type_template_id_333f24ba_hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmDeleteGroupText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_DeleteGroupDescription')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "yes",
     type: "button",
     value: _ctx.translate('General_Yes')
-  }, null, 8, TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_5), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+  }, null, 8, TabManageGroupsvue_type_template_id_333f24ba_hoisted_5), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
     role: "no",
     type: "button",
     value: _ctx.translate('General_No')
-  }, null, 8, TabManageGroupsvue_type_template_id_0b43f4ef_hoisted_6)], 512)]);
+  }, null, 8, TabManageGroupsvue_type_template_id_333f24ba_hoisted_6)], 512)]);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=0b43f4ef
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=template&id=333f24ba
 
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupList.vue?vue&type=template&id=4261206b
 
@@ -1542,40 +1542,42 @@ TextFieldvue_type_script_lang_ts.render = TextFieldvue_type_template_id_53914a76
 GroupCreatevue_type_script_lang_ts.render = GroupCreatevue_type_template_id_2028ea89_render
 
 /* harmony default export */ var GroupCreate = (GroupCreatevue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupEdit.vue?vue&type=template&id=6942a7e9
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupEdit.vue?vue&type=template&id=60d8118a
 
-var GroupEditvue_type_template_id_6942a7e9_hoisted_1 = {
+var GroupEditvue_type_template_id_60d8118a_hoisted_1 = {
   class: "row"
 };
-var GroupEditvue_type_template_id_6942a7e9_hoisted_2 = {
+var GroupEditvue_type_template_id_60d8118a_hoisted_2 = {
   class: "col s12 m3 entityList"
 };
-var GroupEditvue_type_template_id_6942a7e9_hoisted_3 = {
+var GroupEditvue_type_template_id_60d8118a_hoisted_3 = {
   class: "listCircle"
 };
-var GroupEditvue_type_template_id_6942a7e9_hoisted_4 = ["data-tab"];
-var GroupEditvue_type_template_id_6942a7e9_hoisted_5 = ["onClick"];
-var GroupEditvue_type_template_id_6942a7e9_hoisted_6 = {
+var GroupEditvue_type_template_id_60d8118a_hoisted_4 = ["data-tab"];
+var GroupEditvue_type_template_id_60d8118a_hoisted_5 = ["onClick"];
+var GroupEditvue_type_template_id_60d8118a_hoisted_6 = {
   key: 0,
   class: "groupPermissionsCount"
 };
-var GroupEditvue_type_template_id_6942a7e9_hoisted_7 = {
+var GroupEditvue_type_template_id_60d8118a_hoisted_7 = {
   class: "entityCancel"
 };
 
-var GroupEditvue_type_template_id_6942a7e9_hoisted_8 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
+var GroupEditvue_type_template_id_60d8118a_hoisted_8 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
   class: "icon-arrow-left"
 }, null, -1);
 
-var GroupEditvue_type_template_id_6942a7e9_hoisted_9 = {
+var GroupEditvue_type_template_id_60d8118a_hoisted_9 = {
   class: "col s12 m9 visibleTab"
 };
-function GroupEditvue_type_template_id_6942a7e9_render(_ctx, _cache, $props, $setup, $data, $options) {
+function GroupEditvue_type_template_id_60d8118a_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_GroupMembers = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("GroupMembers");
 
   var _component_GroupWebsiteAccess = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("GroupWebsiteAccess");
 
   var _component_GroupAutoAccess = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("GroupAutoAccess");
+
+  var _component_GroupSegments = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("GroupSegments");
 
   var _component_GroupSettings = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("GroupSettings");
 
@@ -1586,7 +1588,7 @@ function GroupEditvue_type_template_id_6942a7e9_render(_ctx, _cache, $props, $se
     "content-title": _ctx.translate('GroupPermissions_EditGroup', _ctx.group.name)
   }, {
     default: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withCtx"])(function () {
-      return [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_6942a7e9_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_6942a7e9_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("ul", GroupEditvue_type_template_id_6942a7e9_hoisted_3, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.menu, function (item) {
+      return [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_60d8118a_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_60d8118a_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("ul", GroupEditvue_type_template_id_60d8118a_hoisted_3, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.menu, function (item) {
         return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("li", {
           key: item.tab,
           class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])({
@@ -1598,14 +1600,14 @@ function GroupEditvue_type_template_id_6942a7e9_render(_ctx, _cache, $props, $se
           onClick: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(function ($event) {
             return _ctx.$emit('change-tab', item.tab);
           }, ["prevent"])
-        }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(item.title) + " ", 1), item.count !== undefined ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("span", GroupEditvue_type_template_id_6942a7e9_hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(item.count), 1)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)], 8, GroupEditvue_type_template_id_6942a7e9_hoisted_5)], 10, GroupEditvue_type_template_id_6942a7e9_hoisted_4);
-      }), 128))]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_6942a7e9_hoisted_7, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
+        }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(item.title) + " ", 1), item.count !== undefined ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("span", GroupEditvue_type_template_id_60d8118a_hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(item.count), 1)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)], 8, GroupEditvue_type_template_id_60d8118a_hoisted_5)], 10, GroupEditvue_type_template_id_60d8118a_hoisted_4);
+      }), 128))]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_60d8118a_hoisted_7, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
         href: "",
         class: "entityCancelLink groupPermissionsBackToGroups",
         onClick: _cache[0] || (_cache[0] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(function ($event) {
           return _ctx.$emit('back');
         }, ["prevent"]))
-      }, [GroupEditvue_type_template_id_6942a7e9_hoisted_8, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_BackToGroups')), 1)])])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_6942a7e9_hoisted_9, [_ctx.activeTab === 'members' ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_GroupMembers, {
+      }, [GroupEditvue_type_template_id_60d8118a_hoisted_8, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_BackToGroups')), 1)])])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupEditvue_type_template_id_60d8118a_hoisted_9, [_ctx.activeTab === 'members' ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_GroupMembers, {
         key: 0,
         group: _ctx.group,
         onChanged: _cache[1] || (_cache[1] = function ($event) {
@@ -1626,8 +1628,11 @@ function GroupEditvue_type_template_id_6942a7e9_render(_ctx, _cache, $props, $se
         onChanged: _cache[4] || (_cache[4] = function ($event) {
           return _ctx.$emit('changed');
         })
-      }, null, 8, ["group"])) : _ctx.activeTab === 'settings' ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_GroupSettings, {
+      }, null, 8, ["group"])) : _ctx.activeTab === 'segments' ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_GroupSegments, {
         key: 3,
+        group: _ctx.group
+      }, null, 8, ["group"])) : _ctx.activeTab === 'settings' ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_GroupSettings, {
+        key: 4,
         group: _ctx.group,
         onRenamed: _cache[5] || (_cache[5] = function ($event) {
           return _ctx.$emit('renamed', $event);
@@ -1640,7 +1645,7 @@ function GroupEditvue_type_template_id_6942a7e9_render(_ctx, _cache, $props, $se
     _: 1
   }, 8, ["content-title"]);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/GroupEdit.vue?vue&type=template&id=6942a7e9
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/GroupEdit.vue?vue&type=template&id=60d8118a
 
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupMembers.vue?vue&type=template&id=ffb4f3de
 
@@ -4383,6 +4388,265 @@ function GroupAutoAccessvue_type_template_id_630aba4d_render(_ctx, _cache, $prop
 GroupAutoAccessvue_type_script_lang_ts.render = GroupAutoAccessvue_type_template_id_630aba4d_render
 
 /* harmony default export */ var GroupAutoAccess = (GroupAutoAccessvue_type_script_lang_ts);
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupSegments.vue?vue&type=template&id=6fa1c8f1
+
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_1 = {
+  class: "groupPermissionsSegments"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_2 = {
+  class: "groupPermissionsIntro"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_3 = {
+  class: "groupPermissionsSegmentField"
+};
+
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_4 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
+  id: "ajaxErrorGroupSegments"
+}, null, -1);
+
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_5 = {
+  class: "actions-cell-header"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_6 = {
+  key: 0
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_7 = {
+  colspan: "4"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_8 = {
+  key: 1,
+  class: "groupPermissionsEmpty"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_9 = {
+  colspan: "4"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_10 = ["data-id-segment"];
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_11 = ["title"];
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_12 = {
+  class: "segmentSite"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_13 = {
+  class: "segmentLogin"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_14 = {
+  class: "center actions-cell"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_15 = ["title", "onClick"];
+
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_16 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
+  class: "icon-delete"
+}, null, -1);
+
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_17 = [GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_16];
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_18 = {
+  class: "ui-confirm",
+  ref: "confirmUnshareSegment"
+};
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_19 = ["value"];
+var GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_20 = ["value"];
+function GroupSegmentsvue_type_template_id_6fa1c8f1_render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_Field = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("Field");
+
+  var _component_SaveButton = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("SaveButton");
+
+  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
+
+  var _directive_content_table = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveDirective"])("content-table");
+
+  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_2, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_SegmentsDescription')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("form", {
+    class: "groupPermissionsShareSegment",
+    onSubmit: _cache[2] || (_cache[2] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(function ($event) {
+      return _ctx.shareSegment();
+    }, ["prevent"]))
+  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ShareSegment')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_3, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_Field, {
+    uicontrol: "select",
+    name: "groupPermissionsSegment",
+    title: _ctx.translate('GroupPermissions_Segment'),
+    "model-value": _ctx.selectedSegment,
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      return _ctx.selectedSegment = $event;
+    }),
+    options: _ctx.segmentOptions,
+    disabled: !_ctx.segmentOptions.length
+  }, null, 8, ["title", "model-value", "options", "disabled"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_SaveButton, {
+    class: "groupPermissionsShareSegmentButton",
+    value: _ctx.translate('GroupPermissions_ShareSegmentButton'),
+    saving: _ctx.isSaving,
+    disabled: !_ctx.selectedSegment,
+    onConfirm: _cache[1] || (_cache[1] = function ($event) {
+      return _ctx.shareSegment();
+    })
+  }, null, 8, ["value", "saving", "disabled"])], 32), GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_4, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", {
+    class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])(["groupPermissionsSegmentsTable", {
+      loading: _ctx.isLoading
+    }])
+  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_Segment')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Website')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_CreatedBy')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_5, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Actions')), 1)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tbody", null, [_ctx.isLoading && !_ctx.sharedSegments.length ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_6, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_7, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
+    loading: true
+  })])])) : !_ctx.sharedSegments.length ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_8, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_9, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_NoSharedSegments')), 1)])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.sharedSegments, function (segment) {
+    return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", {
+      key: segment.idSegment,
+      class: "groupPermissionsSegmentRow",
+      "data-id-segment": segment.idSegment
+    }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", {
+      class: "segmentName",
+      title: segment.definition
+    }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(segment.name), 9, GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_11), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_12, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.siteName(segment)), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_13, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(segment.login), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_14, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("button", {
+      class: "table-action groupPermissionsUnshareSegment",
+      title: _ctx.translate('GroupPermissions_UnshareSegment'),
+      onClick: function onClick($event) {
+        return _ctx.confirmUnshareSegment(segment);
+      }
+    }, GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_17, 8, GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_15)])], 8, GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_10);
+  }), 128))])], 2), [[_directive_content_table]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_18, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+    role: "yes",
+    type: "button",
+    value: _ctx.translate('General_Yes')
+  }, null, 8, GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_19), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
+    role: "no",
+    type: "button",
+    value: _ctx.translate('General_No')
+  }, null, 8, GroupSegmentsvue_type_template_id_6fa1c8f1_hoisted_20)], 512)]);
+}
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/GroupSegments.vue?vue&type=template&id=6fa1c8f1
+
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupSegments.vue?vue&type=script&lang=ts
+
+
+
+
+/* harmony default export */ var GroupSegmentsvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
+  components: {
+    ActivityIndicator: external_CoreHome_["ActivityIndicator"],
+    Field: external_CorePluginsAdmin_["Field"],
+    SaveButton: external_CorePluginsAdmin_["SaveButton"]
+  },
+  directives: {
+    ContentTable: external_CoreHome_["ContentTable"]
+  },
+  props: {
+    group: {
+      type: Object,
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      segments: [],
+      selectedSegment: '',
+      confirmText: '',
+      isLoading: false,
+      isSaving: false
+    };
+  },
+  mounted: function mounted() {
+    this.loadSegments();
+  },
+  computed: {
+    sharedSegments: function sharedSegments() {
+      return this.segments.filter(function (s) {
+        return s.isShared;
+      });
+    },
+    segmentOptions: function segmentOptions() {
+      var _this = this;
+
+      return this.segments.filter(function (s) {
+        return !s.isShared && !s.enabledAllUsers;
+      }).map(function (s) {
+        return {
+          key: String(s.idSegment),
+          value: "".concat(s.name, " (").concat(_this.siteName(s), ", ").concat(s.login, ")")
+        };
+      });
+    }
+  },
+  methods: {
+    siteName: function siteName(segment) {
+      return segment.idSite ? segment.siteName : Object(external_CoreHome_["translate"])('UsersManager_AllWebsites');
+    },
+    loadSegments: function loadSegments() {
+      var _this2 = this;
+
+      this.isLoading = true;
+      return external_CoreHome_["AjaxHelper"].fetch({
+        method: 'GroupPermissions.getSegmentsForGroup',
+        idGroup: this.group.idGroup,
+        filter_limit: -1
+      }).then(function (segments) {
+        _this2.segments = segments;
+
+        if (!_this2.segmentOptions.some(function (o) {
+          return o.key === _this2.selectedSegment;
+        })) {
+          _this2.selectedSegment = '';
+        }
+      }).finally(function () {
+        _this2.isLoading = false;
+      });
+    },
+    shareSegment: function shareSegment() {
+      var _this3 = this;
+
+      var segment = this.segments.find(function (s) {
+        return String(s.idSegment) === _this3.selectedSegment;
+      });
+
+      if (!segment || this.isSaving) {
+        return;
+      }
+
+      this.isSaving = true;
+      external_CoreHome_["AjaxHelper"].post({
+        method: 'GroupPermissions.shareSegmentWithGroup'
+      }, {
+        idSegment: segment.idSegment,
+        idGroup: this.group.idGroup
+      }, {
+        errorElement: '#ajaxErrorGroupSegments'
+      }).then(function () {
+        notifySuccess('groupPermissionsSegmentShared', 'GroupPermissions_SegmentShared', segment.name, _this3.group.name);
+        _this3.selectedSegment = '';
+        return _this3.loadSegments();
+      }).finally(function () {
+        _this3.isSaving = false;
+      });
+    },
+    confirmUnshareSegment: function confirmUnshareSegment(segment) {
+      var _this4 = this;
+
+      this.confirmText = Object(external_CoreHome_["translate"])('GroupPermissions_UnshareSegmentConfirm', segment.name, this.group.name);
+      external_CoreHome_["Matomo"].helper.modalConfirm(this.$refs.confirmUnshareSegment, {
+        yes: function yes() {
+          return _this4.unshareSegment(segment);
+        }
+      });
+    },
+    unshareSegment: function unshareSegment(segment) {
+      var _this5 = this;
+
+      external_CoreHome_["AjaxHelper"].post({
+        method: 'GroupPermissions.unshareSegmentFromGroup'
+      }, {
+        idSegment: segment.idSegment,
+        idGroup: this.group.idGroup
+      }, {
+        errorElement: '#ajaxErrorGroupSegments'
+      }).then(function () {
+        notifySuccess('groupPermissionsSegmentUnshared', 'GroupPermissions_SegmentUnshared', segment.name, _this5.group.name);
+        return _this5.loadSegments();
+      });
+    }
+  }
+}));
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/GroupSegments.vue?vue&type=script&lang=ts
+ 
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/GroupSegments.vue
+
+
+
+GroupSegmentsvue_type_script_lang_ts.render = GroupSegmentsvue_type_template_id_6fa1c8f1_render
+
+/* harmony default export */ var GroupSegments = (GroupSegmentsvue_type_script_lang_ts);
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupSettings.vue?vue&type=template&id=28d60fb0
 
 var GroupSettingsvue_type_template_id_28d60fb0_hoisted_1 = {
@@ -4523,12 +4787,14 @@ GroupSettingsvue_type_script_lang_ts.render = GroupSettingsvue_type_template_id_
 
 
 
+
 /* harmony default export */ var GroupEditvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
     ContentBlock: external_CoreHome_["ContentBlock"],
     GroupMembers: GroupMembers,
     GroupWebsiteAccess: GroupWebsiteAccess,
     GroupAutoAccess: GroupAutoAccess,
+    GroupSegments: GroupSegments,
     GroupSettings: GroupSettings
   },
   props: {
@@ -4556,6 +4822,9 @@ GroupSettingsvue_type_script_lang_ts.render = GroupSettingsvue_type_template_id_
         tab: 'autoaccess',
         title: Object(external_CoreHome_["translate"])('GroupPermissions_AutoAccess')
       }, {
+        tab: 'segments',
+        title: Object(external_CoreHome_["translate"])('GroupPermissions_Segments')
+      }, {
         tab: 'settings',
         title: Object(external_CoreHome_["translate"])('General_Settings')
       }];
@@ -4568,7 +4837,7 @@ GroupSettingsvue_type_script_lang_ts.render = GroupSettingsvue_type_template_id_
 
 
 
-GroupEditvue_type_script_lang_ts.render = GroupEditvue_type_template_id_6942a7e9_render
+GroupEditvue_type_script_lang_ts.render = GroupEditvue_type_template_id_60d8118a_render
 
 /* harmony default export */ var GroupEdit = (GroupEditvue_type_script_lang_ts);
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/InviteUser.vue?vue&type=template&id=f056124c
@@ -4797,7 +5066,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 var OWN_HASH_PARAMS = ['idGroup', 'groupTab', 'groupView', 'inviteGroup'];
-var EDIT_TABS = ['members', 'access', 'autoaccess', 'settings'];
+var EDIT_TABS = ['members', 'access', 'autoaccess', 'segments', 'settings'];
 /* harmony default export */ var TabManageGroupsvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
     ActivityIndicator: external_CoreHome_["ActivityIndicator"],
@@ -5015,7 +5284,7 @@ var EDIT_TABS = ['members', 'access', 'autoaccess', 'settings'];
 
 
 
-TabManageGroupsvue_type_script_lang_ts.render = TabManageGroupsvue_type_template_id_0b43f4ef_render
+TabManageGroupsvue_type_script_lang_ts.render = TabManageGroupsvue_type_template_id_333f24ba_render
 
 /* harmony default export */ var TabManageGroups = (TabManageGroupsvue_type_script_lang_ts);
 // CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/index.ts

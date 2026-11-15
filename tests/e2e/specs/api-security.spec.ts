@@ -99,6 +99,9 @@ test.describe('API access checks', () => {
   test('view users cannot copy dashboards or manage groups', async () => {
     for (const [method, params] of [
       ['GroupPermissions.copyDashboardToGroup', { idDashboard: 1, idGroup: group.idGroup }],
+      ['GroupPermissions.shareSegmentWithGroup', { idSegment: 1, idGroup: group.idGroup }],
+      ['GroupPermissions.unshareSegmentFromGroup', { idSegment: 1, idGroup: group.idGroup }],
+      ['GroupPermissions.getGroupsOfSegment', { idSegment: 1 }],
       ['GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: viewUser.login }],
       ['GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: viewUser.login }],
       ['GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: 'x' }],
@@ -124,6 +127,7 @@ test.describe('API access checks', () => {
       ['GroupPermissions.getMembersOfGroup', { idGroup: group.idGroup }],
       ['GroupPermissions.getGroupsOverview', {}],
       ['GroupPermissions.getSitesAccessFromGroup', { idGroup: group.idGroup }],
+      ['GroupPermissions.getSegmentsForGroup', { idGroup: group.idGroup }],
       ['GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: adminUser.login }],
       ['GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: adminUser.login }],
       ['GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: 'nope' }],
