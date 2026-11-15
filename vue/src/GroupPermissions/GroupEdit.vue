@@ -51,6 +51,11 @@
           :group="group"
           @changed="$emit('changed')"
         />
+        <GroupAutoAccess
+          v-else-if="activeTab === 'autoaccess'"
+          :group="group"
+          @changed="$emit('changed')"
+        />
         <GroupSettings
           v-else-if="activeTab === 'settings'"
           :group="group"
@@ -67,6 +72,7 @@ import { defineComponent, PropType } from 'vue';
 import { ContentBlock, translate } from 'CoreHome';
 import GroupMembers from './GroupMembers.vue';
 import GroupWebsiteAccess from './GroupWebsiteAccess.vue';
+import GroupAutoAccess from './GroupAutoAccess.vue';
 import GroupSettings from './GroupSettings.vue';
 import { GroupOverview } from './types';
 
@@ -75,6 +81,7 @@ export default defineComponent({
     ContentBlock,
     GroupMembers,
     GroupWebsiteAccess,
+    GroupAutoAccess,
     GroupSettings,
   },
   props: {
@@ -93,6 +100,7 @@ export default defineComponent({
       return [
         { tab: 'members', title: translate('GroupPermissions_Members'), count: this.group.memberCount },
         { tab: 'access', title: translate('GroupPermissions_WebsiteAccess'), count: this.group.siteCount },
+        { tab: 'autoaccess', title: translate('GroupPermissions_AutoAccess') },
         { tab: 'settings', title: translate('General_Settings') },
       ];
     },

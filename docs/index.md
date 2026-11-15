@@ -16,17 +16,25 @@
 
 - The group list shows every group with its number of members and websites. Search by name, open a group by its name or the edit icon, or delete it with the delete icon.
 - "Create a new group" asks for a name (at most 64 characters) and opens the new group.
-- The group editor has three sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
+- The group editor has four sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
   - **Members**: members with email and invitation status. Add existing users with the searchable user picker, remove members with the delete icon, or invite a new user directly into the group. A user can be in multiple groups; the anonymous user cannot be added to groups.
   - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access. Capabilities (e.g. Tag Manager) can be added per website, like on the Manage Access tab.
+  - **Automatic access**: rules that give the group a role for every website created from now on that is in a matching Matomo website group or has a matching URL (main URL or alias URL). Patterns are case-insensitive and `*` matches any characters; a URL pattern without `/` is compared with the host only (e.g. `*.example.com`), one with `/` with host and path (e.g. `example.com/shop*`). A rule can also give capabilities (e.g. Tag Manager) in addition to its role. If several rules match, the highest role wins and a role the group already has is never downgraded. Existing websites are only changed when you apply a rule to them with the refresh icon ("Apply to existing websites"); removing a rule keeps the access it already gave.
   - **Settings**: rename or delete the group. Deleting a group removes the access its members got through it; the users themselves are kept.
 - "Invite a new user" invites a user by email directly into one or more groups. Unlike the core "Invite user" form, no initial website has to be granted: the user's access comes only from the selected groups. (Internally, Matomo still requires an initial website for invitations, so the plugin temporarily grants view access to a website of the selected groups — which is also the website named in the invitation email — and removes it right after the invite. If none of the selected groups has access to a website yet, the first existing website is used for this step instead; its access is removed right after the invite as well, so the user has no website access until one of their groups is granted one.)
+
+### Website create/edit form
+
+- When creating or editing a website (Administration → Websites → Manage), the "Group Permissions" section has a "Group access" field: a list of group/role pairs. It shows the current roles of the groups for the website, and saving the website saves them, like the Manage Access tab does. Groups that are not listed have no access through groups.
+- Super users can set it when creating a website, admins of a website when editing it. If automatic access rules also match a new website, the higher role wins.
+- Via the API, pass it as a measurable setting of `SitesManager.addSite` / `SitesManager.updateSite`, e.g. `settingValues[GroupPermissions][0][name]=group_access&settingValues[GroupPermissions][0][value][0][group]=1&settingValues[GroupPermissions][0][value][0][role]=view`.
 
 ## Permissions required
 
 - Managing groups (create/rename/delete groups, add/remove members, invite users to groups, the group editor) requires Super User access.
 - Changing the access of groups requires Admin access on the selected website(s).
 - Changing the capabilities of groups requires Admin access on the selected website(s) as well.
+- Managing the automatic access rules of groups requires Super User access. The rules apply to every new website, no matter who creates it.
 - Members get the highest role of all their groups and their own permissions for each website, plus all capabilities of their groups and their own capabilities.
 - Like in Matomo core, a capability only applies while the group has a role for the website: removing the role removes the group's capabilities for it, and capabilities included in a new role are dropped (others are kept when the role changes).
 

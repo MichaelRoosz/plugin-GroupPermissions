@@ -26,8 +26,9 @@ compose exec -T matomo bash -c '
     dest=/var/www/html/plugins/GroupPermissions
     rm -rf "$dest" && mkdir -p "$dest/vue"
     cd /plugin-src
-    cp -r API.php Access.php Controller.php GroupPermissions.php Menu.php Model.php plugin.json Updates \
-        Dao config javascripts lang stylesheets templates "$dest/"
+    find . -maxdepth 1 -name "*.php" ! -name phpstan-bootstrap.php -exec cp {} "$dest/" \;
+    cp -r plugin.json Updates \
+        Dao Settings config javascripts lang stylesheets templates "$dest/"
     cp -r vue/dist "$dest/vue/dist"
     chown -R www-data:www-data "$dest"
 '

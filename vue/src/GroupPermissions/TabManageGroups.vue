@@ -80,7 +80,7 @@ import { notifySuccess } from './notify';
 import { Group, GroupOverview } from './types';
 
 const OWN_HASH_PARAMS = ['idGroup', 'groupTab', 'groupView', 'inviteGroup'];
-const EDIT_TABS = ['members', 'access', 'settings'];
+const EDIT_TABS = ['members', 'access', 'autoaccess', 'settings'];
 
 export default defineComponent({
   components: {

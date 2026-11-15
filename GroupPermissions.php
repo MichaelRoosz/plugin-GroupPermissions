@@ -10,6 +10,9 @@
 
 namespace Piwik\Plugins\GroupPermissions;
 
+use Piwik\Access\CapabilitiesProvider;
+use Piwik\Container\StaticContainer;
+use Piwik\Log\LoggerInterface;
 use Piwik\Plugin;
 
 class GroupPermissions extends Plugin {
@@ -32,6 +35,7 @@ class GroupPermissions extends Plugin {
         return [
             'AssetManager.getJavaScriptFiles'        => 'getJavaScriptFiles',
             'AssetManager.getStylesheetFiles'        => 'getStylesheetFiles',
+            'SitesManager.addSite.end'               => 'addSite',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             'UsersManager.deleteUser'                => 'deleteUser',
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
@@ -77,10 +81,20 @@ class GroupPermissions extends Plugin {
         $translations[] = 'General_Website';
         $translations[] = 'General_Yes';
         $translations[] = 'GroupPermissions_AccessUpdated';
+        $translations[] = 'GroupPermissions_AddAutoAccessRule';
+        $translations[] = 'GroupPermissions_AddAutoAccessRuleButton';
         $translations[] = 'GroupPermissions_AddCapability';
         $translations[] = 'GroupPermissions_AddUserToGroup';
         $translations[] = 'GroupPermissions_AddUserToGroupButton';
         $translations[] = 'GroupPermissions_AllWebsitesNote';
+        $translations[] = 'GroupPermissions_ApplyAutoAccessRule';
+        $translations[] = 'GroupPermissions_ApplyAutoAccessRuleConfirm';
+        $translations[] = 'GroupPermissions_AutoAccess';
+        $translations[] = 'GroupPermissions_AutoAccessCapabilitiesHelp';
+        $translations[] = 'GroupPermissions_AutoAccessDescription';
+        $translations[] = 'GroupPermissions_AutoAccessRuleAdded';
+        $translations[] = 'GroupPermissions_AutoAccessRuleApplied';
+        $translations[] = 'GroupPermissions_AutoAccessRuleRemoved';
         $translations[] = 'GroupPermissions_BackToGroups';
         $translations[] = 'GroupPermissions_CapabilityAdded';
         $translations[] = 'GroupPermissions_CapabilityRemoved';
@@ -96,6 +110,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_DescriptionGroupsTab';
         $translations[] = 'GroupPermissions_EditGroup';
         $translations[] = 'GroupPermissions_ExceptionGroupDoesNotExist';
+        $translations[] = 'GroupPermissions_ExistingSiteGroups';
         $translations[] = 'GroupPermissions_GiveAccess';
         $translations[] = 'GroupPermissions_GiveAccessButton';
         $translations[] = 'GroupPermissions_Group';
@@ -112,16 +127,25 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_InviteUserIntoGroup';
         $translations[] = 'GroupPermissions_InviteUserSuccess';
         $translations[] = 'GroupPermissions_ManageGroups';
+        $translations[] = 'GroupPermissions_MatchType';
+        $translations[] = 'GroupPermissions_MatchTypeSiteGroup';
+        $translations[] = 'GroupPermissions_MatchTypeUrl';
         $translations[] = 'GroupPermissions_MemberAdded';
         $translations[] = 'GroupPermissions_MemberRemoved';
         $translations[] = 'GroupPermissions_Members';
+        $translations[] = 'GroupPermissions_NoAutoAccessRules';
         $translations[] = 'GroupPermissions_NoGroups';
         $translations[] = 'GroupPermissions_NoGroupsFound';
         $translations[] = 'GroupPermissions_NoMembers';
         $translations[] = 'GroupPermissions_NoUsersFound';
         $translations[] = 'GroupPermissions_NoWebsiteAccess';
+        $translations[] = 'GroupPermissions_Pattern';
+        $translations[] = 'GroupPermissions_PatternHelpSiteGroup';
+        $translations[] = 'GroupPermissions_PatternHelpUrl';
         $translations[] = 'GroupPermissions_RemoveAccess';
         $translations[] = 'GroupPermissions_RemoveAccessConfirm';
+        $translations[] = 'GroupPermissions_RemoveAutoAccessRule';
+        $translations[] = 'GroupPermissions_RemoveAutoAccessRuleConfirm';
         $translations[] = 'GroupPermissions_RemoveCapability';
         $translations[] = 'GroupPermissions_RemoveCapabilityConfirm';
         $translations[] = 'GroupPermissions_RemoveFromGroup';
@@ -145,6 +169,28 @@ class GroupPermissions extends Plugin {
         $translations[] = 'UsersManager_PrivNone';
         $translations[] = 'UsersManager_Role';
         $translations[] = 'UsersManager_Status';
+    }
+
+    /**
+     * Give groups access to a new website according to their automatic access rules
+     */
+    public function addSite(int $idSite): void {
+        try {
+            $capabilityProvider = StaticContainer::get(CapabilitiesProvider::class);
+            if ($capabilityProvider instanceof CapabilitiesProvider) {
+                $autoAccess = new AutoAccess(new Model(), $capabilityProvider);
+                $autoAccess->applyToSite($idSite);
+            }
+        } catch (\Throwable $e) {
+            // never break creating a website, e.g. while the database update of this plugin is still pending
+            $logger = StaticContainer::get(LoggerInterface::class);
+            if ($logger instanceof LoggerInterface) {
+                $logger->warning(
+                    'GroupPermissions: could not apply the automatic access rules to website {idSite}: {message}',
+                    ['idSite' => $idSite, 'message' => $e->getMessage()]
+                );
+            }
+        }
     }
 
     /**

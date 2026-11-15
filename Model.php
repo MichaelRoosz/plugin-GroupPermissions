@@ -11,6 +11,7 @@
 namespace Piwik\Plugins\GroupPermissions;
 
 use Piwik\Plugins\GroupPermissions\Dao\Group;
+use Piwik\Plugins\GroupPermissions\Dao\GroupAutoAccess;
 use Piwik\Plugins\GroupPermissions\Dao\GroupCapability;
 use Piwik\Plugins\GroupPermissions\Dao\GroupPermission;
 use Piwik\Plugins\GroupPermissions\Dao\GroupUser;
@@ -29,6 +30,9 @@ class Model {
 
         $capability = new GroupCapability();
         $capability->install();
+
+        $autoAccess = new GroupAutoAccess();
+        $autoAccess->install();
     }
 
     public function uninstall(): void {
@@ -43,6 +47,9 @@ class Model {
 
         $capability = new GroupCapability();
         $capability->uninstall();
+
+        $autoAccess = new GroupAutoAccess();
+        $autoAccess->uninstall();
     }
 
     // Group
@@ -252,6 +259,74 @@ class Model {
     public function removeAllCapabilitiesForSite(int $idSite): void {
         $groupCapability = new GroupCapability();
         $groupCapability->removeAllCapabilitiesForSite($idSite);
+    }
+
+    // GroupAutoAccess
+    /**
+     * @param array<string> $capabilities
+     */
+    public function addAutoAccessRule(int $idGroup, string $matchType, string $pattern, string $access, array $capabilities): int {
+        $autoAccess = new GroupAutoAccess();
+
+        return $autoAccess->addRule($idGroup, $matchType, $pattern, $access, $capabilities);
+    }
+
+    /**
+     * @return array{
+     *   idrule: int,
+     *   idgroup: int,
+     *   match_type: string,
+     *   pattern: string,
+     *   access: string,
+     *   capabilities: array<string>
+     * }|null
+     */
+    public function getAutoAccessRule(int $idGroup, int $idRule): ?array {
+        $autoAccess = new GroupAutoAccess();
+
+        return $autoAccess->getRule($idGroup, $idRule);
+    }
+
+    /**
+     * @return array<array{
+     *   idrule: int,
+     *   idgroup: int,
+     *   match_type: string,
+     *   pattern: string,
+     *   access: string,
+     *   capabilities: array<string>
+     * }>
+     */
+    public function getAutoAccessRulesOfGroup(int $idGroup): array {
+        $autoAccess = new GroupAutoAccess();
+
+        return $autoAccess->getRulesOfGroup($idGroup);
+    }
+
+    /**
+     * @return array<array{
+     *   idrule: int,
+     *   idgroup: int,
+     *   match_type: string,
+     *   pattern: string,
+     *   access: string,
+     *   capabilities: array<string>
+     * }>
+     */
+    public function getAllAutoAccessRules(): array {
+        $autoAccess = new GroupAutoAccess();
+
+        return $autoAccess->getAllRules();
+    }
+
+    public function removeAutoAccessRule(int $idGroup, int $idRule): void {
+        $autoAccess = new GroupAutoAccess();
+        $autoAccess->removeRule($idGroup, $idRule);
+    }
+
+    public function removeAllAutoAccessRulesOfGroup(int $idGroup): void {
+        $autoAccess = new GroupAutoAccess();
+        $autoAccess->removeAllRulesOfGroup($idGroup);
     }
 
     // MultiTable

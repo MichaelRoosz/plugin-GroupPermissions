@@ -152,7 +152,7 @@ export async function groupListNames(page: Page): Promise<string[]> {
   return (await page.locator('tr.groupPermissionsGroupRow td.groupName').allInnerTexts()).map((t) => t.trim());
 }
 
-export type EditorTab = 'members' | 'access' | 'settings';
+export type EditorTab = 'members' | 'access' | 'autoaccess' | 'settings';
 
 /** Opens the editor of a group directly (the view is kept in the URL hash). */
 export async function openGroupEditor(page: Page, idGroup: number, tab: EditorTab = 'members'): Promise<void> {

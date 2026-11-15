@@ -415,23 +415,8 @@ class API extends \Piwik\Plugin\API {
 
         $idSites = $this->getIdSitesCheckAdminAccess($idSites);
 
-        foreach ($idSites as $idSite) {
-            $this->model->removePermission($idGroup, $idSite);
-        }
-
-        // if the access is noaccess then we don't save it as this is the default value
-        // when no access are specified
-        if ($access != 'noaccess') {
-            foreach ($idSites as $idSite) {
-                $this->model->createPermission($idGroup, $idSite, $access);
-            }
-        }
-
-        $this->removeCapabilitiesNotApplyingToRole($idGroup, $idSites, $access);
-
-        // we reload the access list which doesn't yet take in consideration this new user access
-        Access::getInstance()->reloadAccess();
-        Cache::deleteTrackerCache();
+        $updater = new GroupAccessUpdater($this->model, $this->capabilityProvider);
+        $updater->setAccess($idGroup, $idSites, $access);
     }
 
     /**
@@ -499,6 +484,7 @@ class API extends \Piwik\Plugin\API {
         }
         $idGroup = $group['idgroup'];
 
+        $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
         $this->model->removeAllCapabilitiesOfGroup($idGroup);
         $this->model->removeAllPermissionsOfGroup($idGroup);
         $this->model->removeAllUsersOfGroup($idGroup);
@@ -577,6 +563,127 @@ class API extends \Piwik\Plugin\API {
 
         Access::getInstance()->reloadAccess();
         Cache::deleteTrackerCache();
+    }
+
+    /**
+     * Returns the rules that give a group access to newly created websites.
+     *
+     * @return array<array{
+     *   idRule: int,
+     *   matchType: string,
+     *   pattern: string,
+     *   access: string,
+     *   capabilities: array<string>
+     * }>
+     */
+    public function getAutoAccessRules(int $idGroup): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        return array_map(static function (array $rule): array {
+            return [
+                'idRule' => $rule['idrule'],
+                'matchType' => $rule['match_type'],
+                'pattern' => $rule['pattern'],
+                'access' => $rule['access'],
+                'capabilities' => $rule['capabilities'],
+            ];
+        }, $this->model->getAutoAccessRulesOfGroup($group['idgroup']));
+    }
+
+    /**
+     * Adds a rule that gives a group a role for every website created from now on that matches the rule.
+     * Existing websites are not changed.
+     *
+     * @param int $idGroup
+     * @param string $matchType "sitegroup" to match the Matomo website group of the new website, "url" to match
+     *                          its URLs (main URL and alias URLs)
+     * @param string $pattern Website group name or URL, case-insensitive, `*` matches any characters. URL patterns
+     *                        without `/` are compared with the host only (e.g. `*.example.com`), others with host and
+     *                        path (e.g. `example.com/shop*`)
+     * @param string $access Role to give, e.g. "view", "write" or "admin"
+     * @param string|array<string> $capabilities Optional capabilities to give in addition to the role (e.g.
+     *                                           `tagmanager_write`), see "UsersManager.getAvailableCapabilities"
+     *
+     * @return int ID of the new rule
+     */
+    public function addAutoAccessRule(int $idGroup, string $matchType, string $pattern, string $access, $capabilities = []): int {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        if (!in_array($matchType, Dao\GroupAutoAccess::MATCH_TYPES, true)) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionInvalidMatchType', [
+                implode(', ', Dao\GroupAutoAccess::MATCH_TYPES),
+                $matchType,
+            ]));
+        }
+
+        $pattern = trim($pattern);
+        if ($matchType === Dao\GroupAutoAccess::MATCH_URL) {
+            $pattern = AutoAccess::normalizeUrlPattern($pattern);
+        }
+        if ($pattern === '') {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionEmptyPattern'));
+        }
+        if (mb_strlen($pattern) > Dao\GroupAutoAccess::PATTERN_MAX_LENGTH) {
+            throw new Exception(Piwik::translate(
+                'GroupPermissions_ExceptionPatternTooLong',
+                [Dao\GroupAutoAccess::PATTERN_MAX_LENGTH]
+            ));
+        }
+
+        $this->checkAccessType($access);
+
+        $capabilities = ($capabilities === '' || $capabilities === []) ? [] : $this->parseCapabilities($capabilities);
+        // capabilities the role already includes are not stored, like for addGroupCapabilities
+        $capabilities = array_values(array_filter($capabilities, function (string $capabilityId) use ($access): bool {
+            $capability = $this->capabilityProvider->getCapability($capabilityId);
+
+            return !$capability || !$capability->hasRoleCapability($access);
+        }));
+
+        foreach ($this->model->getAutoAccessRulesOfGroup($group['idgroup']) as $rule) {
+            if ($rule['match_type'] === $matchType && mb_strtolower($rule['pattern']) === mb_strtolower($pattern)) {
+                throw new Exception(Piwik::translate('GroupPermissions_ExceptionRuleDoesExist'));
+            }
+        }
+
+        return $this->model->addAutoAccessRule($group['idgroup'], $matchType, $pattern, $access, $capabilities);
+    }
+
+    /**
+     * Applies a rule to all existing websites (rules normally only apply to websites created after them): groups
+     * get the role of the rule for every matching website unless they already have a higher one, plus the
+     * capabilities of the rule.
+     *
+     * @return array<int> IDs of the matching websites
+     */
+    public function applyAutoAccessRule(int $idGroup, int $idRule): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        $rule = $this->model->getAutoAccessRule($group['idgroup'], $idRule);
+        if (!$rule) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionRuleDoesNotExist', $idRule));
+        }
+
+        $autoAccess = new AutoAccess($this->model, $this->capabilityProvider);
+
+        return $autoAccess->applyToAllSites([$rule]);
+    }
+
+    /**
+     * Removes a rule giving a group access to new websites. Access already given by the rule is kept.
+     */
+    public function removeAutoAccessRule(int $idGroup, int $idRule): void {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        $this->model->removeAutoAccessRule($group['idgroup'], $idRule);
     }
 
     /**
@@ -753,33 +860,6 @@ class API extends \Piwik\Plugin\API {
         }
 
         return $result;
-    }
-
-    /**
-     * After the role of a group changed: capabilities never apply without a role, and the ones included in the
-     * new role are redundant. Other capabilities are kept (unlike UsersManager.setUserAccess), so changing the
-     * role from "view" to "write" does not lose e.g. the Tag Manager publish capability.
-     *
-     * @param array<int> $idSites
-     */
-    private function removeCapabilitiesNotApplyingToRole(int $idGroup, array $idSites, string $access): void {
-        if ($access === 'noaccess') {
-            foreach ($idSites as $idSite) {
-                $this->model->removeAllCapabilitiesOfGroupForSite($idGroup, $idSite);
-            }
-
-            return;
-        }
-
-        $capabilitiesBySite = $this->model->getCapabilitiesOfGroup($idGroup);
-        foreach ($idSites as $idSite) {
-            foreach ($capabilitiesBySite[$idSite] ?? [] as $capabilityId) {
-                $capability = $this->capabilityProvider->getCapability($capabilityId);
-                if ($capability && $capability->hasRoleCapability($access)) {
-                    $this->model->removeCapability($idGroup, $idSite, $capabilityId);
-                }
-            }
-        }
     }
 
     /**

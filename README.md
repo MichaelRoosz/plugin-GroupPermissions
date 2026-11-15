@@ -20,6 +20,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
     - [Navigation](#navigation)
     - [Manage Access tab](#manage-access-tab)
     - [Manage Groups tab](#manage-groups-tab)
+    - [Website create/edit form](#website-createedit-form)
   - [Permissions required](#permissions-required)
   - [API](#api)
   - [Development](#development)
@@ -32,6 +33,8 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Assign users to one or more groups.
 - Grant or revoke site access for entire groups, including applying to all sites you administer.
 - Grant capabilities to groups per website, e.g. the Tag Manager capabilities (write, publish live container, use custom templates).
+- Give groups access to new websites automatically, based on the Matomo website group or the URL of the new website.
+- Set the group access directly in Matomo's website create/edit form.
 - Two clear tabs: Manage Access and Manage Groups.
 
 ## Compatibility
@@ -68,17 +71,25 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 
 - The group list shows every group with its number of members and websites. Search by name, open a group by its name or the edit icon, or delete it with the delete icon.
 - "Create a new group" asks for a name (at most 64 characters) and opens the new group.
-- The group editor has three sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
+- The group editor has four sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
   - **Members**: members with email and invitation status. Add existing users with the searchable user picker, remove members with the delete icon, or invite a new user directly into the group. A user can be in multiple groups; the anonymous user cannot be added to groups.
   - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access. Capabilities (e.g. Tag Manager) can be added per website, like on the Manage Access tab.
+  - **Automatic access**: rules that give the group a role for every website created from now on that is in a matching Matomo website group or has a matching URL (main URL or alias URL). Patterns are case-insensitive and `*` matches any characters; a URL pattern without `/` is compared with the host only (e.g. `*.example.com`), one with `/` with host and path (e.g. `example.com/shop*`). A rule can also give capabilities (e.g. Tag Manager) in addition to its role. If several rules match, the highest role wins and a role the group already has is never downgraded. Existing websites are only changed when you apply a rule to them with the refresh icon ("Apply to existing websites"); removing a rule keeps the access it already gave.
   - **Settings**: rename or delete the group. Deleting a group removes the access its members got through it; the users themselves are kept.
 - "Invite a new user" invites a user by email directly into one or more groups.
+
+### Website create/edit form
+
+- When creating or editing a website (Administration → Websites → Manage), the "Group Permissions" section has a "Group access" field: a list of group/role pairs. It shows the current roles of the groups for the website, and saving the website saves them, like the Manage Access tab does. Groups that are not listed have no access through groups.
+- Super users can set it when creating a website, admins of a website when editing it. If automatic access rules also match a new website, the higher role wins.
+- Via the API, pass it as a measurable setting of `SitesManager.addSite` / `SitesManager.updateSite`, e.g. `settingValues[GroupPermissions][0][name]=group_access&settingValues[GroupPermissions][0][value][0][group]=1&settingValues[GroupPermissions][0][value][0][role]=view`.
 
 ## Permissions required
 
 - Managing groups (create/rename/delete groups, add/remove members, invite users to groups, the group editor) requires Super User access.
 - Changing the access of groups requires Admin access on the selected website(s).
 - Changing the capabilities of groups requires Admin access on the selected website(s) as well.
+- Managing the automatic access rules of groups requires Super User access. The rules apply to every new website, no matter who creates it.
 - Members get the highest role of all their groups and their own permissions for each website, plus all capabilities of their groups and their own capabilities.
 - Like in Matomo core, a capability only applies while the group has a role for the website: removing the role removes the group's capabilities for it, and capabilities included in a new role are dropped (others are kept when the role changes).
 
@@ -114,6 +125,17 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
   ```text
   index.php?module=API&method=GroupPermissions.addGroupCapabilities&idGroup=1&capabilities[]=tagmanager_write&capabilities[]=tagmanager_publish_live_container&idSites=1,2&format=JSON&token_auth=YOUR_TOKEN
   index.php?module=API&method=GroupPermissions.removeGroupCapabilities&idGroup=1&capabilities=tagmanager_write&idSites=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+- Give a group a role for every new website in a Matomo website group or with a matching URL, list and remove these rules (super user):
+  ```text
+  index.php?module=API&method=GroupPermissions.addAutoAccessRule&idGroup=1&matchType=sitegroup&pattern=Shops&access=view&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.addAutoAccessRule&idGroup=1&matchType=url&pattern=*.example.com&access=write&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.getAutoAccessRules&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.removeAutoAccessRule&idGroup=1&idRule=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+  Rules can give capabilities as well (`&capabilities[]=tagmanager_write`). To apply a rule to the websites that already exist (returns the IDs of the matching websites):
+  ```text
+  index.php?module=API&method=GroupPermissions.applyAutoAccessRule&idGroup=1&idRule=1&format=JSON&token_auth=YOUR_TOKEN
   ```
 - Invite a new user directly into groups (super user):
   ```text

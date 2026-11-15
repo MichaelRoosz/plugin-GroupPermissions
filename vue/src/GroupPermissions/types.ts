@@ -52,3 +52,11 @@ export interface CapabilityOption {
   category: string;
   includedInRoles: string[];
 }
+
+export interface AutoAccessRule {
+  idRule: number;
+  matchType: string;
+  pattern: string;
+  access: string;
+  capabilities: string[];
+}
