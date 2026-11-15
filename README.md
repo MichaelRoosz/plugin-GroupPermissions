@@ -20,6 +20,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
     - [Navigation](#navigation)
     - [Manage Access tab](#manage-access-tab)
     - [Manage Groups tab](#manage-groups-tab)
+    - [Group sync from LDAP / SAML](#group-sync-from-ldap--saml)
     - [Website create/edit form](#website-createedit-form)
   - [Permissions required](#permissions-required)
   - [API](#api)
@@ -36,6 +37,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Give groups access to new websites automatically, based on the Matomo website group or the URL of the new website.
 - Share stored segments with groups: the members see them in the segment selector.
 - Shared ownership of scheduled email reports: group members can edit, send and delete them when the creator is absent.
+- Synchronize group memberships from LDAP (LoginLdap), OpenID Connect (LoginOIDC, RebelOIDC) or SAML (LoginSaml) groups; other login plugins via an event or the API.
 - Set the group access directly in Matomo's website create/edit form.
 - Two clear tabs: Manage Access and Manage Groups.
 
@@ -73,14 +75,41 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 
 - The group list shows every group with its number of members and websites. Search by name, open a group by its name or the edit icon, or delete it with the delete icon.
 - "Create a new group" asks for a name (at most 64 characters) and opens the new group.
-- The group editor has six sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
+- The group editor has seven sections (the opened group and section are part of the URL, so they can be bookmarked and survive a reload):
   - **Members**: members with email and invitation status. Add existing users with the searchable user picker, remove members with the delete icon, or invite a new user directly into the group. A user can be in multiple groups; the anonymous user cannot be added to groups.
   - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access. Capabilities (e.g. Tag Manager) can be added per website, like on the Manage Access tab.
   - **Automatic access**: rules that give the group a role for every website created from now on that is in a matching Matomo website group or has a matching URL (main URL or alias URL). Patterns are case-insensitive and `*` matches any characters; a URL pattern without `/` is compared with the host only (e.g. `*.example.com`), one with `/` with host and path (e.g. `example.com/shop*`). A rule can also give capabilities (e.g. Tag Manager) in addition to its role. If several rules match, the highest role wins and a role the group already has is never downgraded. Existing websites are only changed when you apply a rule to them with the refresh icon ("Apply to existing websites"); removing a rule keeps the access it already gave.
   - **Segments**: stored segments shared with the group. Members of the group see a shared segment in the segment selector (in the "Shared with you" part if there is one) as long as they have access to the website the segment is restricted to. Like segments shared with all users, only the creator and super users can edit or delete it. Segments already shared with all users are not offered. Deleting the segment or the group removes the share.
   - **Scheduled reports**: email reports shared with the group (shared ownership). Members of the group see a shared report on Matomo's "Email reports" page and can edit, send, download and delete it like their own as long as they have access to its website — e.g. to change the recipients while the creator is absent, without sharing accounts. Changes are made with the member's own account, so Matomo's events (and an activity log listening to them) record who changed the report; the report keeps its creator, who still gets it with "Send report to me". A member can keep the report's segment or choose one visible to them (including segments shared with their groups), but cannot move the report to another website or change its type. Only email reports can be shared (other types store recipients of the creator, such as the phone numbers of SMS reports). If the creator is deleted, Matomo would delete their reports; a shared report is instead handed over to a member of its groups who has access to its website (the first by login), who then also receives "Send report to me" (without such a member it is deleted as before). Deleting the report or the group removes the share.
+  - **Directory sync**: external groups (LDAP, SAML) mapped to the group, see [Group sync from LDAP / SAML](#group-sync-from-ldap--saml).
   - **Settings**: rename or delete the group. Deleting a group removes the access its members got through it; the users themselves are kept.
 - "Invite a new user" invites a user by email directly into one or more groups.
+
+### Group sync from LDAP / SAML
+
+Group memberships can be synchronized from the groups of an external directory, so users get their Matomo access from their LDAP or identity provider groups. Supported out of the box: LoginLdap, LoginOIDC, RebelOIDC and LoginSaml; other login plugins can trigger the sync with an event.
+
+- **Map external groups** in the "Directory sync" section of the group editor: enter the name of the group as the identity provider sends it, or the distinguished name (DN) of an LDAP group. Names are compared case-insensitively. A DN like `CN=Matomo Admins,OU=Groups,DC=example,DC=com` also matches its first value (`Matomo Admins`) when the other side is a plain name; two DNs must match completely (spaces after `,` / `=` are ignored). Several external groups can be mapped to one group, and one external group to several groups.
+- **On every sync** the user becomes a member of each group mapped to one of their external groups, and is removed from the groups an earlier sync added them to that no longer match. Memberships added manually (or by an invitation) are never removed, and a user who already is a manual member stays one. Synced members are marked "synced" in the member list. Removing a mapping keeps the members it added until their next sync.
+- **LDAP** (with the [LoginLdap](https://plugins.matomo.org/LoginLdap) plugin): enable "Synchronize group memberships from LDAP groups" under Administration → System → General settings → GroupPermissions (the settings only appear while LoginLdap is activated). After an LDAP user logs in with their password, the plugin reads their groups with LoginLdap's server configuration and admin bind:
+  - from an attribute of the user entry, by default `memberOf` (Active Directory, OpenLDAP with the memberOf overlay; the attribute is requested explicitly, so operational attributes work), and/or
+  - with a group search filter where `?` is replaced by the DN of the user, e.g. `(&(objectClass=groupOfNames)(member=?))` or `(&(objectClass=groupOfUniqueNames)(uniqueMember=?))`, below an optional group search base DN. The DNs of the matching groups are used.
+
+  LoginLdap fires no event of its own, so the sync runs on Matomo's `Login.authenticate.successful` event. It does not run for logins with a token (API) or for users created by `loginldap:synchronize-users` until they log in. If the LDAP query fails, the memberships are left unchanged and a warning is logged. Group access of the plugin is independent of LoginLdap's own access synchronization (`enable_synchronize_access_from_ldap`), which only resets the direct permissions of the user.
+- **OpenID Connect** (with the [LoginOIDC](https://plugins.matomo.org/LoginOIDC) or [RebelOIDC](https://plugins.matomo.org/RebelOIDC) plugin): enable "Synchronize group memberships from OpenID Connect groups" in the same settings (shown while one of them is activated) and set the claim listing the groups:
+  - `groups` (default): Keycloak with a "Group Membership" mapper (add it to the ID token; turn off "Full group path" to get `Matomo Admins` instead of `/Matomo Admins`), Microsoft Entra ID (sends group object IDs by default, so map the IDs), Authentik and most other providers,
+  - a namespaced claim such as `https://example.com/groups` (Auth0 actions),
+  - or a path into nested claims such as `realm_access.roles` or `resource_access.matomo.roles` (Keycloak roles).
+
+  The groups must be in the **ID token**: both plugins keep only the ID token after the login (not the access token or the userinfo response), and neither fires an event with the claims. The plugin reads the token from the session while the plugin's login callback starts the Matomo session (`Login.authenticate.successful`). The token comes directly from the provider's token endpoint, so its signature is not checked again (OpenID Connect Core 3.1.3.7). The sync runs on every OIDC login, including the first one that creates the user. If the token has no such claim, memberships are left unchanged (an empty list removes all synced memberships).
+- **SAML** (with the [LoginSaml](https://plugins.matomo.org/LoginSaml) plugin): enable "Synchronize group memberships from SAML groups" in the same settings (shown while LoginSaml is activated) and set the attribute of the SAML response listing the groups, e.g. `groups`, `memberOf`, `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` (Microsoft Entra ID, group object IDs) or `http://schemas.xmlsoap.org/claims/Group` (AD FS). Use the attribute's FriendlyName instead if LoginSaml is set to use friendly names. The attribute name is matched exactly first, then case-insensitively.
+
+  LoginSaml fires no event with the attributes and does not keep them, so while its Assertion Consumer Service starts the Matomo session (`Login.authenticate.successful`), the plugin reads them from LoginSaml's SAML handler (php-saml). If that handler has not validated the response yet, the plugin validates the posted SAML response again with LoginSaml's own settings (signature, audience, validity), so only validated attributes are used. The sync runs on every SAML login, including just-in-time provisioning of new users; a response without the attribute leaves the memberships unchanged. This relies on internals of LoginSaml (`Saml\SamlFactory`, tested with LoginSaml 5.5.11), so check it after LoginSaml updates. It is independent of LoginSaml's own access synchronization, which sets the direct permissions of the user.
+- **Other login plugins**: a login plugin (or a small custom plugin) can trigger the sync after a login without depending on this plugin:
+  ```php
+  \Piwik\Piwik::postEvent('GroupPermissions.syncUserGroups', [$login, $groupsFromTheIdentityProvider]);
+  ```
+  Provisioning scripts can call the `GroupPermissions.syncUserGroups` API method (super user) instead, see [API](#api).
 
 ### Website create/edit form
 
@@ -96,6 +125,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Managing the automatic access rules of groups requires Super User access. The rules apply to every new website, no matter who creates it.
 - Sharing segments with groups: super users can share any segment, users with Admin access to at least one website their own segments (via the API). Matomo itself does not restrict which segment definitions a user may apply, so sharing controls which stored segments are listed, not which data can be seen.
 - Sharing scheduled reports with groups: super users can share any email report, users with Admin access to at least one website their own reports (via the API). Members of the group need view access to the website of the report to see or change it. Matomo only lets the creator manage a report, so the plugin runs the core actions on a shared report with super user rights, after checking everything those rights would skip for the member (website access, the requested reports and a newly chosen segment).
+- Mapping external groups and synchronizing the groups of a user via the API require Super User access. The LDAP, OpenID Connect and SAML sync runs for the user logging in; it only adds them to groups mapped to their groups in the directory.
 - Members get the highest role of all their groups and their own permissions for each website, plus all capabilities of their groups and their own capabilities.
 - Like in Matomo core, a capability only applies while the group has a role for the website: removing the role removes the group's capabilities for it, and capabilities included in a new role are dropped (others are kept when the role changes).
 
@@ -165,6 +195,17 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
   index.php?module=API&method=GroupPermissions.getReportsForGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
   ```
   Members of the group manage shared reports with Matomo's own API (`ScheduledReports.getReports`, `updateReport`, `sendReport`, `generateReport`, `deleteReport`). To make this possible the plugin replaces the API class of the ScheduledReports plugin with a subclass (via dependency injection, like it does for `Piwik\Access`); another plugin replacing the same class would conflict.
+- Map external directory groups (LDAP group DN or name, SAML group value) to a group, remove a mapping, list the mappings (super user):
+  ```text
+  index.php?module=API&method=GroupPermissions.addExternalGroupMapping&idGroup=1&externalGroup=CN%3DMatomo%20Admins%2COU%3DGroups%2CDC%3Dexample%2CDC%3Dcom&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.removeExternalGroupMapping&idGroup=1&externalGroup=matomo-editors&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.getExternalGroupMappings&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  ```
+  Synchronize the groups of a user with their external groups (super user; returns the names of the groups the user was added to and removed from). `externalGroups` is an array or one group per line; an empty list removes all memberships added by the sync:
+  ```text
+  index.php?module=API&method=GroupPermissions.syncUserGroups&userLogin=jane&externalGroups[]=matomo-editors&externalGroups[]=matomo-admins&format=JSON&token_auth=YOUR_TOKEN
+  ```
+  `GroupPermissions.getMembersOfGroup` returns `synced: true` for memberships added by the sync.
 - Invite a new user directly into groups (super user):
   ```text
   index.php?module=API&method=GroupPermissions.inviteUserToGroups&userLogin=jane&email=jane@example.org&idGroups=1,2&format=JSON&token_auth=YOUR_TOKEN

@@ -82,22 +82,26 @@ sql "DROP TABLE matomo_gpermissions_autoaccess"
 check "website is created" "1" "$(su SitesManager.addSite --data-urlencode "siteName=Lifecycle no table $run_id" \
     --data-urlencode "urls=https://no-table-$run_id.example.org" | grep -cE '"value":[0-9]+' || true)"
 
-echo "==> Updating from version 5.2.1 (without the capability, automatic access, segment and report tables)"
+echo "==> Updating from version 5.2.1 (without the capability, automatic access, segment, report and external group tables and the synced column)"
 sql "DROP TABLE matomo_gpermissions_capability"
 sql "DROP TABLE matomo_gpermissions_segment"
 sql "DROP TABLE matomo_gpermissions_report"
+sql "DROP TABLE matomo_gpermissions_external"
+sql "ALTER TABLE matomo_gpermissions_user DROP COLUMN synced"
 sql "UPDATE matomo_option SET option_value = '5.2.1' WHERE option_name = 'version_GroupPermissions'"
 mexec ./console core:update --yes >/dev/null
 check "capability table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_capability'" | wc -l)"
 check "automatic access table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_autoaccess'" | wc -l)"
 check "segment table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_segment'" | wc -l)"
 check "report table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_report'" | wc -l)"
+check "external group table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_external'" | wc -l)"
+check "existing memberships are not marked as synced" "0" "$(sql "SELECT synced FROM matomo_gpermissions_user WHERE login = '$member'")"
 check "plugin version is updated" "5.3.0" "$(sql "SELECT option_value FROM matomo_option WHERE option_name = 'version_GroupPermissions'")"
 check "group access still applies after the update" "$id_site" "$(member_sites)"
 
 echo "==> Uninstalling the plugin"
 tables_before=$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)
-check "plugin tables exist while installed" "7" "$tables_before"
+check "plugin tables exist while installed" "8" "$tables_before"
 mexec ./console plugin:deactivate GroupPermissions >/dev/null
 mexec ./console plugin:uninstall GroupPermissions >/dev/null
 check "plugin tables are dropped" "0" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
@@ -105,7 +109,7 @@ check "member has no access" "" "$(member_sites)"
 
 echo "==> Reinstalling the plugin"
 ./bin/setup.sh >/dev/null
-check "plugin tables are created again" "7" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
+check "plugin tables are created again" "8" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
 su_token=$(token_for "$SUPERUSER_LOGIN" "$SUPERUSER_PASSWORD")
 check "no groups after reinstall" "[]" "$(su GroupPermissions.getAllGroups)"
 check "member has no access after reinstall" "" "$(member_sites)"

@@ -73,7 +73,14 @@
           :key="login"
           class="groupPermissionsMemberRow"
         >
-          <td class="login">{{ login }}</td>
+          <td class="login">
+            <span class="memberLogin">{{ login }}</span>
+            <span
+              v-if="syncedMembers.includes(login)"
+              class="groupPermissionsSyncedBadge"
+              :title="translate('GroupPermissions_SyncedMemberHelp')"
+            >{{ translate('GroupPermissions_SyncedMember') }}</span>
+          </td>
           <td class="email">{{ usersByLogin[login]?.email || '' }}</td>
           <td class="status">
             <span :class="statusClass(login)">{{ statusText(login) }}</span>
@@ -132,6 +139,7 @@ export default defineComponent({
   data() {
     return {
       members: [] as string[],
+      syncedMembers: [] as string[],
       users: [] as MatomoUser[],
       selectedUser: null as MatomoUser|null,
       confirmRemoveMemberText: '',
@@ -185,13 +193,15 @@ export default defineComponent({
     },
     loadGroupMembers() {
       this.isLoadingMembers = true;
-      AjaxHelper.fetch<Array<{ login: string }>>({
+      AjaxHelper.fetch<Array<{ login: string, synced?: boolean }>>({
         method: 'GroupPermissions.getMembersOfGroup',
         idGroup: this.group.idGroup,
         filter_limit: -1,
       }).then((response) => {
         this.members = response.map((member) => member.login)
           .sort((a, b) => a.localeCompare(b));
+        this.syncedMembers = response.filter((member) => member.synced)
+          .map((member) => member.login);
       }).finally(() => {
         this.isLoadingMembers = false;
       });
@@ -246,6 +256,7 @@ export default defineComponent({
         errorElement: '#ajaxErrorManageGroupMembers',
       }).then(() => {
         this.members = this.members.filter((member) => member !== login);
+        this.syncedMembers = this.syncedMembers.filter((member) => member !== login);
         notifySuccess('groupPermissionsMemberRemoved', 'GroupPermissions_MemberRemoved', login);
         this.$emit('changed');
       });

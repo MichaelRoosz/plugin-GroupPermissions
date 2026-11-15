@@ -298,8 +298,9 @@ class API extends \Piwik\Plugin\API {
 
     /**
      * @return array<array{
-     *    login: string
-     * }>
+     *    login: string,
+     *    synced: bool
+     * }> `synced` is true for memberships added by the group sync from an external directory (LDAP, SAML)
      */
     public function getMembersOfGroup(int $idGroup): array {
         Piwik::checkUserHasSuperUserAccess();
@@ -487,6 +488,7 @@ class API extends \Piwik\Plugin\API {
         $idGroup = $group['idgroup'];
 
         $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
+        $this->model->removeAllExternalGroupMappingsOfGroup($idGroup);
         $this->model->removeAllSegmentSharesOfGroup($idGroup);
         $this->model->removeAllReportSharesOfGroup($idGroup);
         $this->model->removeAllCapabilitiesOfGroup($idGroup);
@@ -688,6 +690,123 @@ class API extends \Piwik\Plugin\API {
         $group = $this->getGroupOrFail($idGroup);
 
         $this->model->removeAutoAccessRule($group['idgroup'], $idRule);
+    }
+
+    /**
+     * Returns the external directory groups (LDAP group DNs or names, SAML group attribute values, ...) mapped to
+     * a group.
+     *
+     * @return array<string>
+     */
+    public function getExternalGroupMappings(int $idGroup): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        return $this->model->getExternalGroupMappingsOfGroup($group['idgroup']);
+    }
+
+    /**
+     * Maps an external directory group to a group: when the groups of a user are synchronized (LDAP login with
+     * the LDAP group sync enabled, the `GroupPermissions.syncUserGroups` event or API method), users in the
+     * external group become members of the group. Users already in the external group are only added on their
+     * next sync.
+     *
+     * @param int $idGroup
+     * @param string $externalGroup Name or distinguished name of the external group, case-insensitive. A DN like
+     *                              `CN=Matomo Admins,OU=Groups,DC=example,DC=com` can also be matched by
+     *                              its first value (`Matomo Admins`)
+     */
+    public function addExternalGroupMapping(int $idGroup, string $externalGroup): void {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        // stored and compared like the directory returns it, e.g. `R&D` instead of the sanitized `R&amp;D`
+        $externalGroup = trim(Common::unsanitizeInputValue($externalGroup));
+        if ($externalGroup === '') {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionEmptyExternalGroup'));
+        }
+        if (mb_strlen($externalGroup) > Dao\GroupExternal::NAME_MAX_LENGTH) {
+            throw new Exception(Piwik::translate(
+                'GroupPermissions_ExceptionExternalGroupTooLong',
+                [Dao\GroupExternal::NAME_MAX_LENGTH]
+            ));
+        }
+
+        foreach ($this->model->getExternalGroupMappingsOfGroup($group['idgroup']) as $existing) {
+            if (GroupSync::normalize($existing) === GroupSync::normalize($externalGroup)) {
+                throw new Exception(Piwik::translate('GroupPermissions_ExceptionExternalGroupDoesExist', $externalGroup));
+            }
+        }
+
+        $this->model->addExternalGroupMapping($group['idgroup'], $externalGroup);
+    }
+
+    /**
+     * Removes the mapping of an external directory group from a group. Members added by the sync keep their
+     * membership until their next sync.
+     */
+    public function removeExternalGroupMapping(int $idGroup, string $externalGroup): void {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+        $externalGroup = Common::unsanitizeInputValue($externalGroup);
+
+        foreach ($this->model->getExternalGroupMappingsOfGroup($group['idgroup']) as $existing) {
+            if (GroupSync::normalize($existing) === GroupSync::normalize($externalGroup)) {
+                $this->model->removeExternalGroupMapping($group['idgroup'], $existing);
+            }
+        }
+    }
+
+    /**
+     * Synchronizes the group memberships of a user with their groups in an external directory, e.g. from a
+     * provisioning script or an identity provider integration: the user becomes a member of every group mapped
+     * to one of the external groups and is removed from groups an earlier sync added them to but that no longer
+     * match. Memberships added manually are kept.
+     *
+     * @param string $userLogin
+     * @param string|array<string> $externalGroups Names or DNs of the external groups of the user, as an array or
+     *                                             one per line. Empty removes all memberships added by the sync
+     *
+     * @return array{added: array<string>, removed: array<string>} names of the groups the user was added to and
+     *                                                              removed from
+     */
+    public function syncUserGroups(string $userLogin, $externalGroups = []): array {
+        Piwik::checkUserHasSuperUserAccess();
+
+        if ($userLogin === 'anonymous') {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionAnonymousNotAllowed'));
+        }
+        if (!UsersManagerAPI::getInstance()->userExists($userLogin)) {
+            throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $userLogin));
+        }
+
+        if (is_string($externalGroups)) {
+            $externalGroups = preg_split('/\r\n|\r|\n/', $externalGroups) ?: [];
+        }
+        if (!is_array($externalGroups)) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionInvalidExternalGroups'));
+        }
+        $externalGroups = array_map(static function ($externalGroup) {
+            return is_string($externalGroup) ? Common::unsanitizeInputValue($externalGroup) : $externalGroup;
+        }, $externalGroups);
+
+        $result = (new GroupSync($this->model))->syncUser($userLogin, $externalGroups);
+
+        $groupNames = [];
+        foreach ($this->model->getAllGroups() as $group) {
+            $groupNames[$group['idgroup']] = $group['name'];
+        }
+        $names = ['added' => [], 'removed' => []];
+        foreach ($result as $key => $idGroups) {
+            foreach ($idGroups as $idGroup) {
+                $names[$key][] = $groupNames[$idGroup] ?? (string) $idGroup;
+            }
+        }
+
+        return $names;
     }
 
     /**

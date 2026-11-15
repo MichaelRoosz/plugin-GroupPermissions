@@ -64,6 +64,10 @@
           v-else-if="activeTab === 'reports'"
           :group="group"
         />
+        <GroupSync
+          v-else-if="activeTab === 'sync'"
+          :group="group"
+        />
         <GroupSettings
           v-else-if="activeTab === 'settings'"
           :group="group"
@@ -83,6 +87,7 @@ import GroupWebsiteAccess from './GroupWebsiteAccess.vue';
 import GroupAutoAccess from './GroupAutoAccess.vue';
 import GroupSegments from './GroupSegments.vue';
 import GroupReports from './GroupReports.vue';
+import GroupSync from './GroupSync.vue';
 import GroupSettings from './GroupSettings.vue';
 import { GroupOverview } from './types';
 
@@ -94,6 +99,7 @@ export default defineComponent({
     GroupAutoAccess,
     GroupSegments,
     GroupReports,
+    GroupSync,
     GroupSettings,
   },
   props: {
@@ -115,6 +121,7 @@ export default defineComponent({
         { tab: 'autoaccess', title: translate('GroupPermissions_AutoAccess') },
         { tab: 'segments', title: translate('GroupPermissions_Segments') },
         { tab: 'reports', title: translate('GroupPermissions_ScheduledReports') },
+        { tab: 'sync', title: translate('GroupPermissions_GroupSync') },
         { tab: 'settings', title: translate('General_Settings') },
       ];
     },

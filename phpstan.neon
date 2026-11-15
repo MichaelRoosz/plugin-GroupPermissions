@@ -11,6 +11,9 @@ parameters:
         - linting
     bootstrapFiles:
         - phpstan-bootstrap.php
+    # optional plugins this plugin integrates with (not part of the vendored Matomo)
+    scanFiles:
+        - phpstan-stubs/LoginPlugins.stub
     stubFiles:
         - phpstan-stubs/Access.stub
     treatPhpDocTypesAsCertain: false

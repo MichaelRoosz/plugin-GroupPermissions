@@ -12,6 +12,7 @@ the specs; the tests themselves run in the `mcr.microsoft.com/playwright` image.
 ```bash
 tests/e2e/bin/run.sh                           # fresh Matomo, all specs
 tests/e2e/bin/run.sh specs/invite-user.spec.ts # a single spec (extra args go to `playwright test`)
+tests/e2e/bin/integration-test.sh              # only the login plugin integration specs (Matomo must be running)
 KEEP_ENV=1 tests/e2e/bin/run.sh                # reuse the running instance (faster)
 ```
 
@@ -48,6 +49,9 @@ The database lives on tmpfs, so `teardown.sh` discards all data.
 | `docker-compose.yml` | MariaDB, Matomo (apache), Mailpit, Playwright runner |
 | `bin/setup.sh` | starts the containers, copies the plugin, installs Matomo, activates the plugin |
 | `bin/lifecycle-test.sh` | deactivate / activate / uninstall / reinstall checks (run by `run.sh` after a full run) |
+| `bin/integration-test.sh` | group sync with the login plugins LoginLdap, LoginOIDC, RebelOIDC and LoginSaml (run by `run.sh` after a full run, skip with `INTEGRATIONS=0`): starts OpenLDAP, a mock OpenID Connect provider and SimpleSAMLphp (profile `integrations`), installs the pinned plugin releases, runs `specs-integrations/` and removes the plugins again. LoginSaml is paid and cannot be downloaded: its specs only run with a licensed copy for Matomo 5 in `LOGINSAML_DIR` (default `tmp/5.5.11/LoginSaml`, git-ignored, never commit it) |
+| `saml/authsources.php` | users and group attributes of the SAML identity provider |
+| `specs-integrations/`, `playwright.integrations.config.ts` | specs needing the login plugins |
 | `global-setup.ts` | logs in the super user once and stores the session |
 | `helpers/` | API client, UI helpers, Mailpit client |
 | `specs/access.spec.ts` | group site access, combining user and group permissions, site/user deletion |

@@ -21,7 +21,11 @@ docker compose --profile test run --rm -e HOST_UID="$(id -u)" -e HOST_GID="$(id 
              chown -R "$HOST_UID:$HOST_GID" screenshots test-results playwright-report .auth 2>/dev/null
              exit $status' -- "$@"
 
-# plugin lifecycle (deactivate/uninstall/reinstall) checks: only on a full run, they modify the plugin data
+# only on a full run: the group sync with the login plugins LoginLdap, LoginOIDC and RebelOIDC (INTEGRATIONS=0 skips
+# it), then the plugin lifecycle (deactivate/uninstall/reinstall) checks, which modify the plugin data
 if [ "$#" -eq 0 ]; then
+    if [ "${INTEGRATIONS:-1}" != "0" ]; then
+        ./bin/integration-test.sh
+    fi
     ./bin/lifecycle-test.sh
 fi

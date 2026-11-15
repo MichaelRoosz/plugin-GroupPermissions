@@ -17,6 +17,12 @@ use Piwik\DbHelper;
 class GroupUser {
     public const TABLE = 'gpermissions_user';
 
+    /**
+     * Memberships added by the group sync (see GroupSync) have `synced` = 1, the sync only ever removes those.
+     * Shared with the update that adds the column for existing installations.
+     */
+    public const COLUMN_SYNCED = 'TINYINT(1) UNSIGNED NOT NULL DEFAULT 0';
+
     /** @var string $tablePrefixed */
     private $tablePrefixed = '';
 
@@ -28,6 +34,7 @@ class GroupUser {
         DbHelper::createTable(self::TABLE, '
                   `idgroup` int(10) UNSIGNED NOT NULL,
                   `login` VARCHAR(100) NOT NULL,
+                  `synced` ' . self::COLUMN_SYNCED . ',
                   PRIMARY KEY(`idgroup`, `login`)');
     }
 
@@ -35,23 +42,27 @@ class GroupUser {
         Db::query(sprintf('DROP TABLE IF EXISTS `%s`', $this->tablePrefixed));
     }
 
-    public function addUserToGroup(int $idGroup, string $login): void {
-        Db::query("INSERT INTO `{$this->tablePrefixed}` (idgroup, login) VALUES (?, ?)", [$idGroup, $login]);
+    public function addUserToGroup(int $idGroup, string $login, bool $synced = false): void {
+        Db::query(
+            "INSERT INTO `{$this->tablePrefixed}` (idgroup, login, synced) VALUES (?, ?, ?)",
+            [$idGroup, $login, $synced ? 1 : 0]
+        );
     }
 
     /**
      * @return array<array{
-     *    login: string
+     *    login: string,
+     *    synced: bool
      * }>
      */
     public function getMembersOfGroup(int $idGroup): array {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
 
-        $rows = Rows::list(Db::fetchAll("SELECT login FROM $table WHERE idgroup = ?", [$idGroup]));
+        $rows = Rows::list(Db::fetchAll("SELECT login, synced FROM $table WHERE idgroup = ?", [$idGroup]));
 
         return array_map(static function (array $row): array {
-            return ['login' => Rows::string($row, 'login')];
+            return ['login' => Rows::string($row, 'login'), 'synced' => Rows::int($row, 'synced') === 1];
         }, $rows);
     }
 
@@ -88,6 +99,19 @@ class GroupUser {
         return array_map(static function (array $row): array {
             return ['idgroup' => Rows::int($row, 'idgroup')];
         }, $rows);
+    }
+
+    /**
+     * @return array<int, bool> whether the membership was added by the group sync, by group id
+     */
+    public function getMembershipsOfUser(string $login): array {
+        $table = $this->tablePrefixed;
+        $memberships = [];
+        foreach (Rows::list(Db::fetchAll("SELECT idgroup, synced FROM $table WHERE login = ?", [$login])) as $row) {
+            $memberships[Rows::int($row, 'idgroup')] = Rows::int($row, 'synced') === 1;
+        }
+
+        return $memberships;
     }
 
     public function removeUserFromGroup(int $idGroup, string $login): void {

@@ -152,7 +152,7 @@ export async function groupListNames(page: Page): Promise<string[]> {
   return (await page.locator('tr.groupPermissionsGroupRow td.groupName').allInnerTexts()).map((t) => t.trim());
 }
 
-export type EditorTab = 'members' | 'access' | 'autoaccess' | 'segments' | 'reports' | 'settings';
+export type EditorTab = 'members' | 'access' | 'autoaccess' | 'segments' | 'reports' | 'sync' | 'settings';
 
 /** Opens the editor of a group directly (the view is kept in the URL hash). */
 export async function openGroupEditor(page: Page, idGroup: number, tab: EditorTab = 'members'): Promise<void> {
@@ -173,12 +173,12 @@ export async function switchEditorTab(page: Page, tab: EditorTab): Promise<void>
 
 export function memberRow(page: Page, login: string): Locator {
   return page.locator('tr.groupPermissionsMemberRow', {
-    has: page.locator('td.login', { hasText: new RegExp(`^\\s*${escapeRegExp(login)}\\s*$`) }),
+    has: page.locator('td.login .memberLogin', { hasText: new RegExp(`^\\s*${escapeRegExp(login)}\\s*$`) }),
   });
 }
 
 export async function memberLogins(page: Page): Promise<string[]> {
-  return (await page.locator('tr.groupPermissionsMemberRow td.login').allInnerTexts()).map((t) => t.trim());
+  return (await page.locator('tr.groupPermissionsMemberRow td.login .memberLogin').allInnerTexts()).map((t) => t.trim());
 }
 
 export function websiteRow(page: Page, siteName: string): Locator {

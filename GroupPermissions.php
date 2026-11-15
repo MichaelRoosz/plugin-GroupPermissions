@@ -40,6 +40,9 @@ class GroupPermissions extends Plugin {
             'API.Request.intercept'                  => 'interceptApiRequest',
             'API.SegmentEditor.getAll.end'           => 'addSharedSegments',
             'API.SegmentEditor.delete.end'           => 'deleteSegment',
+            // integration point for login plugins (e.g. SAML): sync the groups of a user with their external groups
+            'GroupPermissions.syncUserGroups'        => 'syncUserGroups',
+            'Login.authenticate.successful'          => 'syncGroupsAfterLogin',
             'ScheduledReports.getReportRecipients'   => ['function' => 'fixReportRecipients', 'after' => true],
             'SitesManager.addSite.end'               => 'addSite',
             'SitesManager.deleteSite.end'            => 'deleteSite',
@@ -91,6 +94,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_AddAutoAccessRule';
         $translations[] = 'GroupPermissions_AddAutoAccessRuleButton';
         $translations[] = 'GroupPermissions_AddCapability';
+        $translations[] = 'GroupPermissions_AddExternalGroup';
+        $translations[] = 'GroupPermissions_AddExternalGroupButton';
         $translations[] = 'GroupPermissions_AddUserToGroup';
         $translations[] = 'GroupPermissions_AddUserToGroupButton';
         $translations[] = 'GroupPermissions_AllWebsitesNote';
@@ -119,6 +124,10 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_EditGroup';
         $translations[] = 'GroupPermissions_ExceptionGroupDoesNotExist';
         $translations[] = 'GroupPermissions_ExistingSiteGroups';
+        $translations[] = 'GroupPermissions_ExternalGroup';
+        $translations[] = 'GroupPermissions_ExternalGroupAdded';
+        $translations[] = 'GroupPermissions_ExternalGroupRemoved';
+        $translations[] = 'GroupPermissions_ExternalGroups';
         $translations[] = 'GroupPermissions_GiveAccess';
         $translations[] = 'GroupPermissions_GiveAccessButton';
         $translations[] = 'GroupPermissions_Group';
@@ -127,6 +136,9 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_GroupName';
         $translations[] = 'GroupPermissions_GroupNameHelp';
         $translations[] = 'GroupPermissions_GroupRenamed';
+        $translations[] = 'GroupPermissions_GroupSync';
+        $translations[] = 'GroupPermissions_GroupSyncDescription';
+        $translations[] = 'GroupPermissions_GroupSyncHelpNames';
         $translations[] = 'GroupPermissions_Groups';
         $translations[] = 'GroupPermissions_IncludedInGroupRole';
         $translations[] = 'GroupPermissions_InviteUser';
@@ -142,6 +154,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_MemberRemoved';
         $translations[] = 'GroupPermissions_Members';
         $translations[] = 'GroupPermissions_NoAutoAccessRules';
+        $translations[] = 'GroupPermissions_NoExternalGroups';
         $translations[] = 'GroupPermissions_NoGroups';
         $translations[] = 'GroupPermissions_NoGroupsFound';
         $translations[] = 'GroupPermissions_NoMembers';
@@ -158,6 +171,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_RemoveAutoAccessRuleConfirm';
         $translations[] = 'GroupPermissions_RemoveCapability';
         $translations[] = 'GroupPermissions_RemoveCapabilityConfirm';
+        $translations[] = 'GroupPermissions_RemoveExternalGroup';
+        $translations[] = 'GroupPermissions_RemoveExternalGroupConfirm';
         $translations[] = 'GroupPermissions_RemoveFromGroup';
         $translations[] = 'GroupPermissions_RemoveFromGroupConfirm';
         $translations[] = 'GroupPermissions_RenameGroup';
@@ -179,6 +194,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_ShareReportButton';
         $translations[] = 'GroupPermissions_ShareSegment';
         $translations[] = 'GroupPermissions_ShareSegmentButton';
+        $translations[] = 'GroupPermissions_SyncedMember';
+        $translations[] = 'GroupPermissions_SyncedMemberHelp';
         $translations[] = 'GroupPermissions_UnshareReport';
         $translations[] = 'GroupPermissions_UnshareReportConfirm';
         $translations[] = 'GroupPermissions_UnshareSegment';
@@ -219,6 +236,60 @@ class GroupPermissions extends Plugin {
                     ['idSite' => $idSite, 'message' => $e->getMessage()]
                 );
             }
+        }
+    }
+
+    /**
+     * Synchronizes the group memberships of a user with the groups of an external directory. Login plugins
+     * without built-in support can post this event after a user logged in, without depending on this
+     * plugin:
+     *
+     *     Piwik::postEvent('GroupPermissions.syncUserGroups', [$login, $groupsFromIdP]);
+     *
+     * The user becomes a member of every group mapped to one of the external groups (see
+     * `GroupPermissions.addExternalGroupMapping`) and is removed from groups an earlier sync added them to but
+     * that no longer match. Memberships added manually are kept.
+     *
+     * @param mixed $login
+     * @param mixed $externalGroups array of group names or DNs
+     */
+    public function syncUserGroups($login, $externalGroups): void {
+        if (!is_string($login) || !is_array($externalGroups)) {
+            return;
+        }
+
+        (new GroupSync(new Model()))->syncUser($login, $externalGroups);
+    }
+
+    /**
+     * Group sync after a login, if enabled in the system settings: from the SAML response for users logging in
+     * through the LoginSaml plugin, from the ID token for users of the LoginOIDC or RebelOIDC plugin, from LDAP for
+     * users of the LoginLdap plugin
+     *
+     * @param mixed $login
+     */
+    public function syncGroupsAfterLogin($login): void {
+        if (!is_string($login)) {
+            return;
+        }
+
+        if (SamlGroupSync::isAvailable() && SamlGroupSync::isAssertionConsumerServiceRequest()) {
+            $samlGroupSync = new SamlGroupSync(new SystemSettings(), new GroupSync(new Model()));
+            $samlGroupSync->syncUserAfterLogin($login);
+
+            return;
+        }
+
+        if (OidcGroupSync::isAvailable() && OidcGroupSync::isCallbackRequest()) {
+            $oidcGroupSync = new OidcGroupSync(new SystemSettings(), new GroupSync(new Model()));
+            $oidcGroupSync->syncUserAfterLogin($login);
+
+            return;
+        }
+
+        if (LdapGroupSync::isAvailable()) {
+            $ldapGroupSync = new LdapGroupSync(new SystemSettings(), new GroupSync(new Model()));
+            $ldapGroupSync->syncUserAfterLogin($login);
         }
     }
 

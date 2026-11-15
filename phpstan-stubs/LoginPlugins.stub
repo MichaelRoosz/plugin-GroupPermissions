@@ -1,0 +1,100 @@
+<?php
+
+// Minimal stubs of the optional login plugins this plugin integrates with, only the members it uses:
+// - LoginLdap (https://github.com/matomo-org/plugin-LoginLdap) 5.x, used by LdapGroupSync
+// - LoginSaml (InnoCraft, https://plugins.matomo.org/LoginSaml) and its bundled onelogin/php-saml, used by SamlGroupSync
+
+namespace Piwik\Plugins\LoginLdap\Ldap {
+    class Client {
+        /**
+         * @param string $baseDn
+         * @param string $ldapFilter
+         * @param array<string> $filterBind
+         * @param array<string> $attributes
+         * @return array<mixed>|null
+         */
+        public function fetchAll($baseDn, $ldapFilter, $filterBind = array(), $attributes = array()) {}
+    }
+
+    class ServerInfo {
+        /** @return string */
+        public function getBaseDn() {}
+    }
+}
+
+namespace Piwik\Plugins\LoginLdap\Model {
+    use Piwik\Plugins\LoginLdap\Ldap\Client;
+    use Piwik\Plugins\LoginLdap\Ldap\ServerInfo;
+
+    class LdapUsers {
+        /** @return LdapUsers */
+        public static function makeConfigured() {}
+
+        /**
+         * @param callable(LdapUsers, Client, ServerInfo): mixed $function
+         * @return mixed
+         */
+        public function doWithClient($function = null) {}
+
+        /** @return void */
+        public function bindAsAdmin(Client $ldapClient, ServerInfo $server) {}
+
+        /**
+         * @param string|null $username
+         * @return array{0: string, 1: array<string>}
+         */
+        public function getUserEntryQuery($username = null) {}
+    }
+}
+
+namespace Piwik\Plugins\LoginLdap\LdapInterop {
+    class UserMapper {
+        /** @return UserMapper */
+        public static function makeConfigured() {}
+
+        /**
+         * @param string $userLogin
+         * @return bool
+         */
+        public function isUserLdapUser($userLogin) {}
+    }
+}
+
+namespace Piwik\Plugins\LoginSaml {
+    class Config {
+        /**
+         * @param string $optionName
+         * @return mixed
+         */
+        public static function getConfigOption($optionName) {}
+    }
+}
+
+namespace Piwik\Plugins\LoginSaml\Saml {
+    class SamlFactory {
+        /** @return \OneLogin\Saml2\Auth */
+        public function getSamlAuth() {}
+    }
+}
+
+namespace OneLogin\Saml2 {
+    class Auth {
+        /**
+         * @param string|null $requestId
+         * @return void
+         */
+        public function processResponse($requestId = null) {}
+
+        /** @return bool */
+        public function isAuthenticated() {}
+
+        /** @return array<string> */
+        public function getErrors() {}
+
+        /** @return array<string, array<mixed>> */
+        public function getAttributes() {}
+
+        /** @return array<string, array<mixed>> */
+        public function getAttributesWithFriendlyName() {}
+    }
+}

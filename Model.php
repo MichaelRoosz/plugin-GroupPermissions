@@ -13,6 +13,7 @@ namespace Piwik\Plugins\GroupPermissions;
 use Piwik\Plugins\GroupPermissions\Dao\Group;
 use Piwik\Plugins\GroupPermissions\Dao\GroupAutoAccess;
 use Piwik\Plugins\GroupPermissions\Dao\GroupCapability;
+use Piwik\Plugins\GroupPermissions\Dao\GroupExternal;
 use Piwik\Plugins\GroupPermissions\Dao\GroupPermission;
 use Piwik\Plugins\GroupPermissions\Dao\GroupReport;
 use Piwik\Plugins\GroupPermissions\Dao\GroupSegment;
@@ -41,6 +42,9 @@ class Model {
 
         $report = new GroupReport();
         $report->install();
+
+        $external = new GroupExternal();
+        $external->install();
     }
 
     public function uninstall(): void {
@@ -64,6 +68,9 @@ class Model {
 
         $report = new GroupReport();
         $report->uninstall();
+
+        $external = new GroupExternal();
+        $external->uninstall();
     }
 
     // Group
@@ -120,14 +127,24 @@ class Model {
     }
 
     // GroupUser
-    public function addUserToGroup(int $idGroup, string $login): void {
+    public function addUserToGroup(int $idGroup, string $login, bool $synced = false): void {
         $user = new GroupUser();
-        $user->addUserToGroup($idGroup, $login);
+        $user->addUserToGroup($idGroup, $login, $synced);
+    }
+
+    /**
+     * @return array<int, bool> whether the membership was added by the group sync, by group id
+     */
+    public function getMembershipsOfUser(string $login): array {
+        $user = new GroupUser();
+
+        return $user->getMembershipsOfUser($login);
     }
 
     /**
      * @return array<array{
-     *    login: string
+     *    login: string,
+     *    synced: bool
      * }>
      */
     public function getMembersOfGroup(int $idGroup): array {
@@ -463,6 +480,43 @@ class Model {
     public function removeAllSharesOfReport(int $idReport): void {
         $groupReport = new GroupReport();
         $groupReport->removeAllSharesOfReport($idReport);
+    }
+
+    // GroupExternal
+    public function addExternalGroupMapping(int $idGroup, string $externalGroup): void {
+        $external = new GroupExternal();
+        $external->addMapping($idGroup, $externalGroup);
+    }
+
+    public function removeExternalGroupMapping(int $idGroup, string $externalGroup): void {
+        $external = new GroupExternal();
+        $external->removeMapping($idGroup, $externalGroup);
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getExternalGroupMappingsOfGroup(int $idGroup): array {
+        $external = new GroupExternal();
+
+        return $external->getMappingsOfGroup($idGroup);
+    }
+
+    /**
+     * @return array<array{
+     *   idgroup: int,
+     *   external_group: string
+     * }>
+     */
+    public function getAllExternalGroupMappings(): array {
+        $external = new GroupExternal();
+
+        return $external->getAllMappings();
+    }
+
+    public function removeAllExternalGroupMappingsOfGroup(int $idGroup): void {
+        $external = new GroupExternal();
+        $external->removeAllMappingsOfGroup($idGroup);
     }
 
     // MultiTable
