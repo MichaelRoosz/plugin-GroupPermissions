@@ -1,5 +1,10 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Şterge"
+        "MatchTypeUrl": "URL site",
+        "Pattern": "Model",
+        "RemoveFromGroup": "Şterge",
+        "Segment": "Segment",
+        "Users": "Utilizatori",
+        "Websites": "Siteuri"
     }
 }
