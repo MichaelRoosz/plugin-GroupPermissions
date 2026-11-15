@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "Esteu segur que voleu donar accés a '%s' al grup '%s' per a tots els llocs web?",
         "CreateNewGroup": "Crear un nou grup",
         "CreateNewGroupButton": "Crear grup",
+        "CreatedBy": "Creat per",
         "DeleteGroup": "Esborrar aquest grup",
         "DeleteGroupButton": "Esborrar grup",
         "DeleteGroupConfirm": "Esteu segur que voleu esborrar el grup '%s'?",
@@ -19,12 +20,19 @@
         "ManageGroup": "Gestiona el grup",
         "ManageGroupMembers": "Gestionar els membres del grup",
         "ManageGroups": "Gestionar els grups",
+        "MatchTypeUrl": "URL del lloc web",
         "MenuGroupPermissions": "Permisos dels grups",
+        "Pattern": "Patró",
         "RemoveFromGroup": "Eliminar",
         "RemoveFromGroupConfirm": "Esteu segur que voleu eliminar l'usuari \"%1$s\" del grup \"%2$s\"?",
         "RenameGroup": "Canvieu el nom d'aquest grup",
         "RenameGroupButton": "Canvia el nom del grup",
         "RenameGroupConfirm": "Esteu segur que voleu canviar el nom del grup \"%1$s\" a \"%2$s\"?",
-        "SelectNewUser": "Seleccioneu un usuari nou"
+        "Segment": "Segment",
+        "Segments": "Segments",
+        "SelectNewUser": "Seleccioneu un usuari nou",
+        "SelectWebsite": "Escolliu un lloc web",
+        "Users": "Usuaris",
+        "Websites": "Llocs web"
     }
 }
