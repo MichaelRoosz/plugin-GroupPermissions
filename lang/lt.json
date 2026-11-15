@@ -1,5 +1,9 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Šalinti"
+        "MatchTypeUrl": "Svetainės URL",
+        "Pattern": "Derinys",
+        "RemoveFromGroup": "Šalinti",
+        "Users": "Naudotojai",
+        "Websites": "Svetainės"
     }
 }
