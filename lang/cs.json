@@ -19,12 +19,19 @@
         "ManageGroup": "Správa skupiny",
         "ManageGroupMembers": "Správa členů skupiny",
         "ManageGroups": "Správa skupin",
+        "MatchTypeUrl": "URL webových stránek",
         "MenuGroupPermissions": "Oprávnění skupin",
+        "Pattern": "Vzor",
         "RemoveFromGroup": "Odstranit",
         "RemoveFromGroupConfirm": "Opravdu chcete odebrat uživatele „%1$s“ ze skupiny „%2$s“?",
         "RenameGroup": "Přejmenovat tuto skupinu",
         "RenameGroupButton": "Přejmenovat skupinu",
         "RenameGroupConfirm": "Opravdu chcete přejmenovat skupinu „%1$s“ na „%2$s“?",
-        "SelectNewUser": "Vyberte nového uživatele"
+        "Segment": "Část",
+        "Segments": "Segmenty",
+        "SelectNewUser": "Vyberte nového uživatele",
+        "SelectWebsite": "Vyberte webovou stránku",
+        "Users": "Uživatelé",
+        "Websites": "Weby"
     }
 }
