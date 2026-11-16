@@ -10,7 +10,6 @@
         "DeleteGroupButton": "Fshije Grupin",
         "DeleteGroupConfirm": "Jeni i sigurt se doni të fshihet grupi “%s”?",
         "DescriptionAccessTab": "Vendosni cilët grupi kanë hyrje te sajtet tuaj. Mundeni edhe të jepni hyrje te krejt sajtet njëherësh, duke zgjedhur “Aplikoje mbi krejt sajtet”, te përzgjedhësi i sajteve.",
-        "DescriptionGroupsTab": "",
         "ExceptionGroupDoesExist": "Grupi ekziston tashmë",
         "ExceptionGroupDoesNotExist": "Grupi s’ekziston",
         "ExceptionUserAlreadyInGroup": "Përdoruesi gjendet tashmë në grup",
