@@ -28,6 +28,7 @@ use Piwik\Plugins\SegmentEditor\Model as SegmentEditorModel;
 use Piwik\Site;
 use Piwik\Tracker\Cache;
 use Piwik\Plugins\UsersManager\API as UsersManagerAPI;
+use Piwik\Plugins\UsersManager\Model as UsersModel;
 use Piwik\Plugins\SitesManager\API as SitesManagerAPI;
 
 class API extends \Piwik\Plugin\API {
@@ -405,9 +406,16 @@ class API extends \Piwik\Plugin\API {
             $usersManagerApi->setUserAccess($userLogin, 'noaccess', $initialIdSite);
         } catch (\Throwable $e) {
             // do not leave an invited user with direct website access or only some of the groups behind
-            $this->rollBackInvite($userLogin, $passwordConfirmation);
+            if (!$this->rollBackInvite($userLogin, $passwordConfirmation)) {
+                throw $e;
+            }
 
-            throw $e;
+            // Matomo has already sent the invitation email, its link no longer works
+            throw new Exception(
+                Piwik::translate('GroupPermissions_ExceptionInviteCancelled', [$userLogin, $e->getMessage()]),
+                0,
+                $e
+            );
         } finally {
             GroupAccessUpdater::reloadAccess();
         }
@@ -415,15 +423,19 @@ class API extends \Piwik\Plugin\API {
 
     /**
      * Removes a user invited by inviteUserToGroups again after a later step failed.
+     *
+     * @return bool whether the user was removed
      */
     private function rollBackInvite(
         string $userLogin,
         #[\SensitiveParameter]
         ?string $passwordConfirmation
-    ): void {
+    ): bool {
         try {
             $this->model->removeUserFromAllGroups($userLogin);
             UsersManagerAPI::getInstance()->deleteUser($userLogin, $passwordConfirmation);
+
+            return true;
         } catch (\Throwable $e) {
             $logger = StaticContainer::get(LoggerInterface::class);
             if ($logger instanceof LoggerInterface) {
@@ -432,6 +444,8 @@ class API extends \Piwik\Plugin\API {
                     ['login' => $userLogin, 'message' => $e->getMessage()]
                 );
             }
+
+            return false;
         }
     }
 
@@ -834,7 +848,10 @@ class API extends \Piwik\Plugin\API {
             }
         }
 
-        $this->model->addExternalGroupMapping($group['idgroup'], $externalGroup);
+        if (!$this->model->addExternalGroupMapping($group['idgroup'], $externalGroup)) {
+            // the database considers it equal to an existing mapping, e.g. `Cafe` and `Café`
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionExternalGroupDoesExist', $externalGroup));
+        }
     }
 
     /**
@@ -907,8 +924,8 @@ class API extends \Piwik\Plugin\API {
      * Copies a dashboard of the current user to all members of a group.
      *
      * Like Dashboard.copyDashboardToUser, the dashboard is only copied to users the current user is allowed to
-     * see (super users see everyone, admins see the users of their websites). The current user and the anonymous
-     * user are skipped.
+     * see (super users see everyone, admins see the users with access to their websites, including access through
+     * groups). The current user and the anonymous user are skipped.
      *
      * @param int $idDashboard Id of the current user's dashboard that should be copied
      * @param int $idGroup Group whose members receive a copy
@@ -956,11 +973,26 @@ class API extends \Piwik\Plugin\API {
             throw new Exception('Dashboard plugin could not be loaded.');
         }
 
+        // websites the current user administers, to also find users who only have access through groups (super
+        // users already see everyone)
+        $adminIdSites = null;
+        if (!Piwik::hasUserSuperUserAccess()) {
+            $adminIdSites = [];
+            foreach (Access::getInstance()->getSitesIdWithAdminAccess() as $idSite) {
+                if (is_numeric($idSite)) {
+                    $adminIdSites[(int) $idSite] = true;
+                }
+            }
+        }
+
         $copiedTo = [];
         foreach ($this->model->getMembersOfGroup($group['idgroup']) as $member) {
             $login = $member['login'];
 
-            if ($login === $currentLogin || $login === 'anonymous' || !isset($visibleLogins[$login])) {
+            if ($login === $currentLogin || $login === 'anonymous') {
+                continue;
+            }
+            if (!isset($visibleLogins[$login]) && !$this->isVisibleThroughGroups($login, $adminIdSites, $currentLogin)) {
                 continue;
             }
 
@@ -969,6 +1001,36 @@ class API extends \Piwik\Plugin\API {
         }
 
         return $copiedTo;
+    }
+
+    /**
+     * Whether a user that Matomo's user list hides from the current (non super) user may be seen anyway, because
+     * a group gives them a role for a website the current user administers. Matomo only considers its own access
+     * table there. Like Matomo, pending invitations are only visible to the user who sent them.
+     *
+     * @param array<int, true>|null $adminIdSites ids of the websites the current user administers as keys, null for
+     *                                           super users
+     */
+    private function isVisibleThroughGroups(string $login, ?array $adminIdSites, string $currentLogin): bool {
+        if (!$adminIdSites) {
+            return false;
+        }
+
+        $user = (new UsersModel())->getUser($login);
+        if (!is_array($user) || !$user) {
+            return false; // deleted
+        }
+        if (!empty($user['invite_token']) && ($user['invited_by'] ?? null) !== $currentLogin) {
+            return false;
+        }
+
+        foreach ($this->model->getPermissionsOfUser($login) as $permission) {
+            if (isset($adminIdSites[$permission['idsite']])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

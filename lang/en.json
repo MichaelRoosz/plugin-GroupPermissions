@@ -44,6 +44,7 @@
         "ExceptionGroupDoesExist": "Group already exists",
         "ExceptionGroupDoesNotExist": "Group does not exists",
         "ExceptionGroupNameTooLong": "The group name is too long (at most %s characters, special characters like quotes count as several characters).",
+        "ExceptionInviteCancelled": "The invitation of %1$s was cancelled because the user could not be added to the groups: %2$s The invitation email that was already sent is no longer valid.",
         "ExceptionInvalidExternalGroups": "The external groups must be a list of group names.",
         "ExceptionInvalidLdapAttribute": "The group membership attribute may only contain letters, digits, hyphens and semicolons.",
         "ExceptionInvalidLdapFilter": "The group search filter must be enclosed in parentheses, e.g. (member=?).",

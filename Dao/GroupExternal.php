@@ -56,11 +56,19 @@ class GroupExternal {
         Db::query(sprintf('DROP TABLE IF EXISTS `%s`', $this->tablePrefixed));
     }
 
-    public function addMapping(int $idGroup, string $externalGroup): void {
+    /**
+     * @return bool false if nothing was stored: the primary key compares the name with the collation of the column,
+     *              which may consider other names equal to an existing mapping (e.g. `Cafe` and `Café` with an
+     *              accent-insensitive collation)
+     */
+    public function addMapping(int $idGroup, string $externalGroup): bool {
         Db::query(
             "INSERT IGNORE INTO `{$this->tablePrefixed}` (idgroup, external_group) VALUES (?, ?)",
             [$idGroup, $externalGroup]
         );
+
+        // compared in PHP, independent of the collation
+        return in_array($externalGroup, $this->getMappingsOfGroup($idGroup), true);
     }
 
     public function removeMapping(int $idGroup, string $externalGroup): void {

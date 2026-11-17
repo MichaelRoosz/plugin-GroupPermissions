@@ -51,6 +51,21 @@ test.describe('Group sync from external directories', () => {
     expect(await su.expectError('GroupPermissions.addExternalGroupMapping', {
       idGroup: group.idGroup, externalGroup: 'r&d "TEAM" <X>',
     })).toContain('already mapped');
+    // the database may consider names equal that differ in more than case (e.g. accents): then adding fails
+    // instead of reporting success without storing the mapping
+    await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'Café' });
+    const accentError = await su.expectError('GroupPermissions.addExternalGroupMapping', {
+      idGroup: group.idGroup, externalGroup: 'Cafe',
+    }).catch(() => null);
+    if (accentError === null) {
+      expect(await mappings(group.idGroup)).toContain('Cafe');
+      await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'Cafe' });
+    } else {
+      expect(accentError).toContain('already mapped');
+    }
+    await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'Café' });
+    expect(await mappings(group.idGroup)).toEqual(['R&D "Team" <x>']);
+
     expect(await su.expectError('GroupPermissions.addExternalGroupMapping', {
       idGroup: group.idGroup, externalGroup: '   ',
     })).toMatch(/Please (enter|specify)/);

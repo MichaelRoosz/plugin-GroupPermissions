@@ -104,6 +104,8 @@ check "group access to the deleted website is left behind" "1" "$(sql "SELECT CO
 echo "==> Activating the plugin again"
 mexec ./console plugin:activate GroupPermissions >/dev/null
 check "group access applies again" "$id_site" "$(member_sites)"
+check "the overview does not count the deleted website" "1" "$(su GroupPermissions.getGroupsOverview --data-urlencode "filter_limit=-1" \
+    | grep -cE "\"idGroup\":$id_group,\"name\":\"[^\"]*\",\"memberCount\":[0-9]+,\"siteCount\":1}" || true)"
 check "group still has its member" "1" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$member\"")"
 check "membership of a deleted user can be removed" "1" "$(su GroupPermissions.removeUserFromGroup --data-urlencode "idGroup=$id_group" \
     --data-urlencode "login=$gone_member" | grep -c '"success"' || true)"

@@ -189,6 +189,31 @@ test.describe('Copy dashboard to group', () => {
       expect(await dashboardNames(su, SUPERUSER.login)).not.toContain(`Admin copy ${RUN_ID}`);
     });
 
+    test('site admins also copy to members who only have access through a group', async () => {
+      const idSite = await su.createSite('Dashboard Group Admin Site');
+      const adminLogin = await su.createUser('dash_gadmin');
+      await su.setUserAccess(adminLogin, 'admin', idSite);
+      const viaGroup = await su.createUser('dash_viagroup');
+      const noAccess = await su.createUser('dash_noaccess');
+      const viewers = await su.createGroup('Dashboard Viewers');
+      await su.addMembers(viewers.idGroup, [viaGroup]);
+      await su.call('GroupPermissions.setGroupAccessById', { idGroup: viewers.idGroup, access: 'view', idSites: idSite });
+      const copyGroup = await su.createGroup('Dashboard Copy Group');
+      await su.addMembers(copyGroup.idGroup, [viaGroup, noAccess]);
+
+      const admin = await MatomoApi.forUser(adminLogin, DEFAULT_PASSWORD);
+      const adminDashboard = await createDashboard(admin, adminLogin, 'Group admin source');
+
+      const copiedTo = await admin.call('GroupPermissions.copyDashboardToGroup', {
+        idDashboard: adminDashboard,
+        idGroup: copyGroup.idGroup,
+        dashboardName: `Group admin copy ${RUN_ID}`,
+      });
+      expect(copiedTo).toEqual([viaGroup]);
+      expect(await dashboardNames(su, viaGroup)).toContain(`Group admin copy ${RUN_ID}`);
+      expect(await dashboardNames(su, noAccess)).not.toContain(`Group admin copy ${RUN_ID}`);
+    });
+
     test('users without admin access cannot copy dashboards to groups', async () => {
       const viewer = await su.createUser('dash_viewer');
       await su.setUserAccess(viewer, 'view', 1);

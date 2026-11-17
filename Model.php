@@ -488,9 +488,13 @@ class Model {
     }
 
     // GroupExternal
-    public function addExternalGroupMapping(int $idGroup, string $externalGroup): void {
+    /**
+     * @return bool false if the database considers the name equal to an existing mapping of the group
+     */
+    public function addExternalGroupMapping(int $idGroup, string $externalGroup): bool {
         $external = new GroupExternal();
-        $external->addMapping($idGroup, $externalGroup);
+
+        return $external->addMapping($idGroup, $externalGroup);
     }
 
     public function removeExternalGroupMapping(int $idGroup, string $externalGroup): void {

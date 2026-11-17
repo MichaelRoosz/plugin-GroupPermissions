@@ -70,12 +70,18 @@ class GroupPermission {
     }
 
     /**
+     * Websites deleted while this plugin was deactivated are not counted (their rows never grant access).
+     *
      * @return array<int, int> number of websites with access by group id (groups without access are missing)
      */
     public function countSitesPerGroup(): array {
         $table = $this->tablePrefixed;
+        $tableSite = Common::prefixTable('site');
+        $sql = "SELECT ga.idgroup, COUNT(*) AS cnt FROM $table AS ga
+                INNER JOIN $tableSite AS s ON s.idsite = ga.idsite
+                GROUP BY ga.idgroup";
         $counts = [];
-        foreach (Rows::list(Db::fetchAll("SELECT idgroup, COUNT(*) AS cnt FROM $table GROUP BY idgroup")) as $row) {
+        foreach (Rows::list(Db::fetchAll($sql)) as $row) {
             $counts[Rows::int($row, 'idgroup')] = Rows::int($row, 'cnt');
         }
 
