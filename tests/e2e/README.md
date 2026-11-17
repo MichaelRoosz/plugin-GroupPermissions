@@ -14,6 +14,7 @@ tests/e2e/bin/run.sh                           # fresh Matomo, all specs
 tests/e2e/bin/run.sh specs/invite-user.spec.ts # a single spec (extra args go to `playwright test`)
 tests/e2e/bin/integration-test.sh              # only the login plugin integration specs (Matomo must be running)
 KEEP_ENV=1 tests/e2e/bin/run.sh                # reuse the running instance (faster)
+tests/e2e/bin/marketplace-screenshots.sh       # regenerate the Marketplace screenshots in the plugin's screenshots/
 ```
 
 Results:
@@ -50,6 +51,7 @@ The database lives on tmpfs, so `teardown.sh` discards all data.
 | `bin/setup.sh` | starts the containers, copies the plugin, installs Matomo, activates the plugin |
 | `bin/lifecycle-test.sh` | deactivate / activate / uninstall / reinstall checks (run by `run.sh` after a full run) |
 | `bin/integration-test.sh` | group sync with the login plugins LoginLdap, LoginOIDC, RebelOIDC and LoginSaml (run by `run.sh` after a full run, skip with `INTEGRATIONS=0`): starts OpenLDAP, a mock OpenID Connect provider and SimpleSAMLphp (profile `integrations`), installs the pinned plugin releases, runs `specs-integrations/` and removes the plugins again. LoginSaml is paid and cannot be downloaded: its specs only run with a licensed copy for Matomo 5 in `LOGINSAML_DIR` (default `tmp/5.5.11/LoginSaml`, git-ignored, never commit it) |
+| `bin/marketplace-screenshots.sh`, `specs-screenshots/`, `playwright.screenshots.config.ts` | Marketplace screenshots (`screenshots/`, file name = caption) from the demo data of `start.sh` plus segments, reports, rules, capabilities and directory groups added by the spec |
 | `saml/authsources.php` | users and group attributes of the SAML identity provider |
 | `specs-integrations/`, `playwright.integrations.config.ts` | specs needing the login plugins |
 | `global-setup.ts` | logs in the super user once and stores the session |
@@ -64,6 +66,7 @@ The database lives on tmpfs, so `teardown.sh` discards all data.
 | `specs/segments.spec.ts` | sharing segments with groups: visibility for members, permissions, cleanup, group editor |
 | `specs/scheduled-reports.spec.ts` | shared ownership of scheduled reports: members view/edit/send/delete, permissions, request cache, cleanup, UI |
 | `specs/special-characters.spec.ts` | group names with HTML, quotes, `&`, unicode: stored as-is, rendered as text (no XSS) |
+| `specs/tracking.spec.ts` | tracking requests with the token_auth of group members (write/admin through a group) |
 | `specs/translations.spec.ts` | all used translation keys exist and are registered, placeholders match, German UI has no raw keys |
 | `specs/overview.spec.ts` | menu entry, main group workflow, overview screenshots |
 | `specs/page-access.spec.ts` | who can open the admin page and what they see |

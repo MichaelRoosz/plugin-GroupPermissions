@@ -244,6 +244,7 @@ A Docker based Matomo test instance and Playwright end-to-end tests live in `tes
 ```bash
 tests/e2e/bin/start.sh      # Matomo with the plugin and demo data on http://localhost:8089
 tests/e2e/bin/run.sh        # run all tests in docker, screenshots end up in tests/e2e/screenshots
+tests/e2e/bin/marketplace-screenshots.sh  # regenerate the Marketplace screenshots in screenshots/
 tests/e2e/bin/teardown.sh   # stop everything
 ```
 
