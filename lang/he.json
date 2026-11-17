@@ -1,5 +1,8 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "מחיקה"
+        "RemoveFromGroup": "מחיקה",
+        "Segment": "מקטע",
+        "Users": "משתמשים",
+        "Websites": "אתרים"
     }
 }

@@ -1,5 +1,11 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Fjern"
+        "MatchTypeUrl": "Hjemmesidens URL",
+        "Pattern": "Mønster",
+        "RemoveFromGroup": "Fjern",
+        "Segment": "Segment",
+        "Segments": "Segmenter",
+        "Users": "Brugere",
+        "Websites": "Hjemmesider"
     }
 }

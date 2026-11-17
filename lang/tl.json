@@ -1,5 +1,8 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Tanggalin"
+        "RemoveFromGroup": "Tanggalin",
+        "Segment": "Bahagi",
+        "Users": "Users",
+        "Websites": "Websites"
     }
 }

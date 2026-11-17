@@ -1,5 +1,11 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Ukloni"
+        "MatchTypeUrl": "Adresa sajta",
+        "Pattern": "Obrazac",
+        "RemoveFromGroup": "Ukloni",
+        "Segment": "Segment",
+        "Segments": "Segmenti",
+        "Users": "Korisnici",
+        "Websites": "Sajtovi"
     }
 }

@@ -18,11 +18,18 @@
         "ManageGroup": "Mengelola grup",
         "ManageGroupMembers": "Mengelola anggota grup",
         "ManageGroups": "Mengelola Grup",
+        "MatchTypeUrl": "URL Situs Web",
         "MenuGroupPermissions": "Izin Grup",
+        "Pattern": "Pola",
         "RemoveFromGroup": "Hapus",
         "RemoveFromGroupConfirm": "Apakah Anda yakin ingin menghapus pengguna '%1$s' dari grup '%2$s'?",
         "RenameGroup": "Mengganti nama grup ini",
         "RenameGroupButton": "Ganti Nama Grup",
-        "RenameGroupConfirm": "Apakah Anda yakin ingin mengganti nama grup '%1$s' menjadi '%2$s'?"
+        "RenameGroupConfirm": "Apakah Anda yakin ingin mengganti nama grup '%1$s' menjadi '%2$s'?",
+        "Segment": "Segmen",
+        "Segments": "Segmen",
+        "SelectWebsite": "Pilih situs web",
+        "Users": "Pengguna",
+        "Websites": "Situs Web"
     }
 }

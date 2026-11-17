@@ -1,5 +1,9 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "हटाना"
+        "Pattern": "प्रतिमान",
+        "RemoveFromGroup": "हटाना",
+        "Segment": "खंड",
+        "Users": "उपयोगकर्ता",
+        "Websites": "वेबसाइटें"
     }
 }

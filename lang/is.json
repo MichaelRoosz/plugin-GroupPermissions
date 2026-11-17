@@ -1,1 +1,7 @@
-{}
+{
+    "GroupPermissions": {
+        "Pattern": "Mynstur",
+        "Users": "Notendur",
+        "Websites": "Vefir"
+    }
+}

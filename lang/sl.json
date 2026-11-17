@@ -1,5 +1,9 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Odstrani"
+        "Pattern": "Vzorec",
+        "RemoveFromGroup": "Odstrani",
+        "Segment": "Segment",
+        "Users": "Uporabniki",
+        "Websites": "Spletne strani"
     }
 }

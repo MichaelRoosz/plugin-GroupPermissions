@@ -1,1 +1,7 @@
-{}
+{
+    "GroupPermissions": {
+        "Pattern": "Шаблон",
+        "Users": "Карыстачы",
+        "Websites": "Вэб-сайты"
+    }
+}

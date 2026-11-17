@@ -5,11 +5,11 @@
         "ChangeAccessToAllSitesConfirm": "Jeni i sigurt se doni t’i jepet “%s” hyrje te grupi '%s' për krejt sajtet?",
         "CreateNewGroup": "Krijoni grup të ri",
         "CreateNewGroupButton": "Krijoni Grup",
+        "CreatedBy": "Krijuar nga",
         "DeleteGroup": "Fshije këtë grup",
         "DeleteGroupButton": "Fshije Grupin",
         "DeleteGroupConfirm": "Jeni i sigurt se doni të fshihet grupi “%s”?",
         "DescriptionAccessTab": "Vendosni cilët grupi kanë hyrje te sajtet tuaj. Mundeni edhe të jepni hyrje te krejt sajtet njëherësh, duke zgjedhur “Aplikoje mbi krejt sajtet”, te përzgjedhësi i sajteve.",
-        "DescriptionGroupsTab": "Këtu mund të hidhni një sy te krejt anëtarët e çdo grupi. Grupet mund t’i përpunojnë superpërdoruesit.",
         "ExceptionGroupDoesExist": "Grupi ekziston tashmë",
         "ExceptionGroupDoesNotExist": "Grupi s’ekziston",
         "ExceptionUserAlreadyInGroup": "Përdoruesi gjendet tashmë në grup",
@@ -19,12 +19,18 @@
         "ManageGroup": "Administroni grup",
         "ManageGroupMembers": "Administroni anëtarë grupi",
         "ManageGroups": "Administroni Grupe",
+        "MatchTypeUrl": "URL sajti",
         "MenuGroupPermissions": "Leje Grupi",
+        "Pattern": "Mostër",
         "RemoveFromGroup": "Hiqe",
         "RemoveFromGroupConfirm": "Jeni i sigurt se doni të hiqet përdoruesi “%1$s” nga grupi “%2$s”?",
         "RenameGroup": "Riemërtojeni këtë grup",
         "RenameGroupButton": "Riemërtoje Grupin",
         "RenameGroupConfirm": "Jeni i sigurt se doni të riemërtoni grupin “%1$s” si “%2$s”?",
-        "SelectNewUser": "Përzgjidhni përdorues të ri"
+        "Segments": "Segmente",
+        "SelectNewUser": "Përzgjidhni përdorues të ri",
+        "SelectWebsite": "Përzgjidhni një sajt",
+        "Users": "Përdorues",
+        "Websites": "Sajte"
     }
 }

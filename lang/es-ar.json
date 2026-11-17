@@ -1,5 +1,11 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Quitar"
+        "MatchTypeUrl": "Dirección web del sitio",
+        "Pattern": "Patrón",
+        "RemoveFromGroup": "Quitar",
+        "Segment": "Segmento",
+        "Segments": "Segmentos",
+        "Users": "Usuarios",
+        "Websites": "Sitios web"
     }
 }

@@ -1,6 +1,13 @@
 {
     "GroupPermissions": {
+        "MatchTypeUrl": "URL веб-сайту",
+        "Pattern": "Шаблон",
         "RemoveFromGroup": "Видалити",
-        "RenameGroupConfirm": "Ви впевнені, що хочете перейменувати групу «%1$s» на «%2$s»?"
+        "RenameGroupConfirm": "Ви впевнені, що хочете перейменувати групу «%1$s» на «%2$s»?",
+        "Segment": "Сегмент",
+        "Segments": "Сегменти",
+        "SelectWebsite": "Вибрати вебсайт",
+        "Users": "Користувачі",
+        "Websites": "Сайти"
     }
 }
