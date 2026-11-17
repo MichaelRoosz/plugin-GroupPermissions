@@ -258,9 +258,9 @@ export default defineComponent({
     saveAccess(idSites: number|string, siteName: string, access: string) {
       this.isSaving = true;
       AjaxHelper.post({
-        method: 'GroupPermissions.setGroupAccess',
+        method: 'GroupPermissions.setGroupAccessById',
       }, {
-        name: this.group.name,
+        idGroup: this.group.idGroup,
         access,
         idSites,
       }, {

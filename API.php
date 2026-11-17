@@ -18,6 +18,7 @@ use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
 use Piwik\Db;
 use Piwik\API\Request;
+use Piwik\Log\LoggerInterface;
 use Piwik\Piwik;
 use Piwik\Plugin\Manager as PluginManager;
 use Piwik\Plugins\Dashboard\Dashboard;
@@ -395,14 +396,43 @@ class API extends \Piwik\Plugin\API {
         $usersManagerApi = UsersManagerAPI::getInstance();
         $usersManagerApi->inviteUser($userLogin, $email, $initialIdSite, $expiryInDays, $passwordConfirmation);
 
-        // permissions are granted through the groups only, remove the initial direct access again
-        $usersManagerApi->setUserAccess($userLogin, 'noaccess', $initialIdSite);
+        try {
+            foreach ($idGroups as $idGroup) {
+                $this->model->addUserToGroup($idGroup, $userLogin);
+            }
 
-        foreach ($idGroups as $idGroup) {
-            $this->model->addUserToGroup($idGroup, $userLogin);
+            // permissions are granted through the groups only, remove the initial direct access again
+            $usersManagerApi->setUserAccess($userLogin, 'noaccess', $initialIdSite);
+        } catch (\Throwable $e) {
+            // do not leave an invited user with direct website access or only some of the groups behind
+            $this->rollBackInvite($userLogin, $passwordConfirmation);
+
+            throw $e;
+        } finally {
+            GroupAccessUpdater::reloadAccess();
         }
+    }
 
-        GroupAccessUpdater::reloadAccess();
+    /**
+     * Removes a user invited by inviteUserToGroups again after a later step failed.
+     */
+    private function rollBackInvite(
+        string $userLogin,
+        #[\SensitiveParameter]
+        ?string $passwordConfirmation
+    ): void {
+        try {
+            $this->model->removeUserFromAllGroups($userLogin);
+            UsersManagerAPI::getInstance()->deleteUser($userLogin, $passwordConfirmation);
+        } catch (\Throwable $e) {
+            $logger = StaticContainer::get(LoggerInterface::class);
+            if ($logger instanceof LoggerInterface) {
+                $logger->warning(
+                    'GroupPermissions: could not remove the invited user {login} after the invitation failed: {message}',
+                    ['login' => $userLogin, 'message' => $e->getMessage()]
+                );
+            }
+        }
     }
 
     public function removeUserFromGroup(int $idGroup, string $login): void {
@@ -424,18 +454,46 @@ class API extends \Piwik\Plugin\API {
         GroupAccessUpdater::reloadAccess();
     }
 
+    /**
+     * Sets the role of a group, identified by its name, for websites.
+     *
+     * Prefer setGroupAccessById: names are compared case-insensitively, and installations created before group
+     * names had to be unique may contain several groups with the same name (an exact match of the name wins).
+     *
+     * @param string $name
+     * @param string $access Role ("view", "write", "admin") or "noaccess"
+     * @param string $idSites Website ID, comma separated list of website IDs or "all"
+     */
     public function setGroupAccess(string $name, string $access, string $idSites): void {
         Piwik::checkUserHasSomeAdminAccess();
-
-        if ($access != 'noaccess') {
-            $this->checkAccessType($access);
-        }
 
         $group = $this->model->getGroupWithName($name);
         if (empty($group['idgroup'])) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $name));
         }
-        $idGroup = $group['idgroup'];
+
+        $this->updateGroupAccess($group['idgroup'], $access, $idSites);
+    }
+
+    /**
+     * Sets the role of a group for websites.
+     *
+     * @param int $idGroup
+     * @param string $access Role ("view", "write", "admin") or "noaccess"
+     * @param string $idSites Website ID, comma separated list of website IDs or "all"
+     */
+    public function setGroupAccessById(int $idGroup, string $access, string $idSites): void {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $group = $this->getGroupOrFail($idGroup);
+
+        $this->updateGroupAccess($group['idgroup'], $access, $idSites);
+    }
+
+    private function updateGroupAccess(int $idGroup, string $access, string $idSites): void {
+        if ($access !== 'noaccess') {
+            $this->checkAccessType($access);
+        }
 
         $idSites = $this->getIdSitesCheckAdminAccess($idSites);
 
@@ -455,7 +513,7 @@ class API extends \Piwik\Plugin\API {
         $groupName = $this->checkGroupName($groupName);
 
         $idGroup = $this->withGroupNameLock(function () use ($groupName): int {
-            if ($this->findGroupWithName($groupName)) {
+            if ($this->isGroupNameTaken($groupName)) {
                 throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesExist', $groupName));
             }
 
@@ -483,10 +541,8 @@ class API extends \Piwik\Plugin\API {
         $idGroup = $group['idgroup'];
 
         $this->withGroupNameLock(function () use ($idGroup, $newName): void {
-            $existingGroup = $this->findGroupWithName($newName);
-
-            // names are compared case-insensitively, so changing only the case finds the group itself
-            if ($existingGroup && $existingGroup['idgroup'] !== $idGroup) {
+            // names are compared case-insensitively, changing only the case of the name is allowed
+            if ($this->isGroupNameTaken($newName, $idGroup)) {
                 throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesExist', $newName));
             }
 
@@ -1372,17 +1428,17 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
-     * @return ?array{
-     *   idgroup: int,
-     *   name: string
-     * }
+     * Whether another group already has the name (case-insensitive, like Dao\Group::getGroupWithName)
      */
-    private function findGroupWithName(string $name): ?array {
-        try {
-            return $this->model->getGroupWithName($name);
-        } catch (Exception $e) {
-            return null;
+    private function isGroupNameTaken(string $name, ?int $exceptIdGroup = null): bool {
+        $folded = mb_strtolower($name);
+        foreach ($this->model->getAllGroups() as $group) {
+            if ($group['idgroup'] !== $exceptIdGroup && mb_strtolower($group['name']) === $folded) {
+                return true;
+            }
         }
+
+        return false;
     }
 
     /**

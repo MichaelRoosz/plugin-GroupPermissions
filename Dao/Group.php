@@ -60,7 +60,7 @@ class Group {
     public function getAllGroups(): array {
         $table = $this->tablePrefixed;
 
-        $rows = Rows::list(Db::fetchAll("SELECT * FROM $table"));
+        $rows = Rows::list(Db::fetchAll("SELECT * FROM $table ORDER BY idgroup"));
 
         return array_map([$this, 'mapGroup'], $rows);
     }
@@ -90,14 +90,26 @@ class Group {
      * }
      */
     public function getGroupWithName(string $name): array {
-        $table = $this->tablePrefixed;
+        // Compared in PHP rather than with `name = ?`: the result of the SQL comparison depends on the collation
+        // of the column (e.g. utf8mb4_0900_ai_ci also ignores accents, so `Cafe` would find `Café`). Names are
+        // case-insensitive; installations may contain several groups with the same name from before names had to
+        // be unique, then an exact match wins, otherwise the oldest group.
+        $folded = mb_strtolower($name);
+        $match = null;
+        foreach ($this->getAllGroups() as $group) {
+            if ($group['name'] === $name) {
+                return $group;
+            }
+            if ($match === null && mb_strtolower($group['name']) === $folded) {
+                $match = $group;
+            }
+        }
 
-        $group = Rows::row(Db::fetchRow("SELECT * FROM $table WHERE name = ?", [$name]));
-        if (!$group) {
+        if ($match === null) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $name));
         }
 
-        return $this->mapGroup($group);
+        return $match;
     }
 
     public function renameGroup(int $idGroup, string $newName): void {

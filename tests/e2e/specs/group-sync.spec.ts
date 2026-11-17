@@ -200,6 +200,8 @@ test.describe('Group sync from external directories', () => {
       await expect(toast(page, `Users in the external group '${external}' now become members of the group '${group.name}'`)).toBeVisible();
       await expect(page.locator('tr.groupPermissionsExternalGroupRow td.externalGroup')).toHaveText([external]);
       expect(await mappings(group.idGroup)).toEqual([external]);
+      // a DN gets no warning
+      await expect(page.locator('.groupPermissionsPlainNameWarning')).toHaveCount(0);
       await screenshot(page.locator('.groupPermissionsEditGroup'), 'group-editor-directory-sync');
 
       // the URL keeps the section
@@ -225,6 +227,25 @@ test.describe('Group sync from external directories', () => {
       await expect(toast(page, `is no longer mapped to the group '${group.name}'`)).toBeVisible();
       await expect(page.locator('.groupPermissionsExternalGroupsTable .groupPermissionsEmpty')).toBeVisible();
       expect(await mappings(group.idGroup)).toEqual([]);
+    });
+
+    test('mappings of plain names show a warning that they match LDAP groups with that name anywhere', async ({ page }) => {
+      const group = await su.createGroup('Sync UI plain');
+      const plain = `Plain ${RUN_ID}`;
+      await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: `CN=Dn ${RUN_ID},DC=example` });
+      await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: plain });
+
+      await openGroupEditor(page, group.idGroup, 'sync');
+      await waitForIdle(page);
+      const warning = page.locator('.groupPermissionsPlainNameWarning');
+      await expect(warning).toContainText(`${plain}: names without a distinguished name also match every LDAP group`);
+      await expect(warning).not.toContainText(`CN=Dn ${RUN_ID}`);
+
+      await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: plain });
+      await page.reload();
+      await waitForIdle(page);
+      await expect(page.locator('tr.groupPermissionsExternalGroupRow')).toHaveCount(1);
+      await expect(warning).toHaveCount(0);
     });
   });
 });

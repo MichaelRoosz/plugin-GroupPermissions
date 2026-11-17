@@ -136,6 +136,61 @@ test.describe('Group management API', () => {
     await su.call('GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: upper });
   });
 
+  test('setGroupAccessById sets the role of a group by its ID', async () => {
+    const group = await su.createGroup('By id');
+    const idSite = await su.createSite('By Id Site');
+    const role = async () => (await su.call('GroupPermissions.getSitesAccessFromGroup', { idGroup: group.idGroup }))
+      .find((s: { idSite: number }) => s.idSite === idSite)?.access;
+
+    await su.call('GroupPermissions.setGroupAccessById', { idGroup: group.idGroup, access: 'write', idSites: String(idSite) });
+    expect(await role()).toBe('write');
+    await su.call('GroupPermissions.setGroupAccessById', { idGroup: group.idGroup, access: 'noaccess', idSites: String(idSite) });
+    expect(await role()).toBeUndefined();
+
+    expect(await su.expectError('GroupPermissions.setGroupAccessById', { idGroup: 999999, access: 'view', idSites: String(idSite) }))
+      .toMatch(/Group does not exist/);
+    expect(await su.expectError('GroupPermissions.setGroupAccessById', { idGroup: group.idGroup, access: 'owner', idSites: String(idSite) }))
+      .toMatch(/owner/);
+
+    // like setGroupAccess, only for websites the user administers
+    const viewer = await su.createUser('by_id_viewer');
+    await su.setUserAccess(viewer, 'view', idSite);
+    const viewerApi = await MatomoApi.forUser(viewer, 'secretPass1!');
+    expect(await viewerApi.expectError('GroupPermissions.setGroupAccessById', {
+      idGroup: group.idGroup, access: 'admin', idSites: String(idSite),
+    })).toMatch(/admin/i);
+    expect(await role()).toBeUndefined();
+  });
+
+  test('group names are compared case-insensitively, but not accent-insensitively', async () => {
+    const plain = await su.call('GroupPermissions.createGroup', { groupName: `Cafe ${RUN_ID}` });
+    // the database collation may ignore accents, the plugin does not
+    const accented = await su.call('GroupPermissions.createGroup', { groupName: `Café ${RUN_ID}` });
+    expect(accented.idGroup).not.toBe(plain.idGroup);
+    expect(await su.expectError('GroupPermissions.createGroup', { groupName: `CAFÉ ${RUN_ID}` })).toMatch(/Group already exists/);
+    expect(await su.expectError('GroupPermissions.renameGroup', { idGroup: plain.idGroup, newName: `café ${RUN_ID}` }))
+      .toMatch(/Group already exists/);
+
+    const idSite = await su.createSite('Accent Site');
+    await su.setGroupAccess(`CAFÉ ${RUN_ID}`, 'view', idSite);
+    const access = await su.call('GroupPermissions.getGroupPermissionsFromSite', { idSite });
+    expect(access.find((g: { idGroup: number }) => g.idGroup === accented.idGroup).access).toBe('view');
+    expect(access.find((g: { idGroup: number }) => g.idGroup === plain.idGroup).access).toBe('noaccess');
+  });
+
+  test('concurrent addUserToGroup requests for the same user add one membership without a database error', async () => {
+    const group = await su.createGroup('Concurrent members');
+    const login = await su.createUser('concurrent_member');
+    const results = await Promise.allSettled(
+      Array.from({ length: 6 }, () => su.call('GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login })),
+    );
+    for (const result of results) {
+      if (result.status === 'rejected') expect(String(result.reason)).toMatch(/User is already in group/);
+    }
+    expect(results.some((r) => r.status === 'fulfilled')).toBe(true);
+    expect(await su.members(group.idGroup)).toEqual([login]);
+  });
+
   test('deleteGroup removes the group, its members and its permissions', async () => {
     const group = await su.createGroup('Delete me');
     const idSite = await su.createSite('Delete Group Site');

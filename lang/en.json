@@ -73,6 +73,7 @@
         "GroupSync": "Directory sync",
         "GroupSyncDescription": "Users in one of these external groups automatically become members of this group when their groups are synchronized: when they log in via LDAP, OpenID Connect or SAML (if enabled in the general settings), when another login plugin triggers the sync, or via the API method GroupPermissions.syncUserGroups. Members added by the sync are removed again when they are no longer in a mapped group; members added manually are kept.",
         "GroupSyncHelpNames": "Enter the name of the group as sent by the identity provider (e.g. the value of the groups claim or SAML attribute), or the distinguished name of an LDAP group. Names are case-insensitive, and a DN like CN=Matomo Admins,OU=Groups,DC=example,DC=com also matches its first value (Matomo Admins).",
+        "GroupSyncPlainNameWarning": "%1$s: names without a distinguished name also match every LDAP group whose first value is this name, in any part of the directory (e.g. both CN=Admins,OU=Staff,... and CN=Admins,OU=Contractors,...). Users in any of these LDAP groups become members. If you sync from LDAP, map the full distinguished name instead.",
         "Groups": "Groups",
         "IncludedInGroupRole": "included in the role of the group",
         "InviteUser": "Invite a new user to groups",

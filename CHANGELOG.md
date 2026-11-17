@@ -12,6 +12,7 @@ New features (requires a database update):
   - Invite new users directly into groups
   - Copy dashboards to all members of a group
   - New API methods for all of the above
+  - `setGroupAccessById` sets the role of a group by its ID (the UI uses it, so groups with the same name from older versions are no longer mixed up)
 
 Security:
   - `getAllGroups` and `getGroupWithId` require admin access (previously any user could read groups, members and permissions). Thanks to [ipankwave88](https://github.com/ipankwave88) for reporting this
@@ -21,6 +22,8 @@ Fixes:
   - Members of groups with write/admin access can use their token_auth for tracking requests that need one (e.g. log imports)
   - Capabilities given directly to a user were lost when the user was also in a group with website access
   - Group names with `&`, quotes or `<`/`>` could not be managed on Manage Access; names are trimmed, empty or overlong names are rejected, case-only renames work
+  - Group names must be unique (case-insensitive), also when groups are created or renamed at the same time; names are no longer matched accent-insensitively depending on the database collation
+  - Adding a member that the directory sync added makes the membership a manual one, which the sync keeps
   - "Send now" failed for reports scheduled "Never"
   - Website IDs that do not exist are rejected; better error messages for invalid access values
   - Manage Access opens with the website from the URL

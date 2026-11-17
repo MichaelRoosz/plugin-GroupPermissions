@@ -1,6 +1,6 @@
 import { test, expect, Browser } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
-import { DEFAULT_PASSWORD, RUN_ID, superUserStorageState } from '../helpers/env';
+import { DEFAULT_PASSWORD, RUN_ID, SUPERUSER, superUserStorageState } from '../helpers/env';
 import { waitForMessageTo } from '../helpers/mailpit';
 import {
   chooseOption, clickModalButton, login, openGroupEditor, saveButton, screenshot, switchEditorTab, toast, waitForIdle,
@@ -371,6 +371,41 @@ test.describe('Shared ownership of scheduled reports', () => {
       expect(response.ok).toBe(true);
       expect(await response.text()).toContain(`Segmented taken over ${idReport} ${RUN_ID}`);
     }
+  });
+
+  test('a private segment of another user in a report of a deleted super user is copied for the new owner', async () => {
+    const leaver = await su.createUser('rep_superleaver');
+    await su.call('UsersManager.setSuperUserAccess', {
+      userLogin: leaver, hasSuperUserAccess: 1, passwordConfirmation: SUPERUSER.password,
+    });
+    const leaverApi = await MatomoApi.forUser(leaver, DEFAULT_PASSWORD);
+
+    // a private segment of the owner, which only super users can use in their reports
+    const idSegment = await addSegment(api[owner], 'Owner Segment For Super User');
+    const idReport = await addReport(leaverApi, 'Super User Segmented', idSite, { idSegment });
+    await share(leaverApi, idReport);
+
+    await su.call('UsersManager.setSuperUserAccess', {
+      userLogin: leaver, hasSuperUserAccess: 0, passwordConfirmation: SUPERUSER.password,
+    });
+    await su.deleteUser(leaver);
+
+    const report = await reportAsSuperUser(idReport);
+    expect(report.login).toBe(member);
+    const idCopy = Number(report.idsegment);
+    expect(idCopy).not.toBe(idSegment);
+    const original = await su.call('SegmentEditor.get', { idSegment });
+    expect(original.login).toBe(owner);
+    expect(await su.call('SegmentEditor.get', { idSegment: idCopy }))
+      .toMatchObject({ login: member, definition: original.definition, name: original.name });
+
+    await api[member].call('ScheduledReports.updateReport', {
+      idReport, ...reportParams(`Super user report taken over ${RUN_ID}`, idSite, { idSegment: idCopy }),
+    });
+    const response = await api[member].fetchRaw('ScheduledReports.generateReport', {
+      idReport, date: 'yesterday', outputType: 3, format: 'html',
+    });
+    expect(response.ok).toBe(true);
   });
 
   test('a member edits a shared report on the "Email reports" page', async ({ browser }) => {

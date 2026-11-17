@@ -42,9 +42,12 @@ class GroupUser {
         Db::query(sprintf('DROP TABLE IF EXISTS `%s`', $this->tablePrefixed));
     }
 
+    /**
+     * Does nothing if the user is already a member (e.g. added by a concurrent request), keeping that membership.
+     */
     public function addUserToGroup(int $idGroup, string $login, bool $synced = false): void {
         Db::query(
-            "INSERT INTO `{$this->tablePrefixed}` (idgroup, login, synced) VALUES (?, ?, ?)",
+            "INSERT IGNORE INTO `{$this->tablePrefixed}` (idgroup, login, synced) VALUES (?, ?, ?)",
             [$idGroup, $login, $synced ? 1 : 0]
         );
     }

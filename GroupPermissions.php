@@ -142,6 +142,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_GroupSync';
         $translations[] = 'GroupPermissions_GroupSyncDescription';
         $translations[] = 'GroupPermissions_GroupSyncHelpNames';
+        $translations[] = 'GroupPermissions_GroupSyncPlainNameWarning';
         $translations[] = 'GroupPermissions_Groups';
         $translations[] = 'GroupPermissions_IncludedInGroupRole';
         $translations[] = 'GroupPermissions_InviteUser';

@@ -107,17 +107,17 @@
           </tr>
           <tr
             v-for="group in filteredGroupAccess"
-            :key="group.name"
+            :key="group.idGroup"
             class="groupPermissionsAccessRow"
           >
             <td class="groupName">{{ group.name }}</td>
             <td class="access-cell">
               <Field
-                :key="`${group.name}-${rowVersions[group.name] || 0}`"
+                :key="`${group.idGroup}-${rowVersions[group.idGroup] || 0}`"
                 uicontrol="select"
-                :name="`groupPermissionsAccess${rowIndex(group.name)}`"
+                :name="`groupPermissionsAccess${rowIndex(group.idGroup)}`"
                 :model-value="group.access"
-                @update:model-value="onRoleSelected(group.name, $event)"
+                @update:model-value="onRoleSelected(group, $event)"
                 :options="roleOptions"
               />
             </td>
@@ -198,8 +198,9 @@ export default defineComponent({
     return {
       site: undefined as SelectedSite|undefined,
       isInitialSiteResolved: false,
-      groupAccess: new Map<string, GroupSitePermission>(),
-      rowVersions: {} as Record<string, number>,
+      // by group id: names are not unique in installations from before names had to be unique
+      groupAccess: new Map<number, GroupSitePermission>(),
+      rowVersions: {} as Record<number, number>,
       roles: [] as RoleOption[],
       capabilities: [] as CapabilityOption[],
       searchTerm: '',
@@ -234,7 +235,7 @@ export default defineComponent({
     roleOptions(): RoleOption[] {
       return [noAccessOption(), ...this.roles];
     },
-    groupNames(): string[] {
+    groupIds(): number[] {
       return [...this.groupAccess.keys()];
     },
     filteredGroupAccess(): GroupSitePermission[] {
@@ -256,8 +257,8 @@ export default defineComponent({
     },
   },
   methods: {
-    rowIndex(groupName: string): number {
-      return this.groupNames.indexOf(groupName);
+    rowIndex(idGroup: number): number {
+      return this.groupIds.indexOf(idGroup);
     },
     /**
      * Starts with the website of the URL if the user administers it. Otherwise the site selector
@@ -295,7 +296,7 @@ export default defineComponent({
           this.isInitialSiteResolved = true;
         });
     },
-    onRoleSelected(groupName: string, access: string) {
+    onRoleSelected(group: GroupSitePermission, access: string) {
       if (!this.site) {
         return;
       }
@@ -305,34 +306,34 @@ export default defineComponent({
         this.confirmUpdateAccessToAllSitesText = translate(
           'GroupPermissions_ChangeAccessToAllSitesConfirm',
           roleName(this.roles, access),
-          groupName,
+          group.name,
         );
         Matomo.helper.modalConfirm(this.$refs.confirmUpdateAccessToAllSites as HTMLElement, {
-          yes: () => this.updateGroupAccess(idSite, groupName, access),
-          no: () => this.resetRow(groupName),
+          yes: () => this.updateGroupAccess(idSite, group.idGroup, access),
+          no: () => this.resetRow(group.idGroup),
         });
       } else {
-        this.updateGroupAccess(idSite, groupName, access);
+        this.updateGroupAccess(idSite, group.idGroup, access);
       }
     },
-    resetRow(groupName: string) {
+    resetRow(idGroup: number) {
       // re-creates the select of the row, so it shows the stored role again
-      this.rowVersions[groupName] = (this.rowVersions[groupName] || 0) + 1;
+      this.rowVersions[idGroup] = (this.rowVersions[idGroup] || 0) + 1;
     },
-    updateGroupAccess(idSite: number|string, groupName: string, access: string) {
+    updateGroupAccess(idSite: number|string, idGroup: number, access: string) {
       this.isLoading = true;
       const siteName = this.site ? this.site.name : '';
 
       AjaxHelper.post({
-        method: 'GroupPermissions.setGroupAccess',
+        method: 'GroupPermissions.setGroupAccessById',
       }, {
         idSites: idSite,
-        name: groupName,
+        idGroup,
         access,
       }, {
         errorElement: '#ajaxErrorAccessGroupMember',
       }).then(() => {
-        const group = this.groupAccess.get(groupName);
+        const group = this.groupAccess.get(idGroup);
         if (group) {
           group.access = access;
           // like the server: capabilities need a role, and the ones included in the new role
@@ -345,12 +346,12 @@ export default defineComponent({
         notifySuccess(
           'groupPermissionsAccessUpdated',
           'GroupPermissions_AccessUpdated',
-          groupName,
+          group ? group.name : '',
           siteName,
           roleName(this.roles, access),
         );
       }).catch(() => {
-        this.resetRow(groupName);
+        this.resetRow(idGroup);
       }).finally(() => {
         this.isLoading = false;
       });
@@ -380,7 +381,7 @@ export default defineComponent({
           (response as Group[])
             .sort((a, b) => a.name.localeCompare(b.name))
             .forEach((group) => {
-              this.groupAccess.set(group.name, {
+              this.groupAccess.set(group.idGroup, {
                 idGroup: group.idGroup,
                 name: group.name,
                 access: 'noaccess',
@@ -406,7 +407,7 @@ export default defineComponent({
           (response as GroupSitePermission[])
             .sort((a, b) => a.name.localeCompare(b.name))
             .forEach((group) => {
-              this.groupAccess.set(group.name, group);
+              this.groupAccess.set(group.idGroup, group);
             });
         }).finally(() => {
           this.isLoading = false;

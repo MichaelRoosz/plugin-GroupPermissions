@@ -69,6 +69,12 @@
       </tbody>
     </table>
 
+    <div class="groupPermissionsPlainNameWarning" v-if="plainNameMappings.length">
+      <Notification context="warning" type="persistent" :noclear="true">
+        {{ translate('GroupPermissions_GroupSyncPlainNameWarning', plainNameMappings.join(', ')) }}
+      </Notification>
+    </div>
+
     <div class="ui-confirm" ref="confirmRemoveExternalGroup">
       <h2>{{ confirmText }}</h2>
       <input role="yes" type="button" :value="translate('General_Yes')"/>
@@ -84,6 +90,7 @@ import {
   AjaxHelper,
   ContentTable,
   Matomo,
+  Notification,
   translate,
 } from 'CoreHome';
 import { SaveButton } from 'CorePluginsAdmin';
@@ -94,6 +101,7 @@ import { notifySuccess } from './notify';
 export default defineComponent({
   components: {
     ActivityIndicator,
+    Notification,
     SaveButton,
     TextField,
   },
@@ -117,6 +125,16 @@ export default defineComponent({
   },
   mounted() {
     this.loadExternalGroups();
+  },
+  computed: {
+    /**
+     * Mappings that are not distinguished names: they also match LDAP groups with this first value
+     * anywhere in the directory (see GroupSync::matches)
+     */
+    plainNameMappings(): string[] {
+      const dn = /^[a-z][a-z0-9-]*\s*=(?:[^,\\]|\\.)+,\s*[a-z][a-z0-9-]*\s*=/i;
+      return this.externalGroups.filter((externalGroup) => !dn.test(externalGroup.trim()));
+    },
   },
   methods: {
     loadExternalGroups() {

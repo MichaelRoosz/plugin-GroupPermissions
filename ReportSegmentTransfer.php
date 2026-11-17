@@ -14,6 +14,7 @@ use Piwik\Container\StaticContainer;
 use Piwik\Date;
 use Piwik\Log\LoggerInterface;
 use Piwik\Plugins\SegmentEditor\Model as SegmentEditorModel;
+use Piwik\Plugins\UsersManager\Model as UsersModel;
 
 /**
  * Hands the private segments of a deleted user over to the new owners of their scheduled reports (see
@@ -23,6 +24,9 @@ use Piwik\Plugins\SegmentEditor\Model as SegmentEditorModel;
  * segment of someone else in it if the owner is a super user, so the new owner of a report could no longer save,
  * send or download it. Instead, the segment goes to the new owner of the first report using it. If reports using
  * the same segment go to different users, the others get a copy of the segment.
+ *
+ * A report of a deleted super user can also use a private segment of another user. If the new owner of the report
+ * cannot use it (not a super user, and the segment is not shared with one of their groups), they get a copy.
  *
  * Must run before the SegmentEditor plugin handles the deletion of the user. Segments shared with all users are
  * left to Matomo, everyone can use them anyway.
@@ -72,12 +76,17 @@ class ReportSegmentTransfer {
         }
 
         $segment = $this->getSegmentModel()->getSegment($idSegment);
-        if (
-            !is_array($segment)
-            || !empty($segment['deleted'])
-            || !empty($segment['enable_all_users'])
-            || ($segment['login'] ?? null) !== $this->deletedLogin
-        ) {
+        if (!is_array($segment) || !empty($segment['deleted']) || !empty($segment['enable_all_users'])) {
+            return;
+        }
+
+        $owner = $segment['login'] ?? null;
+        if ($owner !== $this->deletedLogin) {
+            // a private segment of another user, which the deleted user could use as a super user
+            if ($owner !== $newOwner && !$this->canUseSegmentOfOthers($newOwner, $idSegment)) {
+                $this->copyForReport($idReport, $idSegment, $newOwner);
+            }
+
             return;
         }
 
@@ -100,6 +109,8 @@ class ReportSegmentTransfer {
             return;
         }
 
+        $from = is_string($segment['login'] ?? null) ? $segment['login'] : '';
+
         // all other columns (name, definition, website, archiving) are kept; the hash is set by createSegment
         unset($segment['idsegment'], $segment['hash']);
         $now = Date::now()->getDatetime();
@@ -115,12 +126,25 @@ class ReportSegmentTransfer {
         $this->copies[$idSegment . ':' . $newOwner] = (int) $idCopy;
         $this->model->setReportSegment($idReport, (int) $idCopy);
 
-        $this->log('copied the segment {idSegment} of the deleted user {from} for {to} (new segment {idCopy})', [
+        $this->log('copied the segment {idSegment} of {from} for {to} (new segment {idCopy})', [
             'idSegment' => $idSegment,
-            'from' => $this->deletedLogin,
+            'from' => $from,
             'to' => $newOwner,
             'idCopy' => (int) $idCopy,
         ]);
+    }
+
+    /**
+     * Whether the user can use a private segment of another user in their reports: super users can use any segment,
+     * other users segments shared with one of their groups (see SegmentSharing)
+     */
+    private function canUseSegmentOfOthers(string $login, int $idSegment): bool {
+        $user = (new UsersModel())->getUser($login);
+        if (is_array($user) && !empty($user['superuser_access'])) {
+            return true;
+        }
+
+        return in_array($idSegment, $this->model->getSegmentsSharedWithUser($login), true);
     }
 
     private function getSegmentModel(): SegmentEditorModel {
