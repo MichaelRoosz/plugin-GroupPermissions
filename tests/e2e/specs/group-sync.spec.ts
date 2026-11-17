@@ -55,8 +55,10 @@ test.describe('Group sync from external directories', () => {
       idGroup: group.idGroup, externalGroup: '   ',
     })).toMatch(/Please (enter|specify)/);
     expect(await su.expectError('GroupPermissions.addExternalGroupMapping', {
-      idGroup: group.idGroup, externalGroup: 'x'.repeat(256),
+      idGroup: group.idGroup, externalGroup: 'x'.repeat(191),
     })).toContain('too long');
+    await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'ä'.repeat(190) });
+    await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'ä'.repeat(190) });
 
     await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'R&D "TEAM" <X>' });
     expect(await mappings(group.idGroup)).toEqual([]);
@@ -105,6 +107,21 @@ test.describe('Group sync from external directories', () => {
 
     expect(await sync(user, [editorsName])).toEqual({ added: [], removed: [] });
     expect(await membersWithFlag(editors.idGroup)).toContainEqual({ login: user, synced: false });
+    expect(await sync(user, [])).toEqual({ added: [], removed: [] });
+    expect(await su.members(editors.idGroup)).toContain(user);
+  });
+
+  test('adding a synced member manually keeps the membership when the external group is lost', async () => {
+    const user = await su.createUser('sync_pinned');
+    await sync(user, [editorsName]);
+    expect(await membersWithFlag(editors.idGroup)).toContainEqual({ login: user, synced: true });
+
+    await su.call('GroupPermissions.addUserToGroup', { idGroup: editors.idGroup, login: user });
+    expect(await membersWithFlag(editors.idGroup)).toContainEqual({ login: user, synced: false });
+    // a manual member cannot be added twice
+    expect(await su.expectError('GroupPermissions.addUserToGroup', { idGroup: editors.idGroup, login: user }))
+      .toContain('already in group');
+
     expect(await sync(user, [])).toEqual({ added: [], removed: [] });
     expect(await su.members(editors.idGroup)).toContain(user);
   });

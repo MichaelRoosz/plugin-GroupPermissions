@@ -21,13 +21,16 @@ use Piwik\DbHelper;
 class GroupExternal {
     public const TABLE = 'gpermissions_external';
 
-    /** Length of the `external_group` column */
-    public const NAME_MAX_LENGTH = 255;
+    /**
+     * Length of the `external_group` column. It is part of the primary key: 190 utf8mb4 characters fit the 767 byte
+     * index limit of older MySQL / MariaDB versions (like `site_url.url` in Matomo core).
+     */
+    public const NAME_MAX_LENGTH = 190;
 
     /** Column definition, shared with the update that creates the table for existing installations */
     public const COLUMNS = [
         'idgroup' => 'INT(10) UNSIGNED NOT NULL',
-        'external_group' => 'VARCHAR(255) NOT NULL',
+        'external_group' => 'VARCHAR(190) NOT NULL',
     ];
 
     public const PRIMARY_KEY = ['idgroup', 'external_group'];

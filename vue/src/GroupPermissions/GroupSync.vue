@@ -18,7 +18,7 @@
           @update:model-value="newExternalGroup = $event"
           :title="translate('GroupPermissions_ExternalGroup')"
           :inline-help="translate('GroupPermissions_GroupSyncHelpNames')"
-          :maxlength="255"
+          :maxlength="190"
         />
       </div>
       <SaveButton

@@ -323,6 +323,56 @@ test.describe('Shared ownership of scheduled reports', () => {
     expect((await reportAsSuperUser(sharedWithTeam)).description).toBe(`Taken over ${RUN_ID}`);
   });
 
+  test('a private segment of a deleted user goes to the new owners of their reports', async () => {
+    const leaver = await su.createUser('rep_segleaver');
+    await su.setUserAccess(leaver, 'admin', idSite);
+    const leaverApi = await MatomoApi.forUser(leaver, DEFAULT_PASSWORD);
+
+    // a second new owner: the only member of another group with access to the website
+    const otherTeam = await su.createGroup('Report Other Team');
+    const otherMember = await su.createUser('rep_othermember');
+    await su.addMembers(otherTeam.idGroup, [otherMember]);
+    await su.setGroupAccess(otherTeam.name, 'view', idSite);
+    const otherMemberApi = await MatomoApi.forUser(otherMember, DEFAULT_PASSWORD);
+
+    const idSegment = await addSegment(leaverApi, 'Leaver Segment');
+    const toMember = await addReport(leaverApi, 'Leaver Segmented', idSite, { idSegment });
+    await share(leaverApi, toMember);
+    const toOtherMember = await addReport(leaverApi, 'Leaver Segmented Other', idSite, { idSegment });
+    await share(leaverApi, toOtherMember, otherTeam.idGroup);
+
+    await su.deleteUser(leaver);
+
+    // the first new owner gets the segment itself
+    const first = await reportAsSuperUser(toMember);
+    expect(first.login).toBe(member);
+    expect(Number(first.idsegment)).toBe(idSegment);
+    const segment = await su.call('SegmentEditor.get', { idSegment });
+    expect(segment.login).toBe(member);
+
+    // the other one a copy with the same definition
+    const second = await reportAsSuperUser(toOtherMember);
+    expect(second.login).toBe(otherMember);
+    const idCopy = Number(second.idsegment);
+    expect(idCopy).not.toBe(idSegment);
+    const copy = await su.call('SegmentEditor.get', { idSegment: idCopy });
+    expect(copy).toMatchObject({ login: otherMember, definition: segment.definition, name: segment.name });
+
+    // both can still save and download their report with the segment
+    for (const [as, idReport, segmentId] of [
+      [api[member], toMember, idSegment], [otherMemberApi, toOtherMember, idCopy],
+    ] as const) {
+      await as.call('ScheduledReports.updateReport', {
+        idReport, ...reportParams(`Segmented taken over ${idReport} ${RUN_ID}`, idSite, { idSegment: segmentId }),
+      });
+      const response = await as.fetchRaw('ScheduledReports.generateReport', {
+        idReport, date: 'yesterday', outputType: 3, format: 'html',
+      });
+      expect(response.ok).toBe(true);
+      expect(await response.text()).toContain(`Segmented taken over ${idReport} ${RUN_ID}`);
+    }
+  });
+
   test('a member edits a shared report on the "Email reports" page', async ({ browser }) => {
     const idReport = await addReport(api[owner], 'UI Editable');
     await share(api[owner], idReport);

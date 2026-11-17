@@ -132,6 +132,11 @@ class Model {
         $user->addUserToGroup($idGroup, $login, $synced);
     }
 
+    public function setMembershipSynced(int $idGroup, string $login, bool $synced): void {
+        $user = new GroupUser();
+        $user->setMembershipSynced($idGroup, $login, $synced);
+    }
+
     /**
      * @return array<int, bool> whether the membership was added by the group sync, by group id
      */
@@ -169,12 +174,6 @@ class Model {
         $permission = new GroupPermission();
 
         return $permission->countSitesPerGroup();
-    }
-
-    public function isUserInGroup(string $login, int $idGroup): bool {
-        $user = new GroupUser();
-
-        return $user->isUserInGroup($login, $idGroup);
     }
 
     /**
@@ -449,7 +448,8 @@ class Model {
     /**
      * @return array<array{
      *   idreport: int,
-     *   idsite: int
+     *   idsite: int,
+     *   idsegment: int
      * }>
      */
     public function getSharedReportsOfUser(string $login, string $reportType): array {
@@ -470,6 +470,11 @@ class Model {
     public function setReportOwner(int $idReport, string $login): void {
         $groupReport = new GroupReport();
         $groupReport->setReportOwner($idReport, $login);
+    }
+
+    public function setReportSegment(int $idReport, int $idSegment): void {
+        $groupReport = new GroupReport();
+        $groupReport->setReportSegment($idReport, $idSegment);
     }
 
     public function removeAllReportSharesOfGroup(int $idGroup): void {

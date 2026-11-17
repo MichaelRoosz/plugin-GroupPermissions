@@ -164,9 +164,11 @@ export default defineComponent({
       return result;
     },
     availableUsers(): MatomoUser[] {
-      // the anonymous user cannot be member of a group
+      // the anonymous user cannot be member of a group. Adding a synced member keeps the
+      // membership (it becomes a manual one).
       return this.users.filter(
-        (user) => user.login !== 'anonymous' && !this.members.includes(user.login),
+        (user) => user.login !== 'anonymous'
+          && (!this.members.includes(user.login) || this.syncedMembers.includes(user.login)),
       );
     },
   },
@@ -232,7 +234,10 @@ export default defineComponent({
       }, {
         errorElement: '#ajaxErrorAddMember',
       }).then(() => {
-        this.members = [...this.members, login].sort((a, b) => a.localeCompare(b));
+        if (!this.members.includes(login)) {
+          this.members = [...this.members, login].sort((a, b) => a.localeCompare(b));
+        }
+        this.syncedMembers = this.syncedMembers.filter((member) => member !== login);
         this.selectedUser = null;
         notifySuccess('groupPermissionsMemberAdded', 'GroupPermissions_MemberAdded', login);
         this.$emit('changed');

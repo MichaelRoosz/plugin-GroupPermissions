@@ -49,6 +49,13 @@ class GroupUser {
         );
     }
 
+    public function setMembershipSynced(int $idGroup, string $login, bool $synced): void {
+        Db::query(
+            "UPDATE `{$this->tablePrefixed}` SET synced = ? WHERE idgroup = ? AND login = ?",
+            [$synced ? 1 : 0, $idGroup, $login]
+        );
+    }
+
     /**
      * @return array<array{
      *    login: string,
@@ -77,13 +84,6 @@ class GroupUser {
         }
 
         return $counts;
-    }
-
-    public function isUserInGroup(string $login, int $idGroup): bool {
-        $idGroup = intval($idGroup);
-        $table = $this->tablePrefixed;
-
-        return (bool) Db::fetchAll("SELECT login FROM $table WHERE login = ? AND idgroup = ?", [$login, $idGroup]);
     }
 
     /**

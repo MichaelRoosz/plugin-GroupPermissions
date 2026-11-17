@@ -149,14 +149,11 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
   ```text
   index.php?module=API&method=GroupPermissions.getSitesAccessFromGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
   ```
-- Get the role of every group for a website:
-  ```text
-  index.php?module=API&method=GroupPermissions.getGroupAccessFromSite&idSite=1&format=JSON&token_auth=YOUR_TOKEN
-  ```
 - Get every group with its id, role and capabilities for a website:
   ```text
   index.php?module=API&method=GroupPermissions.getGroupPermissionsFromSite&idSite=1&format=JSON&token_auth=YOUR_TOKEN
   ```
+  The older `getGroupAccessFromSite` (role by group name) is deprecated: it returns the group names as keys, which breaks for numeric group names like `2024`.
 - Add or remove capabilities of a group (the group needs a role for the websites; see `UsersManager.getAvailableCapabilities` for the capability IDs):
   ```text
   index.php?module=API&method=GroupPermissions.addGroupCapabilities&idGroup=1&capabilities[]=tagmanager_write&capabilities[]=tagmanager_publish_live_container&idSites=1,2&format=JSON&token_auth=YOUR_TOKEN

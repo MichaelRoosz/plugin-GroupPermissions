@@ -155,7 +155,7 @@
         "SiteFormGroupAccessHelp": "Roles of the groups for this website. Members of a group get its role. Groups that are not listed have no access through groups. Groups can also get access automatically with the rules in the group editor.",
         "SiteFormGroupAccessInvalid": "Invalid group access.",
         "SyncedMember": "synced",
-        "SyncedMemberHelp": "Added by the directory sync, removed again when the user is no longer in a mapped external group.",
+        "SyncedMemberHelp": "Added by the directory sync, removed again when the user is no longer in a mapped external group. Add the user to the group manually to keep the membership.",
         "UnshareReport": "Stop sharing",
         "UnshareReportConfirm": "Are you sure you want to stop sharing the report '%1$s' with the group '%2$s'?",
         "UnshareSegment": "Stop sharing",

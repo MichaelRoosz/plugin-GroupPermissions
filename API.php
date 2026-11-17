@@ -16,6 +16,7 @@ use Piwik\Common;
 use Piwik\Access\CapabilitiesProvider;
 use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
+use Piwik\Db;
 use Piwik\API\Request;
 use Piwik\Piwik;
 use Piwik\Plugin\Manager as PluginManager;
@@ -93,6 +94,12 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
+     * Returns the role of every group for a website, by group name.
+     *
+     * @deprecated use getGroupPermissionsFromSite: group names are used as keys here, so numeric names (e.g. `2024`)
+     *             become numeric keys, which Matomo's API treats as a list (a JSON array, or renumbered keys with
+     *             `filter_limit`). Kept unchanged for compatibility.
+     *
      * @return array<string, string>
      */
     public function getGroupAccessFromSite(int $idSite): array {
@@ -308,6 +315,10 @@ class API extends \Piwik\Plugin\API {
         return $this->model->getMembersOfGroup($idGroup);
     }
 
+    /**
+     * Adds a user to a group. If the group sync added the user to the group, the membership becomes a manual one:
+     * the sync no longer removes it.
+     */
     public function addUserToGroup(int $idGroup, string $login): void {
         Piwik::checkUserHasSuperUserAccess();
 
@@ -326,8 +337,16 @@ class API extends \Piwik\Plugin\API {
             throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
         }
 
-        if ($this->model->isUserInGroup($login, $idGroup)) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionUserAlreadyInGroup', $login));
+        $memberships = $this->model->getMembershipsOfUser($login);
+        if (array_key_exists($idGroup, $memberships)) {
+            if (!$memberships[$idGroup]) {
+                throw new Exception(Piwik::translate('GroupPermissions_ExceptionUserAlreadyInGroup', $login));
+            }
+
+            // a membership added by the group sync becomes a manual one, which the sync never removes
+            $this->model->setMembershipSynced($idGroup, $login, false);
+
+            return;
         }
 
         $this->model->addUserToGroup($idGroup, $login);
@@ -435,17 +454,13 @@ class API extends \Piwik\Plugin\API {
 
         $groupName = $this->checkGroupName($groupName);
 
-        try {
-            $existingGroup = $this->model->getGroupWithName($groupName);
-        } catch (Exception $e) {
-            $existingGroup = null;
-        }
+        $idGroup = $this->withGroupNameLock(function () use ($groupName): int {
+            if ($this->findGroupWithName($groupName)) {
+                throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesExist', $groupName));
+            }
 
-        if ($existingGroup) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesExist', $groupName));
-        }
-
-        $idGroup = $this->model->createGroup($groupName);
+            return $this->model->createGroup($groupName);
+        });
         if (!$idGroup) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
         }
@@ -467,18 +482,16 @@ class API extends \Piwik\Plugin\API {
         }
         $idGroup = $group['idgroup'];
 
-        try {
-            $existingGroup = $this->model->getGroupWithName($newName);
-        } catch (Exception $e) {
-            $existingGroup = null;
-        }
+        $this->withGroupNameLock(function () use ($idGroup, $newName): void {
+            $existingGroup = $this->findGroupWithName($newName);
 
-        // names are compared case-insensitively, so changing only the case finds the group itself
-        if ($existingGroup && $existingGroup['idgroup'] !== $idGroup) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesExist', $newName));
-        }
+            // names are compared case-insensitively, so changing only the case finds the group itself
+            if ($existingGroup && $existingGroup['idgroup'] !== $idGroup) {
+                throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesExist', $newName));
+            }
 
-        $this->model->renameGroup($idGroup, $newName);
+            $this->model->renameGroup($idGroup, $newName);
+        });
     }
 
     public function deleteGroup(int $idGroup): void {
@@ -1356,6 +1369,44 @@ class API extends \Piwik\Plugin\API {
         }
 
         throw new Exception(Piwik::translate('UsersManager_AddUserNoInitialAccessError'));
+    }
+
+    /**
+     * @return ?array{
+     *   idgroup: int,
+     *   name: string
+     * }
+     */
+    private function findGroupWithName(string $name): ?array {
+        try {
+            return $this->model->getGroupWithName($name);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Runs the callback while holding a lock for group names, so concurrent requests cannot create two groups with
+     * the same name (the name column has no unique index, installations may already contain duplicates).
+     *
+     * @template T
+     *
+     * @param callable(): T $callback
+     *
+     * @return T
+     */
+    private function withGroupNameLock(callable $callback) {
+        // per Matomo installation, several may share a database server
+        $lockName = 'gpermissions_group_name_' . md5(Common::prefixTable(Dao\Group::TABLE));
+        if (!Db::getDbLock($lockName)) {
+            throw new Exception('Could not acquire the lock for group names, please try again.');
+        }
+
+        try {
+            return $callback();
+        } finally {
+            Db::releaseDbLock($lockName);
+        }
     }
 
     /**

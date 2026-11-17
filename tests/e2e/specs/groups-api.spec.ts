@@ -21,6 +21,16 @@ test.describe('Group management API', () => {
     expect(await su.expectError('GroupPermissions.createGroup', { groupName: name })).toMatch(/Group already exists/);
   });
 
+  test('concurrent createGroup requests with the same name create only one group', async () => {
+    const name = `Concurrent ${RUN_ID}`;
+    const results = await Promise.allSettled(
+      Array.from({ length: 6 }, () => su.call('GroupPermissions.createGroup', { groupName: name })),
+    );
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    const groups: { name: string }[] = await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 });
+    expect(groups.filter((g) => g.name === name)).toHaveLength(1);
+  });
+
   test('getAllGroups returns all groups, without the 100 rows limit', async () => {
     const prefix = `Many ${RUN_ID}`;
     const created: number[] = [];

@@ -116,14 +116,15 @@ class GroupReport {
      *
      * @return array<array{
      *   idreport: int,
-     *   idsite: int
+     *   idsite: int,
+     *   idsegment: int
      * }>
      */
     public function getSharedReportsOfUser(string $login, string $reportType): array {
         $reportTable = Common::prefixTable('report');
 
         $rows = Rows::list(Db::fetchAll(
-            "SELECT DISTINCT r.idreport, r.idsite FROM `$reportTable` r
+            "SELECT DISTINCT r.idreport, r.idsite, r.idsegment FROM `$reportTable` r
                 INNER JOIN `{$this->tablePrefixed}` gr ON gr.idreport = r.idreport
                 WHERE r.login = ? AND r.deleted = 0 AND r.type = ?
                 ORDER BY r.idreport",
@@ -134,6 +135,7 @@ class GroupReport {
             return [
                 'idreport' => Rows::int($row, 'idreport'),
                 'idsite' => Rows::int($row, 'idsite'),
+                'idsegment' => is_numeric($row['idsegment'] ?? null) ? (int) $row['idsegment'] : 0,
             ];
         }, $rows);
     }
@@ -162,6 +164,10 @@ class GroupReport {
      */
     public function setReportOwner(int $idReport, string $login): void {
         Db::query('UPDATE `' . Common::prefixTable('report') . '` SET login = ? WHERE idreport = ?', [$login, $idReport]);
+    }
+
+    public function setReportSegment(int $idReport, int $idSegment): void {
+        Db::query('UPDATE `' . Common::prefixTable('report') . '` SET idsegment = ? WHERE idreport = ?', [$idSegment, $idReport]);
     }
 
     public function removeAllSharesOfGroup(int $idGroup): void {

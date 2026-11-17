@@ -112,6 +112,9 @@ class ReportSharing {
      * Keeps the shared reports of a deleted user: Matomo deletes all reports of a deleted user, so each report shared
      * with a group is handed over to a member of these groups who can access its website (the first by login; an
      * active user, not an invited one). Reports without such a member are deleted by Matomo as before.
+     * A private segment of the deleted user that a transferred report uses goes to the new owner as well (see
+     * ReportSegmentTransfer), otherwise Matomo would give it to a super user and the new owner could no longer edit,
+     * send or download the report.
      * Must run before the ScheduledReports plugin handles the deletion of the user.
      */
     public function transferReportsOfDeletedUser(string $login): void {
@@ -127,6 +130,8 @@ class ReportSharing {
                 return;
             }
 
+            $segmentTransfer = new ReportSegmentTransfer($this->model, $login);
+
             foreach ($this->model->getSharedReportsOfUser($login, self::REPORT_TYPE) as $report) {
                 $newOwner = $this->findNewOwner($report['idreport'], $report['idsite'], $login, $usersModel, $access);
                 if ($newOwner === null) {
@@ -139,6 +144,8 @@ class ReportSharing {
                     'from' => $login,
                     'to' => $newOwner,
                 ]);
+
+                $segmentTransfer->transfer($report['idreport'], $report['idsegment'], $newOwner);
             }
 
             CoreScheduledReportsAPI::$cache = [];
