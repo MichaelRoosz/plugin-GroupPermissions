@@ -19,7 +19,7 @@
         </a>
         <a
           href=""
-          class="btn btn-flat groupPermissionsInviteUserButton"
+          class="btn-flat groupPermissionsInviteUserButton"
           :class="{ disabled: !groups.length }"
           @click.prevent="groups.length && $emit('invite')"
         >

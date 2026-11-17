@@ -68,9 +68,15 @@
       gap: 8px;
       padding-left: 0;
 
-      .btn [class^="icon-"] {
+      .btn [class^="icon-"],
+      .btn-flat [class^="icon-"] {
         margin-right: 4px;
         vertical-align: text-bottom;
+      }
+
+      // match the font size of the primary .btn next to it
+      .btn-flat {
+        font-size: 12px;
       }
     }
 
