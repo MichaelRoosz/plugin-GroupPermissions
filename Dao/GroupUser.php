@@ -77,12 +77,19 @@ class GroupUser {
     }
 
     /**
+     * Users deleted while this plugin was deactivated are not counted (like websites in
+     * GroupPermission::countSitesPerGroup). Invited users are counted.
+     *
      * @return array<int, int> number of members by group id (groups without members are missing)
      */
     public function countMembersPerGroup(): array {
         $table = $this->tablePrefixed;
+        $tableUser = Common::prefixTable('user');
+        $sql = "SELECT gu.idgroup, COUNT(*) AS cnt FROM $table AS gu
+                INNER JOIN $tableUser AS u ON u.login = gu.login
+                GROUP BY gu.idgroup";
         $counts = [];
-        foreach (Rows::list(Db::fetchAll("SELECT idgroup, COUNT(*) AS cnt FROM $table GROUP BY idgroup")) as $row) {
+        foreach (Rows::list(Db::fetchAll($sql)) as $row) {
             $counts[Rows::int($row, 'idgroup')] = Rows::int($row, 'cnt');
         }
 

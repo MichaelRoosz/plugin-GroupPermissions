@@ -10,11 +10,13 @@
 
 namespace Piwik\Plugins\GroupPermissions;
 
+use Piwik\Access as PiwikAccess;
 use Piwik\Access\CapabilitiesProvider;
 use Piwik\Container\StaticContainer;
 use Piwik\Log\LoggerInterface;
 use Piwik\Piwik;
 use Piwik\Plugin;
+use Piwik\Plugins\SitesManager\API as SitesManagerAPI;
 use Piwik\Plugins\UsersManager\Model as UsersModel;
 use Piwik\Plugins\UsersManager\UsersManager;
 
@@ -41,6 +43,7 @@ class GroupPermissions extends Plugin {
             'API.Request.intercept'                  => 'interceptApiRequest',
             'API.SegmentEditor.getAll.end'           => 'addSharedSegments',
             'API.SegmentEditor.delete.end'           => 'deleteSegment',
+            'API.SitesManager.getSitesIdFromSiteUrl.end' => 'addGroupSitesFromSiteUrl',
             // integration point for login plugins (e.g. SAML): sync the groups of a user with their external groups
             'GroupPermissions.syncUserGroups'        => 'syncUserGroups',
             'Login.authenticate.successful'          => 'syncGroupsAfterLogin',
@@ -344,6 +347,66 @@ class GroupPermissions extends Plugin {
         if ($result === true && is_numeric($idSegment) && SegmentSharing::getStoredSegment((int) $idSegment) === null) {
             $model = new Model();
             $model->removeAllSharesOfSegment((int) $idSegment);
+        }
+    }
+
+    /**
+     * `SitesManager.getSitesIdFromSiteUrl` (used e.g. by Matomo's log importer to find the website of a URL) only
+     * considers Matomo's own access table for users without super user access, so it misses websites the user has
+     * access to through a group. Looks the URL up again for all websites and keeps those the user can view, which
+     * includes the access through groups.
+     *
+     * @param mixed $result list of rows `['idsite' => id]`
+     * @param array<string, mixed> $extraInfo
+     */
+    public function addGroupSitesFromSiteUrl(&$result, $extraInfo): void {
+        // super users get all websites anyway, groups never apply to the anonymous user
+        if (!is_array($result) || Piwik::hasUserSuperUserAccess() || Piwik::isUserIsAnonymous()) {
+            return;
+        }
+
+        $parameters = is_array($extraInfo['parameters'] ?? null) ? $extraInfo['parameters'] : [];
+        $url = $parameters['url'] ?? null;
+        if (!is_string($url) || $url === '') {
+            return;
+        }
+
+        try {
+            $viewableIdSites = [];
+            foreach (PiwikAccess::getInstance()->getSitesIdWithAtLeastViewAccess() as $idSite) {
+                if (is_numeric($idSite)) {
+                    $viewableIdSites[(int) $idSite] = true;
+                }
+            }
+            if (!$viewableIdSites) {
+                return;
+            }
+
+            // called directly, not through the API proxy, so this event is not posted again
+            $allRows = PiwikAccess::doAsSuperUser(static function () use ($url) {
+                return SitesManagerAPI::getInstance()->getSitesIdFromSiteUrl($url);
+            });
+            if (!is_array($allRows)) {
+                return;
+            }
+
+            $rows = [];
+            foreach ($allRows as $row) {
+                $idSite = is_array($row) ? ($row['idsite'] ?? null) : null;
+                if (is_numeric($idSite) && isset($viewableIdSites[(int) $idSite])) {
+                    $rows[] = $row;
+                }
+            }
+            $result = $rows;
+        } catch (\Throwable $e) {
+            // keep Matomo's result
+            $logger = StaticContainer::get(LoggerInterface::class);
+            if ($logger instanceof LoggerInterface) {
+                $logger->warning(
+                    'GroupPermissions: could not add the websites accessible through groups to the site lookup by URL: {message}',
+                    ['message' => $e->getMessage()]
+                );
+            }
         }
     }
 

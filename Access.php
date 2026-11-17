@@ -13,6 +13,7 @@ namespace Piwik\Plugins\GroupPermissions;
 use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
 use Piwik\Db;
+use Piwik\Log\LoggerInterface;
 use Piwik\Plugins\GroupPermissions\Dao\Rows;
 
 class Access extends \Piwik\Access {
@@ -39,12 +40,26 @@ class Access extends \Piwik\Access {
             return $userRights;
         }
 
-        $model = new Model();
-        $groupRights = $model->getPermissionsOfUser($login);
-        if (!$groupRights) {
+        try {
+            $model = new Model();
+            $groupRights = $model->getPermissionsOfUser($login);
+            if (!$groupRights) {
+                return $userRights;
+            }
+            $groupCapabilities = $model->getCapabilitiesOfUser($login);
+        } catch (\Throwable $e) {
+            // e.g. while the database update of this plugin is still pending (missing tables or columns): fall back
+            // to the access granted directly, never more
+            $logger = StaticContainer::get(LoggerInterface::class);
+            if ($logger instanceof LoggerInterface) {
+                $logger->warning(
+                    'GroupPermissions: could not load the group permissions of {login}, only direct access applies: {message}',
+                    ['login' => $login, 'message' => $e->getMessage()]
+                );
+            }
+
             return $userRights;
         }
-        $groupCapabilities = $model->getCapabilitiesOfUser($login);
 
         // the access table contains roles (view, write, admin) and capabilities (e.g. tagmanager_write), each
         // as a separate row. Combine them: per website the highest role wins, capabilities are added up.

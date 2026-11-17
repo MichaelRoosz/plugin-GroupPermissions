@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
-import { DEFAULT_PASSWORD } from '../helpers/env';
+import { DEFAULT_PASSWORD, RUN_ID } from '../helpers/env';
 
 /**
  * Site access of groups (setGroupAccess / getGroupAccessFromSite) and how group permissions are combined
@@ -191,5 +191,35 @@ test.describe('Group site access', () => {
 
     expect(await su.members(g1.idGroup)).toEqual([]);
     expect(await su.members(g2.idGroup)).toEqual([]);
+  });
+
+  test('SitesManager.getSitesIdFromSiteUrl also finds websites the user can access through a group', async () => {
+    const url = `https://url-lookup-${RUN_ID}.example.org`;
+    const addSite = async (name: string) =>
+      Number((await su.call('SitesManager.addSite', { siteName: `${name} ${RUN_ID}`, urls: url })).value);
+    const viaGroup = await addSite('Lookup via group');
+    const direct = await addSite('Lookup direct');
+    const noAccess = await addSite('Lookup no access');
+
+    const login = await su.createUser('url_lookup');
+    const group = await su.createGroup('URL lookup');
+    await su.addMembers(group.idGroup, [login]);
+    await su.setGroupAccess(group.name, 'view', viaGroup);
+    await su.setUserAccess(login, 'view', direct);
+
+    const member = await MatomoApi.forUser(login, DEFAULT_PASSWORD);
+    const ids = async (api: MatomoApi, lookup: string) =>
+      ((await api.call('SitesManager.getSitesIdFromSiteUrl', { url: lookup })) as Array<{ idsite: string | number }>)
+        .map((row) => Number(row.idsite))
+        .sort((a, b) => a - b);
+
+    expect(await ids(member, url)).toEqual([viaGroup, direct]);
+    expect(await ids(member, `${url}/`)).toEqual([viaGroup, direct]); // normalized like in core
+    expect(await ids(member, 'https://no-such-site.example.org')).toEqual([]);
+    expect(await ids(su, url)).toEqual([viaGroup, direct, noAccess]);
+
+    // without the group, only the direct access remains
+    await su.call('GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login });
+    expect(await ids(member, url)).toEqual([direct]);
   });
 });
