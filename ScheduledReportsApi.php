@@ -26,6 +26,8 @@ use Piwik\Plugins\ScheduledReports\API as CoreScheduledReportsAPI;
  *   user has view access to the website of the report,
  * - lets the user update, send, download and delete it.
  *
+ * Reports with data of other websites (see ReportSharing::CROSS_SITE_REPORTS) are never available to members.
+ *
  * Changes are made with the user's own login, so Matomo's events (e.g. an activity log) record who changed the
  * report; the report keeps its creator. The core methods only accept reports of the current user and validate a
  * segment by loading it as the current user (which fails for a private segment of the creator), so they run
@@ -95,6 +97,15 @@ class ScheduledReportsApi extends CoreScheduledReportsAPI {
         $evolutionPeriodN = null,
         $periodParam = null
     ): void {
+        // also for the creator: recipients added by members would otherwise get data of other websites
+        if (
+            is_numeric($idReport)
+            && ReportSharing::containsCrossSiteReport($reports)
+            && $this->getSharing()->isShared((int) $idReport)
+        ) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionCrossSiteReportNotShareable'));
+        }
+
         $sharedReport = $this->getSharedReport($idReport);
         if ($sharedReport !== null) {
             Piwik::checkUserHasViewAccess($idSite);
@@ -359,6 +370,8 @@ class ScheduledReportsApi extends CoreScheduledReportsAPI {
                 && isset($sharedIds[$this->intValue($report, 'idreport')])
                 && ($report['login'] ?? null) !== $login
                 && ($report['type'] ?? null) === ReportSharing::REPORT_TYPE
+                // shared before such reports could not be shared: members must not get data of other websites
+                && !ReportSharing::containsCrossSiteReport($report['reports'] ?? null)
                 && Piwik::isUserHasViewAccess($this->intValue($report, 'idsite'))
             ) {
                 $sharedReports[] = $report;

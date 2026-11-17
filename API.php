@@ -444,8 +444,9 @@ class API extends \Piwik\Plugin\API {
         }
         $idGroup = $group['idgroup'];
 
-        $usersManagerApi = UsersManagerAPI::getInstance();
-        if (!$usersManagerApi->userExists($login)) {
+        // memberships of users deleted while this plugin was deactivated can still be removed
+        $isMember = array_key_exists($idGroup, $this->model->getMembershipsOfUser($login));
+        if (!$isMember && !UsersManagerAPI::getInstance()->userExists($login)) {
             throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
         }
 
@@ -559,15 +560,34 @@ class API extends \Piwik\Plugin\API {
         }
         $idGroup = $group['idgroup'];
 
-        $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
-        $this->model->removeAllExternalGroupMappingsOfGroup($idGroup);
-        $this->model->removeAllSegmentSharesOfGroup($idGroup);
-        $this->model->removeAllReportSharesOfGroup($idGroup);
-        $this->model->removeAllCapabilitiesOfGroup($idGroup);
-        $this->model->removeAllPermissionsOfGroup($idGroup);
-        $this->model->removeAllUsersOfGroup($idGroup);
+        // all or nothing, so a failure never leaves a group with only part of its data behind
+        // (the API always uses Matomo's Zend based adapter, the tracker one is only used while tracking)
+        $db = Db::get();
+        $db = $db instanceof \Zend_Db_Adapter_Abstract ? $db : null;
+        if ($db) {
+            $db->beginTransaction();
+        }
+        try {
+            $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
+            $this->model->removeAllExternalGroupMappingsOfGroup($idGroup);
+            $this->model->removeAllSegmentSharesOfGroup($idGroup);
+            $this->model->removeAllReportSharesOfGroup($idGroup);
+            $this->model->removeAllCapabilitiesOfGroup($idGroup);
+            $this->model->removeAllPermissionsOfGroup($idGroup);
+            $this->model->removeAllUsersOfGroup($idGroup);
 
-        $this->model->deleteGroup($idGroup);
+            $this->model->deleteGroup($idGroup);
+
+            if ($db) {
+                $db->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($db) {
+                $db->rollBack();
+            }
+
+            throw $e;
+        }
 
         GroupAccessUpdater::reloadAccess();
     }
@@ -1095,6 +1115,9 @@ class API extends \Piwik\Plugin\API {
         if ($report['type'] !== ReportSharing::REPORT_TYPE) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionReportTypeNotShareable'));
         }
+        if (ReportSharing::containsCrossSiteReport($report['reports'])) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionCrossSiteReportNotShareable'));
+        }
 
         $this->model->shareReport($group['idgroup'], $report['idreport']);
     }
@@ -1142,8 +1165,8 @@ class API extends \Piwik\Plugin\API {
 
     /**
      * Returns the scheduled email reports of all users sorted by description, with whether they are shared with
-     * the group. Reports of other types are only returned if they are shared with the group (sharing does not
-     * apply to them, but they can be unshared).
+     * the group. Reports of other types and reports containing the All Websites dashboard are only returned if they
+     * are shared with the group (sharing does not apply to them, but they can be unshared).
      *
      * @return array<array{
      *   idReport: int,
@@ -1179,7 +1202,9 @@ class API extends \Piwik\Plugin\API {
 
             $idReport = (int) $report['idreport'];
             $type = is_string($report['type'] ?? null) ? $report['type'] : '';
-            if ($type !== ReportSharing::REPORT_TYPE && !isset($shared[$idReport])) {
+            $isShareable = $type === ReportSharing::REPORT_TYPE
+                && !ReportSharing::containsCrossSiteReport($report['reports'] ?? null);
+            if (!$isShareable && !isset($shared[$idReport])) {
                 continue;
             }
 
@@ -1244,7 +1269,8 @@ class API extends \Piwik\Plugin\API {
      * @return array{
      *   idreport: int,
      *   login: string,
-     *   type: string
+     *   type: string,
+     *   reports: array<mixed>
      * }
      */
     private function getReportOrFailForSharing(int $idReport): array {
@@ -1263,6 +1289,7 @@ class API extends \Piwik\Plugin\API {
             'idreport' => $report['idreport'],
             'login' => $report['login'],
             'type' => $report['type'],
+            'reports' => $report['reports'],
         ];
     }
 

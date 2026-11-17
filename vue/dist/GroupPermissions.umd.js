@@ -147,7 +147,7 @@ if (typeof window !== 'undefined') {
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=6d6bec20
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=6607e31e
 
 var _hoisted_1 = {
   class: "groupPermissionsManageAccess"
@@ -352,7 +352,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: _ctx.translate('General_No')
   }, null, 8, _hoisted_31)], 512)]);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=6d6bec20
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=6607e31e
 
 // EXTERNAL MODULE: external "CoreHome"
 var external_CoreHome_ = __webpack_require__("19dc");
@@ -801,6 +801,15 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
       return this.showCapabilities ? 3 : 2;
     },
     roleOptions: function roleOptions() {
+      if (this.isAllWebsites) {
+        // the roles differ per website: no role is preselected, so every role (including
+        // "no access") can be chosen and applied to all websites
+        return [{
+          key: '',
+          value: Object(external_CoreHome_["translate"])('GroupPermissions_SelectRoleForAllWebsites')
+        }, noAccessOption()].concat(TabManageGroupAccessvue_type_script_lang_ts_toConsumableArray(this.roles));
+      }
+
       return [noAccessOption()].concat(TabManageGroupAccessvue_type_script_lang_ts_toConsumableArray(this.roles));
     },
     groupIds: function groupIds() {
@@ -879,7 +888,7 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
     onRoleSelected: function onRoleSelected(group, access) {
       var _this3 = this;
 
-      if (!this.site) {
+      if (!this.site || !access) {
         return;
       }
 
@@ -919,7 +928,10 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
       }).then(function () {
         var group = _this4.groupAccess.get(idGroup);
 
-        if (group) {
+        if (idSite === 'all') {
+          // show the placeholder again, so the same role can be applied again later
+          _this4.resetRow(idGroup);
+        } else if (group) {
           group.access = access; // like the server: capabilities need a role, and the ones included in the new role
           // are redundant
 
@@ -973,7 +985,7 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
             _this5.groupAccess.set(group.idGroup, {
               idGroup: group.idGroup,
               name: group.name,
-              access: 'noaccess',
+              access: '',
               capabilities: []
             });
           });

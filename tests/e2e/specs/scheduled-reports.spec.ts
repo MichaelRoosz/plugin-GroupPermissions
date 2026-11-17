@@ -274,6 +274,34 @@ test.describe('Shared ownership of scheduled reports', () => {
     expect(listed.find((r) => r.idReport === ownReport)).toMatchObject({ isShared: false });
   });
 
+  test('reports with the All Websites dashboard (data of other websites) cannot be shared', async () => {
+    const crossSite = { reports: ['VisitsSummary_get', 'MultiSites_getAll'] };
+    const notShareable = /All Websites dashboard cannot be shared/;
+
+    // a report of a super user would show members the data of every website
+    const suReport = await addReport(su, 'All Websites Report', idSite, crossSite);
+    await expect(su.expectError('GroupPermissions.shareReportWithGroup', { idReport: suReport, idGroup: team.idGroup }))
+      .resolves.toMatch(notShareable);
+    const listed: GroupReport[] = await su.call('GroupPermissions.getReportsForGroup', { idGroup: team.idGroup, filter_limit: -1 });
+    expect(listed.map((r) => r.idReport)).not.toContain(suReport);
+    expect(await visibleTo(member, idSite)).not.toContain(suReport);
+
+    // it cannot be added to a shared report: neither by a member nor by the creator
+    const idReport = await addReport(api[owner], 'Becomes All Websites');
+    await share(api[owner], idReport);
+    for (const user of [member, owner]) {
+      await expect(api[user].expectError('ScheduledReports.updateReport', {
+        idReport, ...reportParams('Becomes All Websites', idSite, crossSite),
+      })).resolves.toMatch(notShareable);
+    }
+    expect((await reportAsSuperUser(idReport)).description).toBe(`Becomes All Websites ${RUN_ID}`);
+    // once the report is no longer shared, the creator can add it
+    await api[owner].call('GroupPermissions.unshareReportFromGroup', { idReport, idGroup: team.idGroup });
+    await api[owner].call('ScheduledReports.updateReport', { idReport, ...reportParams('Becomes All Websites', idSite, crossSite) });
+    await expect(api[owner].expectError('GroupPermissions.shareReportWithGroup', { idReport, idGroup: team.idGroup }))
+      .resolves.toMatch(notShareable);
+  });
+
   test('removing a member or deleting the group ends the shared ownership', async () => {
     const tempGroup = await su.createGroup('Report Temp');
     await su.addMembers(tempGroup.idGroup, [outsider]);

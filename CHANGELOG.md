@@ -7,7 +7,7 @@ New features (requires a database update):
   - Automatic access: give groups a role on new websites matching a Matomo website group or URL pattern (e.g. `*.example.com`), optionally applied to existing websites
   - "Group access" field in Matomo's website create/edit form
   - Share stored segments with groups
-  - Share scheduled email reports with groups: members can view, edit, send and delete them; reports of deleted users are handed over to a group member instead of being deleted
+  - Share scheduled email reports with groups: members can view, edit, send and delete them; reports of deleted users are handed over to a group member instead of being deleted (reports with the All Websites dashboard cannot be shared, it could show members data of other websites)
   - Group sync from LDAP, OIDC and SAML: map external directory groups to groups, memberships are synchronized on login (LoginLdap, LoginOIDC / RebelOIDC, LoginSaml; event `GroupPermissions.syncUserGroups` for other login plugins)
   - Invite new users directly into groups
   - Copy dashboards to all members of a group
@@ -17,6 +17,7 @@ New features (requires a database update):
 Security:
   - `getAllGroups` and `getGroupWithId` require admin access (previously any user could read groups, members and permissions). Thanks to [ipankwave88](https://github.com/ipankwave88) for reporting this
   - The anonymous user can no longer be added to groups, and group permissions never apply to it
+  - Group access to websites that no longer exist (e.g. deleted while the plugin was deactivated) is ignored, and a new user never inherits the group memberships of a deleted user with the same login
 
 Fixes:
   - Members of groups with write/admin access can use their token_auth for tracking requests that need one (e.g. log imports)
@@ -25,6 +26,9 @@ Fixes:
   - Group names must be unique (case-insensitive), also when groups are created or renamed at the same time; names are no longer matched accent-insensitively depending on the database collation
   - Adding a member that the directory sync added makes the membership a manual one, which the sync keeps
   - "Send now" failed for reports scheduled "Never"
+  - Users deleted while the plugin was deactivated can be removed from their groups (they stayed listed as members, and removing them failed)
+  - Manage Access with "Apply to all websites" can remove the access of a group from all websites ("No access") and apply the same role again
+  - Deleting a group is all or nothing
   - Website IDs that do not exist are rejected; better error messages for invalid access values
   - Manage Access opens with the website from the URL
   - Updated translations

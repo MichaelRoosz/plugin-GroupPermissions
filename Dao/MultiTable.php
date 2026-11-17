@@ -30,6 +30,9 @@ class MultiTable {
     }
 
     /**
+     * Roles the groups of a user grant. Like Matomo core, joined with the site table: rows of deleted websites (e.g.
+     * deleted while this plugin was deactivated) never grant access.
+     *
      * @return array<array{
      *   idsite: int,
      *   access: string
@@ -38,9 +41,10 @@ class MultiTable {
     public function getPermissionsOfUser(string $login): array {
         $tablePermission = $this->tablePrefixedGroupPermission;
         $tableUser = $this->tablePrefixedGroupUser;
-        $sql = "SELECT ga.idsite, ga.access FROM $tablePermission as ga 
-                INNER JOIN $tableUser AS gu 
-                ON ga.idgroup = gu.idgroup 
+        $tableSite = Common::prefixTable('site');
+        $sql = "SELECT ga.idsite, ga.access FROM $tablePermission AS ga
+                INNER JOIN $tableUser AS gu ON ga.idgroup = gu.idgroup
+                INNER JOIN $tableSite AS s ON s.idsite = ga.idsite
                 WHERE gu.login = ?";
 
         $rows = Rows::list(Db::fetchAll($sql, [$login]));
@@ -91,9 +95,11 @@ class MultiTable {
         $tableCapability = $this->tablePrefixedGroupCapability;
         $tablePermission = $this->tablePrefixedGroupPermission;
         $tableUser = $this->tablePrefixedGroupUser;
+        $tableSite = Common::prefixTable('site');
         $sql = "SELECT DISTINCT gc.idsite, gc.capability FROM $tableCapability AS gc
                 INNER JOIN $tableUser AS gu ON gc.idgroup = gu.idgroup
                 INNER JOIN $tablePermission AS ga ON ga.idgroup = gc.idgroup AND ga.idsite = gc.idsite
+                INNER JOIN $tableSite AS s ON s.idsite = gc.idsite
                 WHERE gu.login = ?";
 
         $rows = Rows::list(Db::fetchAll($sql, [$login]));

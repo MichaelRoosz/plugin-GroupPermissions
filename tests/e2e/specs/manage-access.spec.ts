@@ -197,10 +197,11 @@ test.describe('Manage Access tab', () => {
     await chooseAllWebsites(page);
 
     await expect(page.locator('.groupPermissionsAllWebsitesNote')).toContainText('changes the role of a group for every website');
-    // the all-websites view does not show existing per-site access, every group starts at "no access"
+    // the roles differ per website: no role is preselected, so any role (also "No access") can be chosen
+    const placeholder = 'Select a role for all websites';
     const allGroups: string[] = (await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 })).map((g: any) => g.name);
     expect((await accessTableGroups(page)).sort()).toEqual([...allGroups].sort());
-    await expectAccess(accessRow(page, withAccess.name), 'noaccess');
+    await expect(roleSelect(accessRow(page, withAccess.name))).toHaveValue(placeholder);
 
     const row = accessRow(page, group.name);
     await chooseOption(row, 'View');
@@ -209,16 +210,28 @@ test.describe('Manage Access tab', () => {
 
     // "No" resets the select
     await clickModalButton(page, 'No');
-    await expectAccess(row, 'noaccess');
+    await expect(roleSelect(row)).toHaveValue(placeholder);
     expect((await su.groupAccess(1))[group.name]).toBe('noaccess');
 
     await chooseOption(row, 'View');
     await clickModalButton(page, 'Yes');
-    await expectAccess(row, 'view');
     await waitForIdle(page);
+    await expect(toast(page, `The group '${group.name}' now has the role 'View'`).first()).toBeVisible();
+    // the select shows the placeholder again, so the same role can be applied again
+    await expect(roleSelect(row)).toHaveValue(placeholder);
     const allSites: number[] = (await su.call('SitesManager.getAllSitesId', { filter_limit: -1 })).map(Number);
     for (const idSite of allSites) {
       expect((await su.groupAccess(idSite))[group.name]).toBe('view');
+    }
+
+    // "No access" removes the access of a group from all websites
+    const existingRow = accessRow(page, withAccess.name);
+    await chooseOption(existingRow, 'No access');
+    await clickModalButton(page, 'Yes');
+    await waitForIdle(page);
+    await expect(roleSelect(existingRow)).toHaveValue(placeholder);
+    for (const idSite of allSites) {
+      expect((await su.groupAccess(idSite))[withAccess.name]).toBe('noaccess');
     }
   });
 

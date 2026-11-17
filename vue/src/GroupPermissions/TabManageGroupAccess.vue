@@ -233,6 +233,15 @@ export default defineComponent({
       return this.showCapabilities ? 3 : 2;
     },
     roleOptions(): RoleOption[] {
+      if (this.isAllWebsites) {
+        // the roles differ per website: no role is preselected, so every role (including
+        // "no access") can be chosen and applied to all websites
+        return [
+          { key: '', value: translate('GroupPermissions_SelectRoleForAllWebsites') },
+          noAccessOption(),
+          ...this.roles,
+        ];
+      }
       return [noAccessOption(), ...this.roles];
     },
     groupIds(): number[] {
@@ -297,7 +306,7 @@ export default defineComponent({
         });
     },
     onRoleSelected(group: GroupSitePermission, access: string) {
-      if (!this.site) {
+      if (!this.site || !access) {
         return;
       }
       const idSite = this.site.id;
@@ -334,7 +343,10 @@ export default defineComponent({
         errorElement: '#ajaxErrorAccessGroupMember',
       }).then(() => {
         const group = this.groupAccess.get(idGroup);
-        if (group) {
+        if (idSite === 'all') {
+          // show the placeholder again, so the same role can be applied again later
+          this.resetRow(idGroup);
+        } else if (group) {
           group.access = access;
           // like the server: capabilities need a role, and the ones included in the new role
           // are redundant
@@ -384,7 +396,7 @@ export default defineComponent({
               this.groupAccess.set(group.idGroup, {
                 idGroup: group.idGroup,
                 name: group.name,
-                access: 'noaccess',
+                access: '',
                 capabilities: [],
               });
             });

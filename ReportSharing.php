@@ -31,6 +31,14 @@ class ReportSharing {
     public const REPORT_TYPE = 'email';
 
     /**
+     * Reports with data of other websites than the website of the scheduled report. Matomo limits them to the
+     * websites of the report's creator (or not at all for super users), not of the member managing a shared report,
+     * so they would show members data of websites they have no access to. Reports containing one cannot be shared,
+     * and they cannot be added to a shared report.
+     */
+    public const CROSS_SITE_REPORTS = ['MultiSites_getAll'];
+
+    /**
      * @var Model
      */
     private $model;
@@ -51,12 +59,13 @@ class ReportSharing {
      *   idsite: int,
      *   login: string,
      *   description: string,
-     *   type: string
+     *   type: string,
+     *   reports: array<mixed>
      * }
      */
     public static function getStoredReport(int $idReport): ?array {
         $row = Rows::row(Db::fetchRow(
-            'SELECT r.idreport, r.idsite, r.login, r.description, r.type FROM `' . Common::prefixTable('report') . '` r
+            'SELECT r.idreport, r.idsite, r.login, r.description, r.type, r.reports FROM `' . Common::prefixTable('report') . '` r
                 INNER JOIN `' . Common::prefixTable('site') . '` s ON s.idsite = r.idsite
                 WHERE r.idreport = ? AND r.deleted = 0',
             [$idReport]
@@ -72,7 +81,52 @@ class ReportSharing {
             'login' => Rows::string($row, 'login'),
             'description' => Rows::string($row, 'description'),
             'type' => Rows::string($row, 'type'),
+            'reports' => self::decodeReports($row['reports'] ?? null),
         ];
+    }
+
+    /**
+     * Whether the list of reports (unique IDs like `VisitsSummary_get`) contains a report with data of other websites
+     *
+     * @param mixed $reports
+     */
+    public static function containsCrossSiteReport($reports): bool {
+        if (is_string($reports)) {
+            $reports = self::decodeReports($reports);
+        }
+        if (!is_array($reports)) {
+            return false;
+        }
+
+        foreach ($reports as $report) {
+            if (is_string($report) && in_array($report, self::CROSS_SITE_REPORTS, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed $reports the `reports` column (JSON list)
+     *
+     * @return array<mixed>
+     */
+    private static function decodeReports($reports): array {
+        if (!is_string($reports) || $reports === '') {
+            return [];
+        }
+
+        $decoded = json_decode($reports, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Whether the report is shared with at least one group
+     */
+    public function isShared(int $idReport): bool {
+        return $this->model->getGroupsOfReport($idReport) !== [];
     }
 
     /**

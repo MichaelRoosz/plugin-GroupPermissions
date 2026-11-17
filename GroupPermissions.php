@@ -51,6 +51,8 @@ class GroupPermissions extends Plugin {
             'Tracker.Cache.getSiteAttributes'        => ['function' => 'addGroupTrackingTokens', 'after' => true],
             // before the ScheduledReports plugin deletes the reports of the user
             'UsersManager.deleteUser'                => ['function' => 'deleteUser', 'before' => true],
+            'UsersManager.addUser.end'               => 'removeStaleMemberships',
+            'UsersManager.inviteUser.end'            => 'removeStaleMemberships',
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
         ];
     }
@@ -193,6 +195,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_Segments';
         $translations[] = 'GroupPermissions_SegmentsDescription';
         $translations[] = 'GroupPermissions_SelectNewUser';
+        $translations[] = 'GroupPermissions_SelectRoleForAllWebsites';
         $translations[] = 'GroupPermissions_SelectWebsite';
         $translations[] = 'GroupPermissions_ShareReport';
         $translations[] = 'GroupPermissions_ShareReportButton';
@@ -436,6 +439,35 @@ class GroupPermissions extends Plugin {
         $model = new Model();
         $model->removeAllPermissionsForSite($idSite);
         $model->removeAllCapabilitiesForSite($idSite);
+    }
+
+    /**
+     * A new user never inherits the group memberships of a deleted user with the same login: they are left behind
+     * when the user was deleted while this plugin was deactivated.
+     *
+     * @param mixed $login
+     */
+    public function removeStaleMemberships($login): void {
+        if (!is_string($login) || $login === '') {
+            return;
+        }
+
+        try {
+            $model = new Model();
+            if ($model->getMembershipsOfUser($login)) {
+                $model->removeUserFromAllGroups($login);
+                GroupAccessUpdater::reloadAccess();
+            }
+        } catch (\Throwable $e) {
+            // never break creating a user, e.g. while the database update of this plugin is still pending
+            $logger = StaticContainer::get(LoggerInterface::class);
+            if ($logger instanceof LoggerInterface) {
+                $logger->warning(
+                    'GroupPermissions: could not remove stale group memberships of the new user {login}: {message}',
+                    ['login' => $login, 'message' => $e->getMessage()]
+                );
+            }
+        }
     }
 
     /**

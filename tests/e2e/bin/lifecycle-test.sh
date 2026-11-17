@@ -66,16 +66,51 @@ check "anonymous gets no access from groups" "" "$(api SitesManager.getSitesIdWi
 sql "DELETE FROM matomo_gpermissions_user WHERE login = 'anonymous'"
 su GroupPermissions.setGroupAccess --data-urlencode "name=$group" --data-urlencode "access=view" --data-urlencode "idSites=$id_site" >/dev/null
 
+echo "==> A shared report with the All Websites dashboard (e.g. shared by an older version) is not available to members"
+id_report=$(su ScheduledReports.addReport --data-urlencode "idSite=$id_site" --data-urlencode "description=Lifecycle all websites $run_id" \
+    --data-urlencode "period=never" --data-urlencode "hour=0" --data-urlencode "reportType=email" --data-urlencode "reportFormat=html" \
+    --data-urlencode "reports[]=MultiSites_getAll" --data-urlencode "parameters[displayFormat]=1" \
+    --data-urlencode "parameters[emailMe]=1" --data-urlencode "parameters[evolutionGraph]=0" | sed -E 's/.*"value":([0-9]+).*/\1/')
+sql "INSERT INTO matomo_gpermissions_report (idgroup, idreport) VALUES ($id_group, $id_report)"
+check "member does not see the report" "0" "$(api ScheduledReports.getReports --data-urlencode "token_auth=$member_token" | grep -c "all websites $run_id" || true)"
+check "member cannot download the report" "1" "$(api ScheduledReports.generateReport --data-urlencode "token_auth=$member_token" \
+    --data-urlencode "idReport=$id_report" --data-urlencode "date=yesterday" | grep -c "couldn't be found" || true)"
+sql "DELETE FROM matomo_gpermissions_report WHERE idreport = $id_report"
+
+echo "==> Preparing a website and users that are deleted while the plugin is deactivated"
+gone_site=$(su SitesManager.addSite --data-urlencode "siteName=Lifecycle gone $run_id" --data-urlencode "urls=https://gone-$run_id.example.org" \
+    | sed -E 's/.*"value":([0-9]+).*/\1/')
+su GroupPermissions.setGroupAccess --data-urlencode "name=$group" --data-urlencode "access=view" --data-urlencode "idSites=$gone_site" >/dev/null
+gone_member="lifecycle_gone_$run_id"
+reborn_member="lifecycle_reborn_$run_id"
+for login in "$gone_member" "$reborn_member"; do
+    su UsersManager.addUser --data-urlencode "userLogin=$login" --data-urlencode "password=lifecyclePass1!" \
+        --data-urlencode "email=$login@example.org" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
+    su GroupPermissions.addUserToGroup --data-urlencode "idGroup=$id_group" --data-urlencode "login=$login" >/dev/null
+done
+check "member sees both websites through the group" "$id_site,$gone_site" "$(member_sites)"
+
 echo "==> Deactivating the plugin"
 mexec ./console plugin:deactivate GroupPermissions >/dev/null
 check "group access no longer applies" "" "$(member_sites)"
 check "plugin API is gone" "1" "$(su GroupPermissions.getAllGroups | grep -c 'is not enabled' || true)"
 check "group data is kept" "1" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_group WHERE name = '$group'")"
+su SitesManager.deleteSite --data-urlencode "idSite=$gone_site" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
+for login in "$gone_member" "$reborn_member"; do
+    su UsersManager.deleteUser --data-urlencode "userLogin=$login" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
+done
+check "group access to the deleted website is left behind" "1" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_access WHERE idsite = $gone_site")"
 
 echo "==> Activating the plugin again"
 mexec ./console plugin:activate GroupPermissions >/dev/null
 check "group access applies again" "$id_site" "$(member_sites)"
 check "group still has its member" "1" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$member\"")"
+check "membership of a deleted user can be removed" "1" "$(su GroupPermissions.removeUserFromGroup --data-urlencode "idGroup=$id_group" \
+    --data-urlencode "login=$gone_member" | grep -c '"success"' || true)"
+check "membership of the deleted user is gone" "0" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_user WHERE login = '$gone_member'")"
+su UsersManager.addUser --data-urlencode "userLogin=$reborn_member" --data-urlencode "password=lifecyclePass1!" \
+    --data-urlencode "email=$reborn_member@example.org" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
+check "a new user with the login of a deleted member is in no group" "0" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_user WHERE login = '$reborn_member'")"
 
 echo "==> Creating a website without the automatic access table (e.g. update not run yet) does not fail"
 sql "DROP TABLE matomo_gpermissions_autoaccess"
