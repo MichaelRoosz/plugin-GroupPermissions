@@ -79,7 +79,7 @@ test.describe('Group access in the website form', () => {
 
   test('invalid values are rejected without creating the website', async () => {
     const group = await su.createGroup('Form invalid');
-    const sitesBefore = (await su.call('SitesManager.getAllSitesId')).length;
+    const sitesBefore = (await su.call('SitesManager.getAllSitesId', { filter_limit: -1 })).length;
 
     expect(await su.expectError('SitesManager.addSite', {
       siteName: `Form Invalid ${RUN_ID}`, ...groupAccessParams([{ group: 999999, role: 'view' }]),
@@ -87,7 +87,7 @@ test.describe('Group access in the website form', () => {
     expect(await su.expectError('SitesManager.addSite', {
       siteName: `Form Invalid ${RUN_ID}`, ...groupAccessParams([{ group: group.idGroup, role: 'superuser' }]),
     })).toMatch(/must have one of the following values/);
-    expect((await su.call('SitesManager.getAllSitesId')).length).toBe(sitesBefore);
+    expect((await su.call('SitesManager.getAllSitesId', { filter_limit: -1 })).length).toBe(sitesBefore);
   });
 
   test('the field and the automatic access rules are combined, the higher role wins', async () => {

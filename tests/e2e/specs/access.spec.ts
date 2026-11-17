@@ -34,7 +34,7 @@ test.describe('Group site access', () => {
     expect((await su.groupAccess(s2))[group.name]).toBe('view');
 
     await su.setGroupAccess(group.name, 'write', 'all');
-    const allSites: number[] = (await su.call('SitesManager.getAllSitesId')).map(Number);
+    const allSites: number[] = (await su.call('SitesManager.getAllSitesId', { filter_limit: -1 })).map(Number);
     for (const idSite of [1, s1, s2, allSites[allSites.length - 1]]) {
       expect((await su.groupAccess(idSite))[group.name]).toBe('write');
     }

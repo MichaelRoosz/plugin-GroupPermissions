@@ -100,6 +100,32 @@ test.describe('Group management API', () => {
     expect(await su.expectError('GroupPermissions.renameGroup', { idGroup: 999999, newName: `x ${RUN_ID}` })).toMatch(/Group does not exist/);
   });
 
+  test('names are trimmed and must not be empty', async () => {
+    // Matomo itself already rejects empty (and blank) parameters
+    for (const groupName of ['', '   ']) {
+      expect(await su.expectError('GroupPermissions.createGroup', { groupName })).toMatch(/Please (enter a group name|specify a value)/);
+    }
+
+    const name = `Trimmed ${RUN_ID}`;
+    const group = await su.call('GroupPermissions.createGroup', { groupName: `  ${name}  ` });
+    expect(group.name).toBe(name);
+    expect(await su.expectError('GroupPermissions.createGroup', { groupName: ` ${name}` })).toMatch(/Group already exists/);
+
+    expect(await su.expectError('GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: ' ' })).toMatch(/Please (enter a group name|specify a value)/);
+    await su.call('GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: ` ${name} 2 ` });
+    expect((await su.call('GroupPermissions.getGroupWithId', { idGroup: group.idGroup })).name).toBe(`${name} 2`);
+  });
+
+  test('renameGroup can change only the case of the name', async () => {
+    const group = await su.createGroup('case rename');
+    const upper = group.name.toUpperCase();
+
+    await su.call('GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: upper });
+    expect((await su.call('GroupPermissions.getGroupWithId', { idGroup: group.idGroup })).name).toBe(upper);
+    // renaming to its own name is no error either
+    await su.call('GroupPermissions.renameGroup', { idGroup: group.idGroup, newName: upper });
+  });
+
   test('deleteGroup removes the group, its members and its permissions', async () => {
     const group = await su.createGroup('Delete me');
     const idSite = await su.createSite('Delete Group Site');

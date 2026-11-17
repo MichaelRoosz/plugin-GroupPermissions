@@ -216,7 +216,7 @@ test.describe('Manage Access tab', () => {
     await clickModalButton(page, 'Yes');
     await expectAccess(row, 'view');
     await waitForIdle(page);
-    const allSites: number[] = (await su.call('SitesManager.getAllSitesId')).map(Number);
+    const allSites: number[] = (await su.call('SitesManager.getAllSitesId', { filter_limit: -1 })).map(Number);
     for (const idSite of allSites) {
       expect((await su.groupAccess(idSite))[group.name]).toBe('view');
     }

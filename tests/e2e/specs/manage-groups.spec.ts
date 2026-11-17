@@ -347,7 +347,7 @@ test.describe('Manage Groups tab', () => {
     await clickModalButton(page, 'Yes');
     await waitForIdle(page);
 
-    const allSites: number[] = (await su.call('SitesManager.getAllSitesId')).map(Number);
+    const allSites: number[] = (await su.call('SitesManager.getAllSitesId', { filter_limit: -1 })).map(Number);
     await expect(menuCount(page, 'access')).toHaveText(String(allSites.length));
     for (const idSite of allSites) {
       expect((await su.groupAccess(idSite))[group.name]).toBe('view');
@@ -389,7 +389,8 @@ test.describe('Manage Groups tab', () => {
     await screenshot(page, 'group-settings');
 
     await groupEditor(page).locator('.groupPermissionsBackToGroups').click();
-    expect(await groupListNames(page)).toContain(newName);
+    // the list is loaded after switching back
+    await expect.poll(() => groupListNames(page)).toContain(newName);
   });
 
   test('settings: deletes the group after confirmation', async ({ page }) => {

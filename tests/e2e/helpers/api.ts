@@ -21,7 +21,7 @@ function encode(params: Params): URLSearchParams {
  * Minimal Matomo HTTP API client authenticated with a token_auth (sent via POST).
  */
 export class MatomoApi {
-  constructor(public readonly login: string, private readonly tokenAuth: string) {}
+  constructor(public readonly login: string, public readonly tokenAuth: string) {}
 
   static async forUser(login: string, password: string): Promise<MatomoApi> {
     const token = await MatomoApi.raw('UsersManager.createAppSpecificTokenAuth', {

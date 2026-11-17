@@ -82,7 +82,7 @@ services:
       - ./saml/authsources.php:/var/www/simplesamlphp/config/authsources.php:ro
 
   playwright:
-    image: mcr.microsoft.com/playwright:v1.49.1-noble
+    image: mcr.microsoft.com/playwright:v1.65.1-noble
     profiles: ["test"]
     depends_on:
       matomo:
