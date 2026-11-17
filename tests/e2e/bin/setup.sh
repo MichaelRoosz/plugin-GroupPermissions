@@ -39,6 +39,17 @@ is_installed() {
         && ! mexec grep -q installation_in_progress /var/www/html/config/config.ini.php
 }
 
+has_tables() {
+    compose exec -T db mariadb -umatomo -pmatomo matomo -N -e "SHOW TABLES LIKE 'matomo_site'" | grep -q .
+}
+
+# the database lives on a tmpfs: after the containers were stopped (docker/WSL restart) it is empty again while
+# Matomo's config.ini.php survives, so install again from scratch
+if is_installed && ! has_tables; then
+    echo "==> Database is empty (containers were restarted), reinstalling Matomo"
+    mexec rm -f /var/www/html/config/config.ini.php
+fi
+
 if is_installed; then
     echo "==> Matomo already installed"
 else
