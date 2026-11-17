@@ -8,8 +8,8 @@
     "typecheck": "tsc -p ."
   },
   "devDependencies": {
-    "@playwright/test": "1.49.1",
-    "@types/node": "22.9.0",
-    "typescript": "5.6.3"
+    "@playwright/test": "1.65.1",
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2"
   }
 }
