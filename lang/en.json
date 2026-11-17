@@ -34,6 +34,7 @@
         "EditGroup": "Edit group '%s'",
         "ExceptionAnonymousNotAllowed": "The anonymous user cannot be added to a group.",
         "ExceptionEmptyExternalGroup": "Please enter the name or DN of an external group.",
+        "ExceptionEmptyGroupName": "Please enter a group name.",
         "ExceptionEmptyOidcGroupsClaim": "Please enter the name of the groups claim.",
         "ExceptionEmptyPattern": "Please enter a website group or URL.",
         "ExceptionEmptySamlGroupsAttribute": "Please enter the name of the group attribute.",

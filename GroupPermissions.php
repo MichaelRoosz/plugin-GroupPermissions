@@ -16,6 +16,7 @@ use Piwik\Log\LoggerInterface;
 use Piwik\Piwik;
 use Piwik\Plugin;
 use Piwik\Plugins\UsersManager\Model as UsersModel;
+use Piwik\Plugins\UsersManager\UsersManager;
 
 class GroupPermissions extends Plugin {
     public function install(): void {
@@ -46,6 +47,8 @@ class GroupPermissions extends Plugin {
             'ScheduledReports.getReportRecipients'   => ['function' => 'fixReportRecipients', 'after' => true],
             'SitesManager.addSite.end'               => 'addSite',
             'SitesManager.deleteSite.end'            => 'deleteSite',
+            // after the UsersManager plugin, which resets the list
+            'Tracker.Cache.getSiteAttributes'        => ['function' => 'addGroupTrackingTokens', 'after' => true],
             // before the ScheduledReports plugin deletes the reports of the user
             'UsersManager.deleteUser'                => ['function' => 'deleteUser', 'before' => true],
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
@@ -373,6 +376,55 @@ class GroupPermissions extends Plugin {
         } else {
             unset($recipients[$index]);
             $recipients = array_values($recipients);
+        }
+    }
+
+    /**
+     * The tracker accepts a token_auth (needed e.g. to import logs, track with a custom IP or a timestamp older than
+     * 24 hours) only from users with write or admin access to the website, which Matomo caches per website. Adds
+     * the users who have such a role through a group.
+     *
+     * @param mixed $attributes
+     * @param mixed $idSite
+     */
+    public function addGroupTrackingTokens(&$attributes, $idSite): void {
+        if (!is_array($attributes) || !is_numeric($idSite) || (int) $idSite <= 0) {
+            return;
+        }
+
+        try {
+            $logins = array_values(array_diff(
+                (new Model())->getLoginsWithRoleForSite((int) $idSite, ['write', 'admin']),
+                ['anonymous']
+            ));
+            if (!$logins) {
+                return;
+            }
+
+            $tokens = [];
+            foreach (is_array($attributes['tracking_token_auth'] ?? null) ? $attributes['tracking_token_auth'] : [] as $token) {
+                if (is_string($token)) {
+                    $tokens[$token] = true;
+                }
+            }
+
+            $hashedTokens = (new UsersModel())->getAllHashedTokensForLogins($logins);
+            foreach (is_array($hashedTokens) ? $hashedTokens : [] as $tokenAuth) {
+                $hash = is_string($tokenAuth) ? UsersManager::hashTrackingToken($tokenAuth, (int) $idSite) : null;
+                if (is_string($hash)) {
+                    $tokens[$hash] = true;
+                }
+            }
+            $attributes['tracking_token_auth'] = array_keys($tokens);
+        } catch (\Throwable $e) {
+            // never break the tracker, e.g. while the database update of this plugin is still pending
+            $logger = StaticContainer::get(LoggerInterface::class);
+            if ($logger instanceof LoggerInterface) {
+                $logger->warning(
+                    'GroupPermissions: could not add the tracking tokens of group members for website {idSite}: {message}',
+                    ['idSite' => $idSite, 'message' => $e->getMessage()]
+                );
+            }
         }
     }
 

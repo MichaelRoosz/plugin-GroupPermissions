@@ -533,6 +533,17 @@ class Model {
     }
 
     /**
+     * @param array<string> $roles
+     *
+     * @return array<string> logins of the members of groups with one of the roles for the website
+     */
+    public function getLoginsWithRoleForSite(int $idSite, array $roles): array {
+        $multiTable = new MultiTable();
+
+        return $multiTable->getLoginsWithRoleForSite($idSite, $roles);
+    }
+
+    /**
      * @return array<array{
      *   idsite: int,
      *   capability: string

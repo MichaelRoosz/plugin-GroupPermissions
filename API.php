@@ -330,9 +330,9 @@ class API extends \Piwik\Plugin\API {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionUserAlreadyInGroup', $login));
         }
 
-        $this->model->removeUserFromGroup($idGroup, $login);
-
         $this->model->addUserToGroup($idGroup, $login);
+
+        GroupAccessUpdater::reloadAccess();
     }
 
     /**
@@ -383,7 +383,7 @@ class API extends \Piwik\Plugin\API {
             $this->model->addUserToGroup($idGroup, $userLogin);
         }
 
-        Access::getInstance()->reloadAccess();
+        GroupAccessUpdater::reloadAccess();
     }
 
     public function removeUserFromGroup(int $idGroup, string $login): void {
@@ -401,6 +401,8 @@ class API extends \Piwik\Plugin\API {
         }
 
         $this->model->removeUserFromGroup($idGroup, $login);
+
+        GroupAccessUpdater::reloadAccess();
     }
 
     public function setGroupAccess(string $name, string $access, string $idSites): void {
@@ -431,7 +433,7 @@ class API extends \Piwik\Plugin\API {
     public function createGroup(string $groupName): array {
         Piwik::checkUserHasSuperUserAccess();
 
-        $this->checkGroupName($groupName);
+        $groupName = $this->checkGroupName($groupName);
 
         try {
             $existingGroup = $this->model->getGroupWithName($groupName);
@@ -457,7 +459,7 @@ class API extends \Piwik\Plugin\API {
     public function renameGroup(int $idGroup, string $newName): void {
         Piwik::checkUserHasSuperUserAccess();
 
-        $this->checkGroupName($newName);
+        $newName = $this->checkGroupName($newName);
 
         $group = $this->model->getGroupWithId($idGroup);
         if (empty($group['idgroup'])) {
@@ -471,7 +473,8 @@ class API extends \Piwik\Plugin\API {
             $existingGroup = null;
         }
 
-        if ($existingGroup) {
+        // names are compared case-insensitively, so changing only the case finds the group itself
+        if ($existingGroup && $existingGroup['idgroup'] !== $idGroup) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesExist', $newName));
         }
 
@@ -496,6 +499,8 @@ class API extends \Piwik\Plugin\API {
         $this->model->removeAllUsersOfGroup($idGroup);
 
         $this->model->deleteGroup($idGroup);
+
+        GroupAccessUpdater::reloadAccess();
     }
 
     /**
@@ -1354,13 +1359,20 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
-     * Group names are stored in a VARCHAR column, longer names would be truncated silently.
+     * Returns the name without surrounding whitespace. Group names are stored in a VARCHAR column, longer names
+     * would be truncated silently.
      * Note: the length is checked on the sanitized value Matomo stores (e.g. `"` is stored as `&quot;`).
      */
-    private function checkGroupName(string $name): void {
+    private function checkGroupName(string $name): string {
+        $name = trim($name);
+        if ($name === '') {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionEmptyGroupName'));
+        }
         if (mb_strlen($name) > Dao\Group::NAME_MAX_LENGTH) {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupNameTooLong', [Dao\Group::NAME_MAX_LENGTH]));
         }
+
+        return $name;
     }
 
     private function checkAccessType(string $access): void {

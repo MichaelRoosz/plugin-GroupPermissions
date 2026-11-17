@@ -54,6 +54,31 @@ class MultiTable {
     }
 
     /**
+     * Logins of the members of groups that have one of the given roles for a website.
+     *
+     * @param array<string> $roles
+     *
+     * @return array<string>
+     */
+    public function getLoginsWithRoleForSite(int $idSite, array $roles): array {
+        if (!$roles) {
+            return [];
+        }
+
+        $tablePermission = $this->tablePrefixedGroupPermission;
+        $tableUser = $this->tablePrefixedGroupUser;
+        $sql = "SELECT DISTINCT gu.login FROM $tablePermission AS ga
+                INNER JOIN $tableUser AS gu ON ga.idgroup = gu.idgroup
+                WHERE ga.idsite = ? AND ga.access IN (" . Common::getSqlStringFieldsArray($roles) . ')';
+
+        $rows = Rows::list(Db::fetchAll($sql, array_merge([$idSite], array_values($roles))));
+
+        return array_map(static function (array $row): string {
+            return Rows::string($row, 'login');
+        }, $rows);
+    }
+
+    /**
      * Capabilities the groups of a user grant. Only capabilities of groups that also have a role for the
      * website are returned (a capability never applies without a role).
      *

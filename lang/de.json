@@ -29,6 +29,7 @@
         "DescriptionGroupsTab": "Erstellen Sie Gruppen, fügen Sie Benutzer hinzu und geben Sie den Gruppen Zugriff auf Websites. Jedes Mitglied erhält den Zugriff aller seiner Gruppen (die höchste Rolle gilt).",
         "EditGroup": "Gruppe '%s' bearbeiten",
         "ExceptionAnonymousNotAllowed": "Der anonyme Benutzer kann keiner Gruppe hinzugefügt werden.",
+        "ExceptionEmptyGroupName": "Bitte einen Gruppennamen eingeben.",
         "ExceptionEmptyPattern": "Bitte eine Website-Gruppe oder URL eingeben.",
         "ExceptionGroupDoesExist": "Gruppe existiert bereits",
         "ExceptionGroupDoesNotExist": "Gruppe existiert nicht",
