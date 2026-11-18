@@ -4,6 +4,7 @@
         "MatchTypeUrl": "Veebisaidi URL",
         "Pattern": "Muster",
         "RemoveFromGroup": "Eemalda",
+        "ScheduledReport": "Raport",
         "Segment": "Segment",
         "Users": "Kasutajaid",
         "Websites": "Veebilehed"
