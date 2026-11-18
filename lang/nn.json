@@ -93,6 +93,7 @@
         "RenameGroupButton": "Endre namn på gruppa",
         "RenameGroupConfirm": "Er du sikker på at du vil endre namnet på gruppa «%1$s» til «%2$s»?",
         "RolesOfGroupsFor": "Rollene til gruppene for «%s»",
+        "ScheduledReport": "Rapporter",
         "SearchGroups": "Søk i grupper",
         "Segment": "Segment",
         "SegmentShared": "Segmentet «%1$s» er no delt med gruppa «%2$s».",
