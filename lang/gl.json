@@ -1,5 +1,6 @@
 {
     "GroupPermissions": {
+        "ScheduledReport": "Informe",
         "Users": "Usuario",
         "Websites": "Sitios"
     }
