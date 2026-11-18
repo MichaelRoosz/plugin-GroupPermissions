@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "Pattern": "Шаблон",
+        "ScheduledReport": "Справаздача",
         "Users": "Карыстачы",
         "Websites": "Вэб-сайты"
     }
