@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "Pattern": "Modelis",
         "RemoveFromGroup": "Noņemt",
+        "ScheduledReport": "Ziņot",
         "Segment": "Segments",
         "Segments": "Segmenti",
         "SelectWebsite": "Izvēlieties vietni",
