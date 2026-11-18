@@ -23,7 +23,6 @@ use Piwik\Piwik;
 use Piwik\Plugin\Manager as PluginManager;
 use Piwik\Plugins\Dashboard\Dashboard;
 use Piwik\Plugins\Dashboard\Model as DashboardModel;
-use Piwik\Plugins\ScheduledReports\API as CoreScheduledReportsAPI;
 use Piwik\Plugins\SegmentEditor\Model as SegmentEditorModel;
 use Piwik\Site;
 use Piwik\Tracker\Cache;
@@ -421,34 +420,6 @@ class API extends \Piwik\Plugin\API {
         }
     }
 
-    /**
-     * Removes a user invited by inviteUserToGroups again after a later step failed.
-     *
-     * @return bool whether the user was removed
-     */
-    private function rollBackInvite(
-        string $userLogin,
-        #[\SensitiveParameter]
-        ?string $passwordConfirmation
-    ): bool {
-        try {
-            $this->model->removeUserFromAllGroups($userLogin);
-            UsersManagerAPI::getInstance()->deleteUser($userLogin, $passwordConfirmation);
-
-            return true;
-        } catch (\Throwable $e) {
-            $logger = StaticContainer::get(LoggerInterface::class);
-            if ($logger instanceof LoggerInterface) {
-                $logger->warning(
-                    'GroupPermissions: could not remove the invited user {login} after the invitation failed: {message}',
-                    ['login' => $userLogin, 'message' => $e->getMessage()]
-                );
-            }
-
-            return false;
-        }
-    }
-
     public function removeUserFromGroup(int $idGroup, string $login): void {
         Piwik::checkUserHasSuperUserAccess();
 
@@ -503,17 +474,6 @@ class API extends \Piwik\Plugin\API {
         $group = $this->getGroupOrFail($idGroup);
 
         $this->updateGroupAccess($group['idgroup'], $access, $idSites);
-    }
-
-    private function updateGroupAccess(int $idGroup, string $access, string $idSites): void {
-        if ($access !== 'noaccess') {
-            $this->checkAccessType($access);
-        }
-
-        $idSites = $this->getIdSitesCheckAdminAccess($idSites);
-
-        $updater = new GroupAccessUpdater($this->model, $this->capabilityProvider);
-        $updater->setAccess($idGroup, $idSites, $access);
     }
 
     /**
@@ -581,11 +541,11 @@ class API extends \Piwik\Plugin\API {
         if ($db) {
             $db->beginTransaction();
         }
+
         try {
             $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
             $this->model->removeAllExternalGroupMappingsOfGroup($idGroup);
             $this->model->removeAllSegmentSharesOfGroup($idGroup);
-            $this->model->removeAllReportSharesOfGroup($idGroup);
             $this->model->removeAllCapabilitiesOfGroup($idGroup);
             $this->model->removeAllPermissionsOfGroup($idGroup);
             $this->model->removeAllUsersOfGroup($idGroup);
@@ -957,80 +917,18 @@ class API extends \Piwik\Plugin\API {
             throw new Exception('Dashboard not found');
         }
 
-        // UsersManager.getUsers only returns users the current user is allowed to manage
-        $visibleLogins = [];
-        $users = Request::processRequest('UsersManager.getUsers', ['filter_limit' => -1]);
-        if (is_array($users)) {
-            foreach ($users as $user) {
-                if (is_array($user) && isset($user['login']) && is_string($user['login'])) {
-                    $visibleLogins[$user['login']] = true;
-                }
-            }
-        }
-
         $dashboardModel = StaticContainer::get(DashboardModel::class);
         if (!($dashboardModel instanceof DashboardModel)) {
             throw new Exception('Dashboard plugin could not be loaded.');
         }
 
-        // websites the current user administers, to also find users who only have access through groups (super
-        // users already see everyone)
-        $adminIdSites = null;
-        if (!Piwik::hasUserSuperUserAccess()) {
-            $adminIdSites = [];
-            foreach (Access::getInstance()->getSitesIdWithAdminAccess() as $idSite) {
-                if (is_numeric($idSite)) {
-                    $adminIdSites[(int) $idSite] = true;
-                }
-            }
-        }
-
         $copiedTo = [];
-        foreach ($this->model->getMembersOfGroup($group['idgroup']) as $member) {
-            $login = $member['login'];
-
-            if ($login === $currentLogin || $login === 'anonymous') {
-                continue;
-            }
-            if (!isset($visibleLogins[$login]) && !$this->isVisibleThroughGroups($login, $adminIdSites, $currentLogin)) {
-                continue;
-            }
-
+        foreach ($this->getMembersVisibleToCurrentUser($group['idgroup']) as $login) {
             $dashboardModel->createNewDashboardForUser($login, $dashboardName, $layout);
             $copiedTo[] = $login;
         }
 
         return $copiedTo;
-    }
-
-    /**
-     * Whether a user that Matomo's user list hides from the current (non super) user may be seen anyway, because
-     * a group gives them a role for a website the current user administers. Matomo only considers its own access
-     * table there. Like Matomo, pending invitations are only visible to the user who sent them.
-     *
-     * @param array<int, true>|null $adminIdSites ids of the websites the current user administers as keys, null for
-     *                                           super users
-     */
-    private function isVisibleThroughGroups(string $login, ?array $adminIdSites, string $currentLogin): bool {
-        if (!$adminIdSites) {
-            return false;
-        }
-
-        $user = (new UsersModel())->getUser($login);
-        if (!is_array($user) || !$user) {
-            return false; // deleted
-        }
-        if (!empty($user['invite_token']) && ($user['invited_by'] ?? null) !== $currentLogin) {
-            return false;
-        }
-
-        foreach ($this->model->getPermissionsOfUser($login) as $permission) {
-            if (isset($adminIdSites[$permission['idsite']])) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -1161,74 +1059,39 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
-     * Shares a scheduled email report with a group (shared ownership).
+     * Copies a scheduled email report to the members of a group: every member gets an independent copy of their
+     * own, which they manage like any other report. The copies are sent to their member only ("Send report to
+     * me"), the additional recipients of the original are not copied.
      *
-     * Members of the group can see, edit, send, download and delete the report like their own as long as they
-     * have view access to its website, e.g. to change the recipients while the creator is absent. Changes are made
-     * with the member's own account; the report keeps its creator. Only email reports can be shared.
-     * Super users can share any report, users with admin access to at least one website their own reports.
+     * Like copyDashboardToGroup, the report is only copied to members the current user is allowed to see. Members
+     * without view access to the website of the report, invited users that did not accept yet, the current user and
+     * the anonymous user are skipped. Super users can copy any email report, users with admin access to at least
+     * one website their own reports. Reports using a segment must use one shared with all users (Matomo does not
+     * let members use private segments of other users).
+     *
+     * @return array<string> Logins of the users the report was copied to
      */
-    public function shareReportWithGroup(int $idReport, int $idGroup): void {
+    public function copyReportToGroup(int $idReport, int $idGroup): array {
         Piwik::checkUserHasSomeAdminAccess();
 
-        $report = $this->getReportOrFailForSharing($idReport);
+        $reportCopy = new ReportCopy();
+        $report = $reportCopy->getReportOrFail($idReport);
         $group = $this->getGroupOrFail($idGroup);
 
-        if ($report['type'] !== ReportSharing::REPORT_TYPE) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionReportTypeNotShareable'));
-        }
-        if (ReportSharing::containsCrossSiteReport($report['reports'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionCrossSiteReportNotShareable'));
-        }
-
-        $this->model->shareReport($group['idgroup'], $report['idreport']);
-    }
-
-    /**
-     * Stops sharing a scheduled report with a group. Same permissions as `shareReportWithGroup`.
-     */
-    public function unshareReportFromGroup(int $idReport, int $idGroup): void {
-        Piwik::checkUserHasSomeAdminAccess();
-
-        $report = $this->getReportOrFailForSharing($idReport);
-        $group = $this->getGroupOrFail($idGroup);
-
-        $this->model->unshareReport($group['idgroup'], $report['idreport']);
-    }
-
-    /**
-     * Returns the groups a scheduled report is shared with, sorted by name. Same permissions as
-     * `shareReportWithGroup`.
-     *
-     * @return array<array{
-     *   idGroup: int,
-     *   name: string
-     * }>
-     */
-    public function getGroupsOfReport(int $idReport): array {
-        Piwik::checkUserHasSomeAdminAccess();
-
-        $report = $this->getReportOrFailForSharing($idReport);
-        $idGroups = array_flip($this->model->getGroupsOfReport($report['idreport']));
-
-        $groups = [];
-        foreach ($this->model->getAllGroups() as $group) {
-            if (isset($idGroups[$group['idgroup']])) {
-                $groups[] = ['idGroup' => $group['idgroup'], 'name' => $group['name']];
+        $idSite = Dao\Rows::int($report, 'idsite');
+        $logins = array_values(array_filter(
+            $this->getMembersVisibleToCurrentUser($group['idgroup']),
+            static function (string $login) use ($reportCopy, $idSite): bool {
+                return $reportCopy->canReceiveCopy($login, $idSite);
             }
-        }
+        ));
 
-        usort($groups, static function (array $a, array $b): int {
-            return strcasecmp($a['name'], $b['name']);
-        });
-
-        return $groups;
+        return $reportCopy->copyToUsers($report, $logins);
     }
 
     /**
-     * Returns the scheduled email reports of all users sorted by description, with whether they are shared with
-     * the group. Reports of other types and reports containing the All Websites dashboard are only returned if they
-     * are shared with the group (sharing does not apply to them, but they can be unshared).
+     * Returns the scheduled email reports the current user can copy to a group, sorted by description: super users
+     * get the reports of all users, other users their own. `idSegment` is 0 for reports without segment.
      *
      * @return array<array{
      *   idReport: int,
@@ -1236,66 +1099,133 @@ class API extends \Piwik\Plugin\API {
      *   login: string,
      *   idSite: int,
      *   siteName: string,
-     *   type: string,
      *   period: string,
-     *   isShared: bool
+     *   idSegment: int
      * }>
      */
-    public function getReportsForGroup(int $idGroup): array {
-        Piwik::checkUserHasSuperUserAccess();
+    public function getCopyableReports(): array {
+        Piwik::checkUserHasSomeAdminAccess();
 
-        $group = $this->getGroupOrFail($idGroup);
+        return (new ReportCopy())->getCopyableReports();
+    }
 
-        if (!ReportSharing::isScheduledReportsActivated()) {
-            return [];
+    /**
+     * Removes a user invited by inviteUserToGroups again after a later step failed.
+     *
+     * @return bool whether the user was removed
+     */
+    private function rollBackInvite(
+        string $userLogin,
+        #[\SensitiveParameter]
+        ?string $passwordConfirmation
+    ): bool {
+        try {
+            $this->model->removeUserFromAllGroups($userLogin);
+            UsersManagerAPI::getInstance()->deleteUser($userLogin, $passwordConfirmation);
+
+            return true;
+        } catch (\Throwable $e) {
+            $logger = StaticContainer::get(LoggerInterface::class);
+            if ($logger instanceof LoggerInterface) {
+                $logger->warning(
+                    'GroupPermissions: could not remove the invited user {login} after the invitation failed: {message}',
+                    ['login' => $userLogin, 'message' => $e->getMessage()]
+                );
+            }
+
+            return false;
+        }
+    }
+
+    private function updateGroupAccess(int $idGroup, string $access, string $idSites): void {
+        if ($access !== 'noaccess') {
+            $this->checkAccessType($access);
         }
 
-        $shared = array_flip($this->model->getReportsOfGroup($group['idgroup']));
-        $siteNames = [];
+        $idSites = $this->getIdSitesCheckAdminAccess($idSites);
 
-        // super users get the reports of all users
-        $reports = CoreScheduledReportsAPI::getInstance()->getReports();
+        $updater = new GroupAccessUpdater($this->model, $this->capabilityProvider);
+        $updater->setAccess($idGroup, $idSites, $access);
+    }
 
-        $result = [];
-        foreach ($reports as $report) {
-            if (!is_array($report) || !is_numeric($report['idreport'] ?? null) || !is_numeric($report['idsite'] ?? null)) {
-                continue;
-            }
+    /**
+     * Logins of the members of a group the current user is allowed to see, like Dashboard.copyDashboardToUser:
+     * super users see everyone, admins see the users with access to their websites, including access through
+     * groups. The current user and the anonymous user are left out.
+     *
+     * @return array<string>
+     */
+    private function getMembersVisibleToCurrentUser(int $idGroup): array {
+        $currentLogin = Piwik::getCurrentUserLogin();
 
-            $idReport = (int) $report['idreport'];
-            $type = is_string($report['type'] ?? null) ? $report['type'] : '';
-            $isShareable = $type === ReportSharing::REPORT_TYPE
-                && !ReportSharing::containsCrossSiteReport($report['reports'] ?? null);
-            if (!$isShareable && !isset($shared[$idReport])) {
-                continue;
-            }
-
-            $idSite = (int) $report['idsite'];
-            if (!isset($siteNames[$idSite])) {
-                try {
-                    $siteNames[$idSite] = Site::getNameFor($idSite);
-                } catch (Exception $e) {
-                    $siteNames[$idSite] = (string) $idSite;
+        // UsersManager.getUsers only returns users the current user is allowed to manage
+        $visibleLogins = [];
+        $users = Request::processRequest('UsersManager.getUsers', ['filter_limit' => -1]);
+        if (is_array($users)) {
+            foreach ($users as $user) {
+                if (is_array($user) && isset($user['login']) && is_string($user['login'])) {
+                    $visibleLogins[$user['login']] = true;
                 }
             }
-
-            $result[] = [
-                'idReport' => $idReport,
-                'description' => is_string($report['description'] ?? null) ? $report['description'] : '',
-                'login' => is_string($report['login'] ?? null) ? $report['login'] : '',
-                'idSite' => $idSite,
-                'siteName' => $siteNames[$idSite],
-                'type' => $type,
-                'period' => is_string($report['period'] ?? null) ? $report['period'] : '',
-                'isShared' => isset($shared[$idReport]),
-            ];
         }
 
-        usort($result, static function (array $a, array $b): int {
-            return strcasecmp($a['description'], $b['description']) ?: $a['idReport'] <=> $b['idReport'];
-        });
+        // websites the current user administers, to also find users who only have access through groups (super
+        // users already see everyone)
+        $adminIdSites = null;
+        if (!Piwik::hasUserSuperUserAccess()) {
+            $adminIdSites = [];
+            foreach (Access::getInstance()->getSitesIdWithAdminAccess() as $idSite) {
+                if (is_numeric($idSite)) {
+                    $adminIdSites[(int) $idSite] = true;
+                }
+            }
+        }
 
-        return $result;
+        $logins = [];
+        foreach ($this->model->getMembersOfGroup($idGroup) as $member) {
+            $login = $member['login'];
+
+            if ($login === $currentLogin || $login === 'anonymous') {
+                continue;
+            }
+            if (!isset($visibleLogins[$login]) && !$this->isVisibleThroughGroups($login, $adminIdSites, $currentLogin)) {
+                continue;
+            }
+
+            $logins[] = $login;
+        }
+
+        return $logins;
+    }
+
+    /**
+     * Whether a user that Matomo's user list hides from the current (non super) user may be seen anyway, because
+     * a group gives them a role for a website the current user administers. Matomo only considers its own access
+     * table there. Like Matomo, pending invitations are only visible to the user who sent them.
+     *
+     * @param array<int, true>|null $adminIdSites ids of the websites the current user administers as keys, null for
+     *                                           super users
+     */
+    private function isVisibleThroughGroups(string $login, ?array $adminIdSites, string $currentLogin): bool {
+        if (!$adminIdSites) {
+            return false;
+        }
+
+        $user = (new UsersModel())->getUser($login);
+        if (!is_array($user) || !$user) {
+            return false; // deleted
+        }
+        if (!empty($user['invite_token']) && ($user['invited_by'] ?? null) !== $currentLogin) {
+            return false;
+        }
+
+        foreach ($this->model->getPermissionsOfUser($login) as $permission) {
+            if (isset($adminIdSites[$permission['idsite']])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1322,36 +1252,6 @@ class API extends \Piwik\Plugin\API {
         return [
             'idsegment' => $idSegment,
             'login' => $login,
-        ];
-    }
-
-    /**
-     * Returns a scheduled report the current user may share: super users any report, other users their own.
-     *
-     * @return array{
-     *   idreport: int,
-     *   login: string,
-     *   type: string,
-     *   reports: array<mixed>
-     * }
-     */
-    private function getReportOrFailForSharing(int $idReport): array {
-        if (!ReportSharing::isScheduledReportsActivated()) {
-            throw new Exception('The ScheduledReports plugin is not activated.');
-        }
-
-        $report = ReportSharing::getStoredReport($idReport);
-
-        // same error for reports that do not exist and reports of other users, to not reveal report ids
-        if ($report === null || (!Piwik::hasUserSuperUserAccess() && $report['login'] !== Piwik::getCurrentUserLogin())) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionReportNotFound', $idReport));
-        }
-
-        return [
-            'idreport' => $report['idreport'],
-            'login' => $report['login'],
-            'type' => $report['type'],
-            'reports' => $report['reports'],
         ];
     }
 

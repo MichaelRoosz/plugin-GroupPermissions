@@ -2,7 +2,7 @@
 # Tests the plugin lifecycle on the running test instance (started by setup.sh / run.sh / start.sh):
 #   deactivate -> group permissions no longer apply, data is kept
 #   activate   -> group permissions apply again
-#   update     -> updating from 5.2.1 creates the capability, automatic access, segment and report tables
+#   update     -> updating from 5.2.1 creates the capability, automatic access, segment and external group tables
 #   uninstall  -> plugin tables are dropped
 #   reinstall  -> empty tables, everything works again
 # Destructive for the plugin data of the instance; run.sh runs it after the Playwright specs.
@@ -66,17 +66,6 @@ check "anonymous gets no access from groups" "" "$(api SitesManager.getSitesIdWi
 sql "DELETE FROM matomo_gpermissions_user WHERE login = 'anonymous'"
 su GroupPermissions.setGroupAccess --data-urlencode "name=$group" --data-urlencode "access=view" --data-urlencode "idSites=$id_site" >/dev/null
 
-echo "==> A shared report with the All Websites dashboard (e.g. shared by an older version) is not available to members"
-id_report=$(su ScheduledReports.addReport --data-urlencode "idSite=$id_site" --data-urlencode "description=Lifecycle all websites $run_id" \
-    --data-urlencode "period=never" --data-urlencode "hour=0" --data-urlencode "reportType=email" --data-urlencode "reportFormat=html" \
-    --data-urlencode "reports[]=MultiSites_getAll" --data-urlencode "parameters[displayFormat]=1" \
-    --data-urlencode "parameters[emailMe]=1" --data-urlencode "parameters[evolutionGraph]=0" | sed -E 's/.*"value":([0-9]+).*/\1/')
-sql "INSERT INTO matomo_gpermissions_report (idgroup, idreport) VALUES ($id_group, $id_report)"
-check "member does not see the report" "0" "$(api ScheduledReports.getReports --data-urlencode "token_auth=$member_token" | grep -c "all websites $run_id" || true)"
-check "member cannot download the report" "1" "$(api ScheduledReports.generateReport --data-urlencode "token_auth=$member_token" \
-    --data-urlencode "idReport=$id_report" --data-urlencode "date=yesterday" | grep -c "couldn't be found" || true)"
-sql "DELETE FROM matomo_gpermissions_report WHERE idreport = $id_report"
-
 echo "==> Preparing a website and users that are deleted while the plugin is deactivated"
 gone_site=$(su SitesManager.addSite --data-urlencode "siteName=Lifecycle gone $run_id" --data-urlencode "urls=https://gone-$run_id.example.org" \
     | sed -E 's/.*"value":([0-9]+).*/\1/')
@@ -119,10 +108,9 @@ sql "DROP TABLE matomo_gpermissions_autoaccess"
 check "website is created" "1" "$(su SitesManager.addSite --data-urlencode "siteName=Lifecycle no table $run_id" \
     --data-urlencode "urls=https://no-table-$run_id.example.org" | grep -cE '"value":[0-9]+' || true)"
 
-echo "==> Updating from version 5.2.1 (without the capability, automatic access, segment, report and external group tables and the synced column)"
+echo "==> Updating from version 5.2.1 (without the capability, automatic access, segment and external group tables and the synced column)"
 sql "DROP TABLE matomo_gpermissions_capability"
 sql "DROP TABLE matomo_gpermissions_segment"
-sql "DROP TABLE matomo_gpermissions_report"
 sql "DROP TABLE matomo_gpermissions_external"
 sql "ALTER TABLE matomo_gpermissions_user DROP COLUMN synced"
 sql "UPDATE matomo_option SET option_value = '5.2.1' WHERE option_name = 'version_GroupPermissions'"
@@ -130,7 +118,6 @@ mexec ./console core:update --yes >/dev/null
 check "capability table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_capability'" | wc -l)"
 check "automatic access table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_autoaccess'" | wc -l)"
 check "segment table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_segment'" | wc -l)"
-check "report table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_report'" | wc -l)"
 check "external group table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_external'" | wc -l)"
 check "existing memberships are not marked as synced" "0" "$(sql "SELECT synced FROM matomo_gpermissions_user WHERE login = '$member'")"
 check "plugin version is updated" "5.3.0" "$(sql "SELECT option_value FROM matomo_option WHERE option_name = 'version_GroupPermissions'")"
@@ -138,7 +125,7 @@ check "group access still applies after the update" "$id_site" "$(member_sites)"
 
 echo "==> Uninstalling the plugin"
 tables_before=$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)
-check "plugin tables exist while installed" "8" "$tables_before"
+check "plugin tables exist while installed" "7" "$tables_before"
 mexec ./console plugin:deactivate GroupPermissions >/dev/null
 mexec ./console plugin:uninstall GroupPermissions >/dev/null
 check "plugin tables are dropped" "0" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
@@ -146,7 +133,7 @@ check "member has no access" "" "$(member_sites)"
 
 echo "==> Reinstalling the plugin"
 ./bin/setup.sh >/dev/null
-check "plugin tables are created again" "8" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
+check "plugin tables are created again" "7" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_%'" | wc -l)"
 su_token=$(token_for "$SUPERUSER_LOGIN" "$SUPERUSER_PASSWORD")
 check "no groups after reinstall" "[]" "$(su GroupPermissions.getAllGroups)"
 check "member has no access after reinstall" "" "$(member_sites)"

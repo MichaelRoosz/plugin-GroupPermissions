@@ -47,13 +47,11 @@ class GroupPermissions extends Plugin {
             // integration point for login plugins (e.g. SAML): sync the groups of a user with their external groups
             'GroupPermissions.syncUserGroups'        => 'syncUserGroups',
             'Login.authenticate.successful'          => 'syncGroupsAfterLogin',
-            'ScheduledReports.getReportRecipients'   => ['function' => 'fixReportRecipients', 'after' => true],
             'SitesManager.addSite.end'               => 'addSite',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             // after the UsersManager plugin, which resets the list
             'Tracker.Cache.getSiteAttributes'        => ['function' => 'addGroupTrackingTokens', 'after' => true],
-            // before the ScheduledReports plugin deletes the reports of the user
-            'UsersManager.deleteUser'                => ['function' => 'deleteUser', 'before' => true],
+            'UsersManager.deleteUser'                => 'deleteUser',
             'UsersManager.addUser.end'               => 'removeStaleMemberships',
             'UsersManager.inviteUser.end'            => 'removeStaleMemberships',
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
@@ -119,6 +117,8 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_CapabilityAdded';
         $translations[] = 'GroupPermissions_CapabilityRemoved';
         $translations[] = 'GroupPermissions_ChangeAccessToAllSitesConfirm';
+        $translations[] = 'GroupPermissions_CopyReport';
+        $translations[] = 'GroupPermissions_CopyReportButton';
         $translations[] = 'GroupPermissions_CreateNewGroup';
         $translations[] = 'GroupPermissions_CreateNewGroupButton';
         $translations[] = 'GroupPermissions_CreatedBy';
@@ -163,11 +163,11 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_MemberRemoved';
         $translations[] = 'GroupPermissions_Members';
         $translations[] = 'GroupPermissions_NoAutoAccessRules';
+        $translations[] = 'GroupPermissions_NoCopyableReports';
         $translations[] = 'GroupPermissions_NoExternalGroups';
         $translations[] = 'GroupPermissions_NoGroups';
         $translations[] = 'GroupPermissions_NoGroupsFound';
         $translations[] = 'GroupPermissions_NoMembers';
-        $translations[] = 'GroupPermissions_NoSharedReports';
         $translations[] = 'GroupPermissions_NoSharedSegments';
         $translations[] = 'GroupPermissions_NoUsersFound';
         $translations[] = 'GroupPermissions_NoWebsiteAccess';
@@ -185,8 +185,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_RemoveFromGroup';
         $translations[] = 'GroupPermissions_RemoveFromGroupConfirm';
         $translations[] = 'GroupPermissions_RenameGroup';
-        $translations[] = 'GroupPermissions_ReportShared';
-        $translations[] = 'GroupPermissions_ReportUnshared';
+        $translations[] = 'GroupPermissions_ReportCopied';
         $translations[] = 'GroupPermissions_RolesOfGroupsFor';
         $translations[] = 'GroupPermissions_ScheduledReport';
         $translations[] = 'GroupPermissions_ScheduledReports';
@@ -200,14 +199,10 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_SelectNewUser';
         $translations[] = 'GroupPermissions_SelectRoleForAllWebsites';
         $translations[] = 'GroupPermissions_SelectWebsite';
-        $translations[] = 'GroupPermissions_ShareReport';
-        $translations[] = 'GroupPermissions_ShareReportButton';
         $translations[] = 'GroupPermissions_ShareSegment';
         $translations[] = 'GroupPermissions_ShareSegmentButton';
         $translations[] = 'GroupPermissions_SyncedMember';
         $translations[] = 'GroupPermissions_SyncedMemberHelp';
-        $translations[] = 'GroupPermissions_UnshareReport';
-        $translations[] = 'GroupPermissions_UnshareReportConfirm';
         $translations[] = 'GroupPermissions_UnshareSegment';
         $translations[] = 'GroupPermissions_UnshareSegmentConfirm';
         $translations[] = 'GroupPermissions_Users';
@@ -411,42 +406,6 @@ class GroupPermissions extends Plugin {
     }
 
     /**
-     * Matomo lists the current user as the recipient of "Send report to me", but the report is sent to its creator.
-     * Lists the creator for reports of other users, e.g. reports shared with a group of the current user.
-     *
-     * @param mixed $recipients
-     * @param mixed $reportType
-     * @param mixed $report
-     */
-    public function fixReportRecipients(&$recipients, $reportType, $report): void {
-        if ($reportType !== ReportSharing::REPORT_TYPE || !is_array($recipients) || !is_array($report)) {
-            return;
-        }
-
-        $login = is_string($report['login'] ?? null) ? $report['login'] : '';
-        $parameters = is_array($report['parameters'] ?? null) ? $report['parameters'] : [];
-        if ($login === '' || $login === Piwik::getCurrentUserLogin() || empty($parameters['emailMe'])) {
-            return;
-        }
-
-        // the core adds the email of the current user first
-        $index = array_search(Piwik::getCurrentUserEmail(), $recipients, true);
-        if ($index === false) {
-            return;
-        }
-
-        $creator = (new UsersModel())->getUser($login);
-        $creatorEmail = is_array($creator) && is_string($creator['email'] ?? null) ? $creator['email'] : '';
-
-        if ($creatorEmail !== '') {
-            $recipients[$index] = $creatorEmail;
-        } else {
-            unset($recipients[$index]);
-            $recipients = array_values($recipients);
-        }
-    }
-
-    /**
      * The tracker accepts a token_auth (needed e.g. to import logs, track with a custom IP or a timestamp older than
      * 24 hours) only from users with write or admin access to the website, which Matomo caches per website. Adds
      * the users who have such a role through a group.
@@ -538,7 +497,6 @@ class GroupPermissions extends Plugin {
      */
     public function deleteUser(string $login): void {
         $model = new Model();
-        (new ReportSharing($model))->transferReportsOfDeletedUser($login);
         $model->removeUserFromAllGroups($login);
     }
 }

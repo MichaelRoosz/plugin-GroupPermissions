@@ -4694,79 +4694,43 @@ function GroupSegmentsvue_type_template_id_6fa1c8f1_render(_ctx, _cache, $props,
 GroupSegmentsvue_type_script_lang_ts.render = GroupSegmentsvue_type_template_id_6fa1c8f1_render
 
 /* harmony default export */ var GroupSegments = (GroupSegmentsvue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupReports.vue?vue&type=template&id=21d78284
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupReports.vue?vue&type=template&id=0b361fe2
 
-var GroupReportsvue_type_template_id_21d78284_hoisted_1 = {
+var GroupReportsvue_type_template_id_0b361fe2_hoisted_1 = {
   class: "groupPermissionsReports"
 };
-var GroupReportsvue_type_template_id_21d78284_hoisted_2 = {
+var GroupReportsvue_type_template_id_0b361fe2_hoisted_2 = {
   class: "groupPermissionsIntro"
 };
-var GroupReportsvue_type_template_id_21d78284_hoisted_3 = {
-  class: "groupPermissionsReportField"
-};
-
-var GroupReportsvue_type_template_id_21d78284_hoisted_4 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
-  id: "ajaxErrorGroupReports"
-}, null, -1);
-
-var GroupReportsvue_type_template_id_21d78284_hoisted_5 = {
-  class: "actions-cell-header"
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_6 = {
-  key: 0
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_7 = {
-  colspan: "4"
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_8 = {
+var GroupReportsvue_type_template_id_0b361fe2_hoisted_3 = {
   key: 1,
   class: "groupPermissionsEmpty"
 };
-var GroupReportsvue_type_template_id_21d78284_hoisted_9 = {
-  colspan: "4"
+var GroupReportsvue_type_template_id_0b361fe2_hoisted_4 = {
+  key: 2,
+  class: "groupPermissionsReportField"
 };
-var GroupReportsvue_type_template_id_21d78284_hoisted_10 = ["data-id-report"];
-var GroupReportsvue_type_template_id_21d78284_hoisted_11 = {
-  class: "reportDescription"
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_12 = {
-  class: "reportSite"
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_13 = {
-  class: "reportLogin"
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_14 = {
-  class: "center actions-cell"
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_15 = ["title", "onClick"];
 
-var GroupReportsvue_type_template_id_21d78284_hoisted_16 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
-  class: "icon-delete"
+var GroupReportsvue_type_template_id_0b361fe2_hoisted_5 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
+  id: "ajaxErrorGroupReports"
 }, null, -1);
 
-var GroupReportsvue_type_template_id_21d78284_hoisted_17 = [GroupReportsvue_type_template_id_21d78284_hoisted_16];
-var GroupReportsvue_type_template_id_21d78284_hoisted_18 = {
-  class: "ui-confirm",
-  ref: "confirmUnshareReport"
-};
-var GroupReportsvue_type_template_id_21d78284_hoisted_19 = ["value"];
-var GroupReportsvue_type_template_id_21d78284_hoisted_20 = ["value"];
-function GroupReportsvue_type_template_id_21d78284_render(_ctx, _cache, $props, $setup, $data, $options) {
+function GroupReportsvue_type_template_id_0b361fe2_render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
+
   var _component_Field = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("Field");
 
   var _component_SaveButton = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("SaveButton");
 
-  var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
-
-  var _directive_content_table = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveDirective"])("content-table");
-
-  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", GroupReportsvue_type_template_id_21d78284_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", GroupReportsvue_type_template_id_21d78284_hoisted_2, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ScheduledReportsDescription')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("form", {
-    class: "groupPermissionsShareReport",
+  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", GroupReportsvue_type_template_id_0b361fe2_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", GroupReportsvue_type_template_id_0b361fe2_hoisted_2, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ScheduledReportsDescription')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("form", {
+    class: "groupPermissionsCopyReport",
     onSubmit: _cache[2] || (_cache[2] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(function ($event) {
-      return _ctx.shareReport();
+      return _ctx.copyReport();
     }, ["prevent"]))
-  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ShareReport')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupReportsvue_type_template_id_21d78284_hoisted_3, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_Field, {
+  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h3", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_CopyReport')), 1), _ctx.isLoading ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_ActivityIndicator, {
+    key: 0,
+    loading: true
+  })) : !_ctx.reportOptions.length ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("p", GroupReportsvue_type_template_id_0b361fe2_hoisted_3, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_NoCopyableReports')), 1)) : (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", GroupReportsvue_type_template_id_0b361fe2_hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_Field, {
     uicontrol: "select",
     name: "groupPermissionsReport",
     title: _ctx.translate('GroupPermissions_ScheduledReport'),
@@ -4774,61 +4738,29 @@ function GroupReportsvue_type_template_id_21d78284_render(_ctx, _cache, $props, 
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
       return _ctx.selectedReport = $event;
     }),
-    options: _ctx.reportOptions,
-    disabled: !_ctx.reportOptions.length
-  }, null, 8, ["title", "model-value", "options", "disabled"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_SaveButton, {
-    class: "groupPermissionsShareReportButton",
-    value: _ctx.translate('GroupPermissions_ShareReportButton'),
+    options: _ctx.reportOptions
+  }, null, 8, ["title", "model-value", "options"])])), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_SaveButton, {
+    class: "groupPermissionsCopyReportButton",
+    value: _ctx.translate('GroupPermissions_CopyReportButton'),
     saving: _ctx.isSaving,
     disabled: !_ctx.selectedReport,
     onConfirm: _cache[1] || (_cache[1] = function ($event) {
-      return _ctx.shareReport();
+      return _ctx.copyReport();
     })
-  }, null, 8, ["value", "saving", "disabled"])], 32), GroupReportsvue_type_template_id_21d78284_hoisted_4, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", {
-    class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])(["groupPermissionsReportsTable", {
-      loading: _ctx.isLoading
-    }])
-  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_ScheduledReport')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Website')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_CreatedBy')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", GroupReportsvue_type_template_id_21d78284_hoisted_5, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Actions')), 1)])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tbody", null, [_ctx.isLoading && !_ctx.sharedReports.length ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", GroupReportsvue_type_template_id_21d78284_hoisted_6, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupReportsvue_type_template_id_21d78284_hoisted_7, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
-    loading: true
-  })])])) : !_ctx.sharedReports.length ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", GroupReportsvue_type_template_id_21d78284_hoisted_8, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupReportsvue_type_template_id_21d78284_hoisted_9, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_NoSharedReports')), 1)])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.sharedReports, function (report) {
-    return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", {
-      key: report.idReport,
-      class: "groupPermissionsReportRow",
-      "data-id-report": report.idReport
-    }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupReportsvue_type_template_id_21d78284_hoisted_11, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(report.description), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupReportsvue_type_template_id_21d78284_hoisted_12, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(report.siteName), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupReportsvue_type_template_id_21d78284_hoisted_13, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(report.login), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", GroupReportsvue_type_template_id_21d78284_hoisted_14, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("button", {
-      class: "table-action groupPermissionsUnshareReport",
-      title: _ctx.translate('GroupPermissions_UnshareReport'),
-      onClick: function onClick($event) {
-        return _ctx.confirmUnshareReport(report);
-      }
-    }, GroupReportsvue_type_template_id_21d78284_hoisted_17, 8, GroupReportsvue_type_template_id_21d78284_hoisted_15)])], 8, GroupReportsvue_type_template_id_21d78284_hoisted_10);
-  }), 128))])], 2), [[_directive_content_table]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", GroupReportsvue_type_template_id_21d78284_hoisted_18, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.confirmText), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
-    role: "yes",
-    type: "button",
-    value: _ctx.translate('General_Yes')
-  }, null, 8, GroupReportsvue_type_template_id_21d78284_hoisted_19), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("input", {
-    role: "no",
-    type: "button",
-    value: _ctx.translate('General_No')
-  }, null, 8, GroupReportsvue_type_template_id_21d78284_hoisted_20)], 512)]);
+  }, null, 8, ["value", "saving", "disabled"])], 32), GroupReportsvue_type_template_id_0b361fe2_hoisted_5]);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/GroupReports.vue?vue&type=template&id=21d78284
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/GroupReports.vue?vue&type=template&id=0b361fe2
 
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupReports.vue?vue&type=script&lang=ts
 
 
 
- // only email reports can be shared (see ReportSharing.php)
 
-var SHAREABLE_REPORT_TYPE = 'email';
 /* harmony default export */ var GroupReportsvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
     ActivityIndicator: external_CoreHome_["ActivityIndicator"],
     Field: external_CorePluginsAdmin_["Field"],
     SaveButton: external_CorePluginsAdmin_["SaveButton"]
-  },
-  directives: {
-    ContentTable: external_CoreHome_["ContentTable"]
   },
   props: {
     group: {
@@ -4840,7 +4772,6 @@ var SHAREABLE_REPORT_TYPE = 'email';
     return {
       reports: [],
       selectedReport: '',
-      confirmText: '',
       isLoading: false,
       isSaving: false
     };
@@ -4849,15 +4780,8 @@ var SHAREABLE_REPORT_TYPE = 'email';
     this.loadReports();
   },
   computed: {
-    sharedReports: function sharedReports() {
-      return this.reports.filter(function (r) {
-        return r.isShared;
-      });
-    },
     reportOptions: function reportOptions() {
-      return this.reports.filter(function (r) {
-        return !r.isShared && r.type === SHAREABLE_REPORT_TYPE;
-      }).map(function (r) {
+      return this.reports.map(function (r) {
         return {
           key: String(r.idReport),
           value: "".concat(r.description, " (").concat(r.siteName, ", ").concat(r.login, ")")
@@ -4871,22 +4795,15 @@ var SHAREABLE_REPORT_TYPE = 'email';
 
       this.isLoading = true;
       return external_CoreHome_["AjaxHelper"].fetch({
-        method: 'GroupPermissions.getReportsForGroup',
-        idGroup: this.group.idGroup,
+        method: 'GroupPermissions.getCopyableReports',
         filter_limit: -1
       }).then(function (reports) {
         _this.reports = reports;
-
-        if (!_this.reportOptions.some(function (o) {
-          return o.key === _this.selectedReport;
-        })) {
-          _this.selectedReport = '';
-        }
       }).finally(function () {
         _this.isLoading = false;
       });
     },
-    shareReport: function shareReport() {
+    copyReport: function copyReport() {
       var _this2 = this;
 
       var report = this.reports.find(function (r) {
@@ -4899,43 +4816,17 @@ var SHAREABLE_REPORT_TYPE = 'email';
 
       this.isSaving = true;
       external_CoreHome_["AjaxHelper"].post({
-        method: 'GroupPermissions.shareReportWithGroup'
+        method: 'GroupPermissions.copyReportToGroup'
       }, {
         idReport: report.idReport,
         idGroup: this.group.idGroup
       }, {
         errorElement: '#ajaxErrorGroupReports'
-      }).then(function () {
-        notifySuccess('groupPermissionsReportShared', 'GroupPermissions_ReportShared', report.description, _this2.group.name);
+      }).then(function (copiedTo) {
+        notifySuccess('groupPermissionsReportCopied', 'GroupPermissions_ReportCopied', report.description, String(Array.isArray(copiedTo) ? copiedTo.length : 0), _this2.group.name);
         _this2.selectedReport = '';
-        return _this2.loadReports();
       }).finally(function () {
         _this2.isSaving = false;
-      });
-    },
-    confirmUnshareReport: function confirmUnshareReport(report) {
-      var _this3 = this;
-
-      this.confirmText = Object(external_CoreHome_["translate"])('GroupPermissions_UnshareReportConfirm', report.description, this.group.name);
-      external_CoreHome_["Matomo"].helper.modalConfirm(this.$refs.confirmUnshareReport, {
-        yes: function yes() {
-          return _this3.unshareReport(report);
-        }
-      });
-    },
-    unshareReport: function unshareReport(report) {
-      var _this4 = this;
-
-      external_CoreHome_["AjaxHelper"].post({
-        method: 'GroupPermissions.unshareReportFromGroup'
-      }, {
-        idReport: report.idReport,
-        idGroup: this.group.idGroup
-      }, {
-        errorElement: '#ajaxErrorGroupReports'
-      }).then(function () {
-        notifySuccess('groupPermissionsReportUnshared', 'GroupPermissions_ReportUnshared', report.description, _this4.group.name);
-        return _this4.loadReports();
       });
     }
   }
@@ -4946,7 +4837,7 @@ var SHAREABLE_REPORT_TYPE = 'email';
 
 
 
-GroupReportsvue_type_script_lang_ts.render = GroupReportsvue_type_template_id_21d78284_render
+GroupReportsvue_type_script_lang_ts.render = GroupReportsvue_type_template_id_0b361fe2_render
 
 /* harmony default export */ var GroupReports = (GroupReportsvue_type_script_lang_ts);
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/GroupSync.vue?vue&type=template&id=6edcc202

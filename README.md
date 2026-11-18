@@ -36,7 +36,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 - Grant capabilities to groups per website, e.g. the Tag Manager capabilities (write, publish live container, use custom templates).
 - Give groups access to new websites automatically, based on the Matomo website group or the URL of the new website.
 - Share stored segments with groups: the members see them in the segment selector.
-- Shared ownership of scheduled email reports: group members can edit, send and delete them when the creator is absent.
+- Copy scheduled email reports to all members of a group.
 - Synchronize group memberships from LDAP (LoginLdap), OpenID Connect (LoginOIDC, RebelOIDC) or SAML (LoginSaml) groups; other login plugins via an event or the API.
 - Set the group access directly in Matomo's website create/edit form.
 - Two clear tabs: Manage Access and Manage Groups.
@@ -80,7 +80,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
   - **Website access**: the websites the group can access with their role. Give access to a website (or all websites) with a role, change roles inline, or remove access. Capabilities (e.g. Tag Manager) can be added per website, like on the Manage Access tab.
   - **Automatic access**: rules that give the group a role for every website created from now on that is in a matching Matomo website group or has a matching URL (main URL or alias URL). Patterns are case-insensitive and `*` matches any characters; a URL pattern without `/` is compared with the host only (e.g. `*.example.com`), one with `/` with host and path (e.g. `example.com/shop*`). A rule can also give capabilities (e.g. Tag Manager) in addition to its role. If several rules match, the highest role wins and a role the group already has is never downgraded. Existing websites are only changed when you apply a rule to them with the refresh icon ("Apply to existing websites"); removing a rule keeps the access it already gave.
   - **Segments**: stored segments shared with the group. Members of the group see a shared segment in the segment selector (in the "Shared with you" part if there is one) as long as they have access to the website the segment is restricted to. Like segments shared with all users, only the creator and super users can edit or delete it. Segments already shared with all users are not offered. Deleting the segment or the group removes the share.
-  - **Scheduled reports**: email reports shared with the group (shared ownership). Members of the group see a shared report on Matomo's "Email reports" page and can edit, send, download and delete it like their own as long as they have access to its website — e.g. to change the recipients while the creator is absent, without sharing accounts. Changes are made with the member's own account, so Matomo's events (and an activity log listening to them) record who changed the report; the report keeps its creator, who still gets it with "Send report to me". A member can keep the report's segment or choose one visible to them (including segments shared with their groups), but cannot move the report to another website or change its type. Only email reports can be shared (other types store recipients of the creator, such as the phone numbers of SMS reports). Reports containing the All Websites dashboard cannot be shared, and it cannot be added to a shared report: Matomo shows it with the websites of the creator, which could include websites the members have no access to. If the creator is deleted, Matomo would delete their reports; a shared report is instead handed over to a member of its groups who has access to its website (the first by login), who then also receives "Send report to me" (without such a member it is deleted as before). Deleting the report or the group removes the share.
+  - **Scheduled reports**: copy an email report to the members of the group. Every member with access to the website of the report gets an independent copy of their own, which they change, send, download or delete like their own reports on Matomo's "Email reports" page. The copies are sent to their member only ("Send report to me"); the other recipients of the report are not copied, so they do not get the report once per member. Later changes of the report are not applied to the copies. Members who only have a pending invitation are skipped. A report with a segment can only be copied if the segment is shared with all users (Matomo does not let members use private segments of other users in their reports). Only email reports can be copied (other types have recipients of the creator, such as the phone numbers of SMS reports).
   - **Directory sync**: external groups (LDAP, SAML) mapped to the group, see [Group sync from LDAP / SAML](#group-sync-from-ldap--saml).
   - **Settings**: rename or delete the group. Deleting a group removes the access its members got through it; the users themselves are kept.
 - "Invite a new user" invites a user by email directly into one or more groups.
@@ -124,7 +124,7 @@ Group memberships can be synchronized from the groups of an external directory, 
 - Changing the capabilities of groups requires Admin access on the selected website(s) as well.
 - Managing the automatic access rules of groups requires Super User access. The rules apply to every new website, no matter who creates it.
 - Sharing segments with groups: super users can share any segment, users with Admin access to at least one website their own segments (via the API). Matomo itself does not restrict which segment definitions a user may apply, so sharing controls which stored segments are listed, not which data can be seen.
-- Sharing scheduled reports with groups: super users can share any email report, users with Admin access to at least one website their own reports (via the API). Members of the group need view access to the website of the report to see or change it. Matomo only lets the creator manage a report, so the plugin runs the core actions on a shared report with super user rights, after checking everything those rights would skip for the member (website access, the requested reports and a newly chosen segment). Reports with data of other websites (the All Websites dashboard) are never available to members.
+- Copying scheduled reports to groups: super users can copy any email report, users with Admin access to at least one website their own reports (via the API). Like dashboards, a report is only copied to members the current user is allowed to see. The copies are ordinary reports of the members, so Matomo applies its own checks to them (e.g. the All Websites dashboard shows the websites of the member).
 - Mapping external groups and synchronizing the groups of a user via the API require Super User access. The LDAP, OpenID Connect and SAML sync runs for the user logging in; it only adds them to groups mapped to their groups in the directory.
 - Members get the highest role of all their groups and their own permissions for each website, plus all capabilities of their groups and their own capabilities.
 - Like in Matomo core, a capability only applies while the group has a role for the website: removing the role removes the group's capabilities for it, and capabilities included in a new role are dropped (others are kept when the role changes).
@@ -180,18 +180,15 @@ Matomo exposes plugin APIs via HTTP. The following methods are available in `Piw
   ```text
   index.php?module=API&method=GroupPermissions.getSegmentsForGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
   ```
-  Members of the group get the shared segments from `SegmentEditor.getAll` and `SegmentEditor.get`. Their own scheduled reports cannot use a segment shared with a group (Matomo's ScheduledReports plugin checks the segment directly, not through the API); scheduled reports shared with their group can.
-- Share a scheduled email report with a group, stop sharing it, list the groups of a report (super users: any report, users with admin access: their own reports):
+  Members of the group get the shared segments from `SegmentEditor.getAll` and `SegmentEditor.get`. Their scheduled reports cannot use a segment shared with a group (Matomo's ScheduledReports plugin checks the segment directly, not through the API).
+- Copy a scheduled email report to the members of a group (super users: any report, users with admin access: their own reports); returns the logins of the members that got a copy:
   ```text
-  index.php?module=API&method=GroupPermissions.shareReportWithGroup&idReport=1&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
-  index.php?module=API&method=GroupPermissions.unshareReportFromGroup&idReport=1&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
-  index.php?module=API&method=GroupPermissions.getGroupsOfReport&idReport=1&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.copyReportToGroup&idReport=1&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
   ```
-  All email reports with whether they are shared with a group (super user):
+  The email reports the current user can copy (super users: all, users with admin access: their own):
   ```text
-  index.php?module=API&method=GroupPermissions.getReportsForGroup&idGroup=1&format=JSON&token_auth=YOUR_TOKEN
+  index.php?module=API&method=GroupPermissions.getCopyableReports&format=JSON&token_auth=YOUR_TOKEN
   ```
-  Members of the group manage shared reports with Matomo's own API (`ScheduledReports.getReports`, `updateReport`, `sendReport`, `generateReport`, `deleteReport`). To make this possible the plugin replaces the API class of the ScheduledReports plugin with a subclass (via dependency injection, like it does for `Piwik\Access`); another plugin replacing the same class would conflict.
 - Map external directory groups (LDAP group DN or name, SAML group value) to a group, remove a mapping, list the mappings (super user):
   ```text
   index.php?module=API&method=GroupPermissions.addExternalGroupMapping&idGroup=1&externalGroup=CN%3DMatomo%20Admins%2COU%3DGroups%2CDC%3Dexample%2CDC%3Dcom&format=JSON&token_auth=YOUR_TOKEN

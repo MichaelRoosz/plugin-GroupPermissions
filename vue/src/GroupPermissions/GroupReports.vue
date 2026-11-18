@@ -11,9 +11,13 @@
       {{ translate('GroupPermissions_ScheduledReportsDescription') }}
     </p>
 
-    <form class="groupPermissionsShareReport" @submit.prevent="shareReport()">
-      <h3>{{ translate('GroupPermissions_ShareReport') }}</h3>
-      <div class="groupPermissionsReportField">
+    <form class="groupPermissionsCopyReport" @submit.prevent="copyReport()">
+      <h3>{{ translate('GroupPermissions_CopyReport') }}</h3>
+      <ActivityIndicator v-if="isLoading" :loading="true" />
+      <p v-else-if="!reportOptions.length" class="groupPermissionsEmpty">
+        {{ translate('GroupPermissions_NoCopyableReports') }}
+      </p>
+      <div v-else class="groupPermissionsReportField">
         <Field
           uicontrol="select"
           name="groupPermissionsReport"
@@ -21,94 +25,33 @@
           :model-value="selectedReport"
           @update:model-value="selectedReport = $event"
           :options="reportOptions"
-          :disabled="!reportOptions.length"
         />
       </div>
       <SaveButton
-        class="groupPermissionsShareReportButton"
-        :value="translate('GroupPermissions_ShareReportButton')"
+        class="groupPermissionsCopyReportButton"
+        :value="translate('GroupPermissions_CopyReportButton')"
         :saving="isSaving"
         :disabled="!selectedReport"
-        @confirm="shareReport()"
+        @confirm="copyReport()"
       />
     </form>
 
     <div id="ajaxErrorGroupReports"></div>
-
-    <table
-      class="groupPermissionsReportsTable"
-      :class="{ loading: isLoading }"
-      v-content-table
-    >
-      <thead>
-        <tr>
-          <th>{{ translate('GroupPermissions_ScheduledReport') }}</th>
-          <th>{{ translate('General_Website') }}</th>
-          <th>{{ translate('GroupPermissions_CreatedBy') }}</th>
-          <th class="actions-cell-header">{{ translate('General_Actions') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="isLoading && !sharedReports.length">
-          <td colspan="4"><ActivityIndicator :loading="true" /></td>
-        </tr>
-        <tr v-else-if="!sharedReports.length" class="groupPermissionsEmpty">
-          <td colspan="4">{{ translate('GroupPermissions_NoSharedReports') }}</td>
-        </tr>
-        <tr
-          v-for="report in sharedReports"
-          :key="report.idReport"
-          class="groupPermissionsReportRow"
-          :data-id-report="report.idReport"
-        >
-          <td class="reportDescription">{{ report.description }}</td>
-          <td class="reportSite">{{ report.siteName }}</td>
-          <td class="reportLogin">{{ report.login }}</td>
-          <td class="center actions-cell">
-            <button
-              class="table-action groupPermissionsUnshareReport"
-              :title="translate('GroupPermissions_UnshareReport')"
-              @click="confirmUnshareReport(report)"
-            >
-              <span class="icon-delete"></span>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="ui-confirm" ref="confirmUnshareReport">
-      <h2>{{ confirmText }}</h2>
-      <input role="yes" type="button" :value="translate('General_Yes')"/>
-      <input role="no" type="button" :value="translate('General_No')"/>
-    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import {
-  ActivityIndicator,
-  AjaxHelper,
-  ContentTable,
-  Matomo,
-  translate,
-} from 'CoreHome';
+import { ActivityIndicator, AjaxHelper } from 'CoreHome';
 import { Field, SaveButton } from 'CorePluginsAdmin';
-import { Group, GroupReport } from './types';
+import { CopyableReport, Group } from './types';
 import { notifySuccess } from './notify';
-
-// only email reports can be shared (see ReportSharing.php)
-const SHAREABLE_REPORT_TYPE = 'email';
 
 export default defineComponent({
   components: {
     ActivityIndicator,
     Field,
     SaveButton,
-  },
-  directives: {
-    ContentTable,
   },
   props: {
     group: {
@@ -118,9 +61,8 @@ export default defineComponent({
   },
   data() {
     return {
-      reports: [] as GroupReport[],
+      reports: [] as CopyableReport[],
       selectedReport: '',
-      confirmText: '',
       isLoading: false,
       isSaving: false,
     };
@@ -129,87 +71,50 @@ export default defineComponent({
     this.loadReports();
   },
   computed: {
-    sharedReports(): GroupReport[] {
-      return this.reports.filter((r) => r.isShared);
-    },
     reportOptions(): Array<{ key: string, value: string }> {
-      return this.reports
-        .filter((r) => !r.isShared && r.type === SHAREABLE_REPORT_TYPE)
-        .map((r) => ({
-          key: String(r.idReport),
-          value: `${r.description} (${r.siteName}, ${r.login})`,
-        }));
+      return this.reports.map((r) => ({
+        key: String(r.idReport),
+        value: `${r.description} (${r.siteName}, ${r.login})`,
+      }));
     },
   },
   methods: {
     loadReports() {
       this.isLoading = true;
-      return AjaxHelper.fetch<GroupReport[]>({
-        method: 'GroupPermissions.getReportsForGroup',
-        idGroup: this.group.idGroup,
+      return AjaxHelper.fetch<CopyableReport[]>({
+        method: 'GroupPermissions.getCopyableReports',
         filter_limit: -1,
       }).then((reports) => {
         this.reports = reports;
-        if (!this.reportOptions.some((o) => o.key === this.selectedReport)) {
-          this.selectedReport = '';
-        }
       }).finally(() => {
         this.isLoading = false;
       });
     },
-    shareReport() {
+    copyReport() {
       const report = this.reports.find((r) => String(r.idReport) === this.selectedReport);
       if (!report || this.isSaving) {
         return;
       }
 
       this.isSaving = true;
-      AjaxHelper.post({
-        method: 'GroupPermissions.shareReportWithGroup',
+      AjaxHelper.post<string[]>({
+        method: 'GroupPermissions.copyReportToGroup',
       }, {
         idReport: report.idReport,
         idGroup: this.group.idGroup,
       }, {
         errorElement: '#ajaxErrorGroupReports',
-      }).then(() => {
+      }).then((copiedTo) => {
         notifySuccess(
-          'groupPermissionsReportShared',
-          'GroupPermissions_ReportShared',
+          'groupPermissionsReportCopied',
+          'GroupPermissions_ReportCopied',
           report.description,
+          String(Array.isArray(copiedTo) ? copiedTo.length : 0),
           this.group.name,
         );
         this.selectedReport = '';
-        return this.loadReports();
       }).finally(() => {
         this.isSaving = false;
-      });
-    },
-    confirmUnshareReport(report: GroupReport) {
-      this.confirmText = translate(
-        'GroupPermissions_UnshareReportConfirm',
-        report.description,
-        this.group.name,
-      );
-      Matomo.helper.modalConfirm(this.$refs.confirmUnshareReport as HTMLElement, {
-        yes: () => this.unshareReport(report),
-      });
-    },
-    unshareReport(report: GroupReport) {
-      AjaxHelper.post({
-        method: 'GroupPermissions.unshareReportFromGroup',
-      }, {
-        idReport: report.idReport,
-        idGroup: this.group.idGroup,
-      }, {
-        errorElement: '#ajaxErrorGroupReports',
-      }).then(() => {
-        notifySuccess(
-          'groupPermissionsReportUnshared',
-          'GroupPermissions_ReportUnshared',
-          report.description,
-          this.group.name,
-        );
-        return this.loadReports();
       });
     },
   },

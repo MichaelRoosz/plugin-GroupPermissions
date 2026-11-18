@@ -7,7 +7,7 @@ New features (requires a database update):
   - Automatic access: give groups a role on new websites matching a Matomo website group or URL pattern (e.g. `*.example.com`), optionally applied to existing websites
   - "Group access" field in Matomo's website create/edit form
   - Share stored segments with groups
-  - Share scheduled email reports with groups: members can view, edit, send and delete them; reports of deleted users are handed over to a group member instead of being deleted (reports with the All Websites dashboard cannot be shared, it could show members data of other websites)
+  - Copy scheduled email reports to all members of a group: every member with access to the website gets a copy of their own, sent to them only
   - Group sync from LDAP, OIDC and SAML: map external directory groups to groups, memberships are synchronized on login (LoginLdap, LoginOIDC / RebelOIDC, LoginSaml; event `GroupPermissions.syncUserGroups` for other login plugins)
   - Invite new users directly into groups
   - Copy dashboards to all members of a group
@@ -27,7 +27,6 @@ Fixes:
   - Group names with `&`, quotes or `<`/`>` could not be managed on Manage Access; names are trimmed, empty or overlong names are rejected, case-only renames work
   - Group names must be unique (case-insensitive), also when groups are created or renamed at the same time; names are no longer matched accent-insensitively depending on the database collation
   - Adding a member that the directory sync added makes the membership a manual one, which the sync keeps
-  - "Send now" failed for reports scheduled "Never"
   - Users deleted while the plugin was deactivated can be removed from their groups (they stayed listed as members, and removing them failed)
   - Manage Access with "Apply to all websites" can remove the access of a group from all websites ("No access") and apply the same role again
   - Deleting a group is all or nothing

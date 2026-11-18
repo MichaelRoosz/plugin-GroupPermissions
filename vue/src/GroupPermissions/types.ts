@@ -72,13 +72,12 @@ export interface GroupSegment {
   isShared: boolean;
 }
 
-export interface GroupReport {
+export interface CopyableReport {
   idReport: number;
   description: string;
   login: string;
   idSite: number;
   siteName: string;
-  type: string;
   period: string;
-  isShared: boolean;
+  idSegment: number;
 }

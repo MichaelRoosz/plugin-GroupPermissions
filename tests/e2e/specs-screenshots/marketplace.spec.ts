@@ -4,7 +4,7 @@ import path from 'node:path';
 import { MatomoApi } from '../helpers/api';
 import { superUserStorageState, SUPERUSER } from '../helpers/env';
 import {
-  accessRow, groupRow, memberRow, openGroupEditor, openGroupPermissions, roleSelect, selectSite,
+  accessRow, chooseOption, groupRow, memberRow, openGroupEditor, openGroupPermissions, roleSelect, selectSite,
   switchEditorTab, waitForIdle, websiteRow,
 } from '../helpers/ui';
 
@@ -93,7 +93,7 @@ test.describe('Marketplace screenshots', () => {
     await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: groups.Marketing.idGroup, externalGroup: 'marketing-team' });
     await su.call('GroupPermissions.syncUserGroups', { userLogin: 'erin', externalGroups: 'marketing-team' });
 
-    // scheduled report shared with the group
+    // scheduled reports to copy to the group
     const report = (description: string, period: string, reports: string[]) => alice.call('ScheduledReports.addReport', {
       idSite: 1,
       description,
@@ -106,12 +106,8 @@ test.describe('Marketplace screenshots', () => {
       'parameters[emailMe]': true,
       'parameters[evolutionGraph]': false,
     });
-    for (const idReport of [
-      Number((await report('Weekly marketing KPIs', 'week', ['VisitsSummary_get', 'Referrers_getReferrerType'])).value),
-      Number((await report('Monthly campaign report', 'month', ['Referrers_getCampaigns'])).value),
-    ]) {
-      await su.call('GroupPermissions.shareReportWithGroup', { idReport, idGroup: groups.Marketing.idGroup });
-    }
+    await report('Weekly marketing KPIs', 'week', ['VisitsSummary_get', 'Referrers_getReferrerType']);
+    await report('Monthly campaign report', 'month', ['Referrers_getCampaigns']);
 
     // segments shared with the group
     for (const [name, definition, idSite] of [
@@ -161,10 +157,10 @@ test.describe('Marketplace screenshots', () => {
     await shoot(page, pluginContent(page), 'Share_Segments_With_A_Group');
   });
 
-  test('Share scheduled reports', async ({ page }) => {
+  test('Copy scheduled reports', async ({ page }) => {
     await openGroupEditor(page, groups.Marketing.idGroup, 'reports');
-    await expect(page.locator('tr.groupPermissionsReportRow')).toHaveCount(2);
-    await shoot(page, pluginContent(page), 'Share_Scheduled_Reports_With_A_Group');
+    await chooseOption(page.locator('.groupPermissionsCopyReport .groupPermissionsReportField'), 'Weekly marketing KPIs (Site One, alice)');
+    await shoot(page, pluginContent(page), 'Copy_Scheduled_Reports_To_A_Group');
   });
 
   test('Directory sync', async ({ page }) => {
