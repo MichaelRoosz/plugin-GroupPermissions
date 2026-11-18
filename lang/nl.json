@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "Ben je zeker dat je '%s' toegang wil geven tot de groep '%s' voor alle website?",
         "CreateNewGroup": "Maak een nieuwe groep",
         "CreateNewGroupButton": "Maak groep",
+        "CreatedBy": "Aangemaakt door",
         "DeleteGroup": "Verwijder deze groep",
         "DeleteGroupButton": "Verwijder groep",
         "DeleteGroupConfirm": "Bent u zeker dat u de groep '%s' wilt verwijderen?",
@@ -19,12 +20,19 @@
         "ManageGroup": "Beheer groep",
         "ManageGroupMembers": "Beheer groepsleden",
         "ManageGroups": "Beheer groepen",
+        "MatchTypeUrl": "URL website",
         "MenuGroupPermissions": "Groep machtigingen",
+        "Pattern": "Patroon",
         "RemoveFromGroup": "Verwijderen",
         "RemoveFromGroupConfirm": "Weet u zeker dat u gebruiker '%1$s' wilt verwijderen uit groep '%2$s'?",
         "RenameGroup": "Hernoem deze groep",
         "RenameGroupButton": "Hernoem groep",
         "RenameGroupConfirm": "Weet u zeker dat u de groep '%1$s' wilt hernoemen naar '%2$s'?",
-        "SelectNewUser": "Selecteer een nieuwe gebruiker"
+        "Segment": "Segment",
+        "Segments": "Segmenten",
+        "SelectNewUser": "Selecteer een nieuwe gebruiker",
+        "SelectWebsite": "Selecteer een website",
+        "Users": "Gebruikers",
+        "Websites": "Websites"
     }
 }

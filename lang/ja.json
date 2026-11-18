@@ -19,12 +19,19 @@
         "ManageGroup": "グループの管理",
         "ManageGroupMembers": "グループ メンバーの管理",
         "ManageGroups": "グループの管理",
+        "MatchTypeUrl": "ウェブサイトの URL",
         "MenuGroupPermissions": "グループ権限",
+        "Pattern": "パターン",
         "RemoveFromGroup": "削除する",
         "RemoveFromGroupConfirm": "グループ '%2$s' からユーザー '%1$s' を削除してもよろしいですか?",
         "RenameGroup": "このグループの名前を変更",
         "RenameGroupButton": "グループの名前を変更",
         "RenameGroupConfirm": "グループ '%1$s' の名前を '%2$s' に変更してもよろしいですか?",
-        "SelectNewUser": "新しいユーザーを選択してください"
+        "Segment": "セグメント",
+        "Segments": "セグメント",
+        "SelectNewUser": "新しいユーザーを選択してください",
+        "SelectWebsite": "ウェブサイトを選択",
+        "Users": "ユーザー",
+        "Websites": "ウェブサイト"
     }
 }

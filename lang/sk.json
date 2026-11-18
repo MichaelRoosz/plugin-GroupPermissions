@@ -1,5 +1,10 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Odstrániť"
+        "MatchTypeUrl": "URL webovej stránky",
+        "Pattern": "Vzor",
+        "RemoveFromGroup": "Odstrániť",
+        "Segment": "Segment",
+        "Users": "Používatelia",
+        "Websites": "Webstránky"
     }
 }

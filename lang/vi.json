@@ -1,5 +1,8 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Tháo bỏ"
+        "Pattern": "Mẫu",
+        "RemoveFromGroup": "Tháo bỏ",
+        "Users": "Các người dùng",
+        "Websites": "Websites"
     }
 }

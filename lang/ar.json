@@ -1,5 +1,11 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "حذف"
+        "MatchTypeUrl": "عنوان URL لموقع الويب",
+        "Pattern": "النمط",
+        "RemoveFromGroup": "حذف",
+        "Segment": "قطاع",
+        "Segments": "فئات",
+        "Users": "المستخدمون",
+        "Websites": "المواقع"
     }
 }

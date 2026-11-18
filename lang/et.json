@@ -1,5 +1,11 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Eemalda"
+        "CreatedBy": "Looja",
+        "MatchTypeUrl": "Veebisaidi URL",
+        "Pattern": "Muster",
+        "RemoveFromGroup": "Eemalda",
+        "Segment": "Segment",
+        "Users": "Kasutajaid",
+        "Websites": "Veebilehed"
     }
 }

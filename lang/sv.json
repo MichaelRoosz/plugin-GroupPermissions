@@ -19,12 +19,19 @@
         "ManageGroup": "Hantera grupp",
         "ManageGroupMembers": "Hantera gruppmedlemmar",
         "ManageGroups": "Hantera grupper",
+        "MatchTypeUrl": "Webbplatsens URL",
         "MenuGroupPermissions": "Gruppbehörigheter",
+        "Pattern": "mönster",
         "RemoveFromGroup": "Ta bort",
         "RemoveFromGroupConfirm": "Är du säker på att du vill ta bort användaren '%1$s' från gruppen '%2$s'?",
         "RenameGroup": "Döp om denna grupp",
         "RenameGroupButton": "Döp om grupp",
         "RenameGroupConfirm": "Är du säker på att du vill döpa om gruppen '%1$s' till '%2$s'?",
-        "SelectNewUser": "Välj en ny användare"
+        "Segment": "Segment",
+        "Segments": "Segment",
+        "SelectNewUser": "Välj en ny användare",
+        "SelectWebsite": "Välj en webbplats",
+        "Users": "Användare",
+        "Websites": "Webbsidor"
     }
 }

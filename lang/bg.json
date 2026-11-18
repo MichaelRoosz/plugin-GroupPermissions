@@ -18,11 +18,18 @@
         "ManageGroup": "Управление на група",
         "ManageGroupMembers": "Управлявайте членовете на групата",
         "ManageGroups": "Управление на групи",
+        "MatchTypeUrl": "Адрес на уебсайта",
         "MenuGroupPermissions": "Групови разрешения",
+        "Pattern": "Модел",
         "RemoveFromGroup": "Премахване",
         "RemoveFromGroupConfirm": "Наистина ли искате да премахнете потребителя „%1$s“ от групата „%2$s“?",
         "RenameGroup": "Преименувайте тази група",
         "RenameGroupButton": "Преименуване на група",
-        "RenameGroupConfirm": "Наистина ли искате да преименувате групата „%1$s“ на „%2$s“?"
+        "RenameGroupConfirm": "Наистина ли искате да преименувате групата „%1$s“ на „%2$s“?",
+        "Segment": "Сегмент",
+        "Segments": "Сегменти",
+        "SelectWebsite": "Изберете уебсайт",
+        "Users": "Потребители",
+        "Websites": "Сайтове"
     }
 }

@@ -18,12 +18,19 @@
         "ManageGroup": "જૂથ મેનેજ કરો",
         "ManageGroupMembers": "જૂથના સભ્યોને મેનેજ કરો",
         "ManageGroups": "જૂથોને મેનેજ કરો",
+        "MatchTypeUrl": "વેબસાઇટ URL",
         "MenuGroupPermissions": "જૂથ પરવાનગીઓ",
+        "Pattern": "પેટર્ન",
         "RemoveFromGroup": "દૂર કરો",
         "RemoveFromGroupConfirm": "શું તમે ખરેખર '%2$s' જૂથમાંથી વપરાશકર્તા '%1$s' ને દૂર કરવા માંગો છો?",
         "RenameGroup": "આ જૂથનું નામ બદલો",
         "RenameGroupButton": "જૂથનું નામ બદલો",
         "RenameGroupConfirm": "શું તમે ખરેખર '%1$s' જૂથનું નામ બદલીને '%2$s' કરવા માંગો છો?",
-        "SelectNewUser": "નવો વપરાશકર્તા પસંદ કરો"
+        "Segment": "સેગમેન્ટ",
+        "Segments": "સેગમેન્ટ્સ",
+        "SelectNewUser": "નવો વપરાશકર્તા પસંદ કરો",
+        "SelectWebsite": "વેબસાઇટ પસંદ કરો",
+        "Users": "વપરાશકર્તાઓ",
+        "Websites": "વેબસાઇટ્સ"
     }
 }

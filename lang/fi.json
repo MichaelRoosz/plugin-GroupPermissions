@@ -18,12 +18,19 @@
         "ManageGroup": "Hallitse ryhmää",
         "ManageGroupMembers": "Hallitse ryhmän jäseniä",
         "ManageGroups": "Hallitse ryhmiä",
+        "MatchTypeUrl": "Sivuston osoite",
         "MenuGroupPermissions": "Ryhmien käyttöoikeudet",
+        "Pattern": "Malli",
         "RemoveFromGroup": "Poista",
         "RemoveFromGroupConfirm": "Haluatko varmasti poistaa käyttäjän '%1$s' ryhmästä '%2$s'?",
         "RenameGroup": "Nimeä tämä ryhmä uudelleen",
         "RenameGroupButton": "Nimeä ryhmä uudelleen",
         "RenameGroupConfirm": "Haluatko varmasti nimetä ryhmän '%1$s' uudelleen nimellä '%2$s'?",
-        "SelectNewUser": "Valitse uusi käyttäjä"
+        "Segment": "Segmentti",
+        "Segments": "Segmentit",
+        "SelectNewUser": "Valitse uusi käyttäjä",
+        "SelectWebsite": "Valitse sivusto",
+        "Users": "Käyttäjät",
+        "Websites": "Sivustot"
     }
 }

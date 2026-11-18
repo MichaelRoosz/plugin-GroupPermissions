@@ -19,12 +19,19 @@
         "ManageGroup": "管理用户组",
         "ManageGroupMembers": "管理用户组成员",
         "ManageGroups": "管理用户组",
+        "MatchTypeUrl": "網站網址",
         "MenuGroupPermissions": "用户组权限",
+        "Pattern": "值或格式",
         "RemoveFromGroup": "移除",
         "RemoveFromGroupConfirm": "你确定要将用户 '%1$s' 从用户组 '%2$s' 中移除？",
         "RenameGroup": "重命名该用户组",
         "RenameGroupButton": "重命名用户组",
         "RenameGroupConfirm": "你确定要将用户组 '%1$s' 重命名为 '%2$s' ？",
-        "SelectNewUser": "选择新用户"
+        "Segment": "區隔",
+        "Segments": "段",
+        "SelectNewUser": "选择新用户",
+        "SelectWebsite": "选择一个网站",
+        "Users": "使用者",
+        "Websites": "网站"
     }
 }

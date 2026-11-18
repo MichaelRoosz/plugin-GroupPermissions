@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "¿Está seguro de que desea dar el acceso «%s» al grupo «%s» en todos los sitios web?",
         "CreateNewGroup": "Crear un nuevo grupo",
         "CreateNewGroupButton": "Crea un grupo",
+        "CreatedBy": "Creado por",
         "DeleteGroup": "Eliminar este grupo",
         "DeleteGroupButton": "Eliminar grupo",
         "DeleteGroupConfirm": "¿Está seguro de que desea eliminar el grupo '%s'?",
@@ -19,12 +20,19 @@
         "ManageGroup": "Administrar grupo",
         "ManageGroupMembers": "Administrar miembros del grupo",
         "ManageGroups": "Administrar grupos",
+        "MatchTypeUrl": "Dirección URL del sitio de internet",
         "MenuGroupPermissions": "Permisos del grupo",
+        "Pattern": "Patrón",
         "RemoveFromGroup": "Quitar",
         "RemoveFromGroupConfirm": "¿Está seguro de que desea eliminar al usuario '%1$s' del grupo '%2$s'?",
         "RenameGroup": "Cambiar el nombre de este grupo",
         "RenameGroupButton": "Cambiar nombre del grupo",
         "RenameGroupConfirm": "¿Está seguro de que desea cambiar el nombre del grupo '%1$s' a '%2$s'?",
-        "SelectNewUser": "Seleccionar nuevo usuario"
+        "Segment": "Segmento",
+        "Segments": "Segmentos",
+        "SelectNewUser": "Seleccionar nuevo usuario",
+        "SelectWebsite": "Seleccione una página web",
+        "Users": "Usuarios",
+        "Websites": "Sitios de internet"
     }
 }

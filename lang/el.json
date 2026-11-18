@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "Είστε σίγουροι ότι θέλετε να δώσετε πρόσβαση '%s' στην ομάδα '%s' σε όλους τους ιστοτόπους;",
         "CreateNewGroup": "Δημιουργία νέας ομάδας",
         "CreateNewGroupButton": "Δημιουργία Ομάδας",
+        "CreatedBy": "Δημιουργήθηκε από",
         "DeleteGroup": "Διαγραφή της ομάδας",
         "DeleteGroupButton": "Διαγραφή Ομάδας",
         "DeleteGroupConfirm": "Είστε σίγουροι για την διαγραφή της ομάδας '%s';",
@@ -19,12 +20,19 @@
         "ManageGroup": "Διαχείριση ομάδας",
         "ManageGroupMembers": "Διαχείριση μελών ομάδας",
         "ManageGroups": "Διαχείριση Ομάδων",
+        "MatchTypeUrl": "Διεύθυνση URL ιστοτόπου",
         "MenuGroupPermissions": "Άδειες Ομάδας",
+        "Pattern": "Υπόδειγμα",
         "RemoveFromGroup": "Αφαίρεση",
         "RemoveFromGroupConfirm": "Είστε σίγουροι ότι θέλετε να αφαιρέσετε το χρήστη '%1$s' από την ομάδα '%2$s';",
         "RenameGroup": "Μετονομασία της ομάδας",
         "RenameGroupButton": "Μετονομασία Ομάδας",
         "RenameGroupConfirm": "Είστε σίγουροι ότι θέλετε να μετονομάσετε την ομάδα '%1$s' σε '%2$s';",
-        "SelectNewUser": "Επιλέξτε ένα νέο χρήστη"
+        "Segment": "Τμήμα",
+        "Segments": "Τμήματα",
+        "SelectNewUser": "Επιλέξτε ένα νέο χρήστη",
+        "SelectWebsite": "Επιλέξτε ιστοτόπο",
+        "Users": "Χρήστες",
+        "Websites": "Ιστότοποι"
     }
 }

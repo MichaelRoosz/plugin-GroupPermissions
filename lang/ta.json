@@ -5,6 +5,7 @@
         "ChangeAccessToAllSitesConfirm": "அனைத்து வலைத்தளங்களுக்கும் '%s' குழுவிற்கு '%s' அணுகலை வழங்க விரும்புகிறீர்களா?",
         "CreateNewGroup": "ஒரு புதிய குழுவை உருவாக்கவும்",
         "CreateNewGroupButton": "குழுவை உருவாக்கவும்",
+        "CreatedBy": "உருவாக்கியது",
         "DeleteGroup": "இந்த குழுவை நீக்கு",
         "DeleteGroupButton": "குழுவை நீக்கு",
         "DeleteGroupConfirm": "'%s' குழுவை நீக்க விரும்புகிறீர்களா?",
@@ -19,12 +20,19 @@
         "ManageGroup": "குழுவை நிர்வகிக்கவும்",
         "ManageGroupMembers": "குழு உறுப்பினர்களை நிர்வகிக்கவும்",
         "ManageGroups": "குழுக்களை நிர்வகிக்கவும்",
+        "MatchTypeUrl": "இணையத்தள முகவரி",
         "MenuGroupPermissions": "குழு அனுமதிகள்",
+        "Pattern": "முறை",
         "RemoveFromGroup": "அகற்று",
         "RemoveFromGroupConfirm": "'%2$s' குழுவிலிருந்து பயனரை '%1$s' ஐ அகற்ற விரும்புகிறீர்களா?",
         "RenameGroup": "இந்த குழுவிற்கு மறுபெயரிடுங்கள்",
         "RenameGroupButton": "குழு மறுபெயரிடுதல்",
         "RenameGroupConfirm": "'%1$s' குழுவை '%2$s' க்கு மறுபெயரிட விரும்புகிறீர்களா?",
-        "SelectNewUser": "புதிய பயனரைத் தேர்ந்தெடுக்கவும்"
+        "Segment": "பிரிவு",
+        "Segments": "பிரிவுகள்",
+        "SelectNewUser": "புதிய பயனரைத் தேர்ந்தெடுக்கவும்",
+        "SelectWebsite": "ஒரு வலைத்தளத்தைத் தேர்ந்தெடுக்கவும்",
+        "Users": "பாவனையாளர்கள்",
+        "Websites": "வலைத்தளங்கள்"
     }
 }

@@ -1,1 +1,6 @@
-{}
+{
+    "GroupPermissions": {
+        "Users": "వాడుకరులు",
+        "Websites": "జాలగూళ్ళు"
+    }
+}
