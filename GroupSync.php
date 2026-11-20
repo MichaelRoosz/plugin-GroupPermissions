@@ -165,9 +165,10 @@ class GroupSync {
             return null;
         }
 
-        $firstValue = trim((string) preg_replace_callback('/\\\\([0-9a-f]{2}|.)/u', static function (array $m): string {
+        // lowercased again after decoding: escapes like `\41` (`A`) or `\c3\89` (`É`) can decode to uppercase
+        $firstValue = trim(mb_strtolower((string) preg_replace_callback('/\\\\([0-9a-f]{2}|.)/u', static function (array $m): string {
             return strlen($m[1]) === 2 && ctype_xdigit($m[1]) ? pack('H2', $m[1]) : $m[1];
-        }, $matches[1]));
+        }, $matches[1])));
 
         return $firstValue !== '' ? $firstValue : null;
     }

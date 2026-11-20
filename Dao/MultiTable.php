@@ -58,6 +58,66 @@ class MultiTable {
     }
 
     /**
+     * The websites each user has a role for, directly (Matomo's access table) or through groups, in a few queries for
+     * all users. Logins are compared like in Matomo core and getPermissionsOfUser (`login = ?`, with the collation of
+     * the column), using a CASE expression to tell which of the given logins a row belongs to.
+     *
+     * @param array<string> $logins
+     * @param array<string> $roles the roles of Matomo's access table to consider (it also stores capabilities)
+     *
+     * @return array<string, array<int>> ids of the websites by given login
+     */
+    public function getIdSitesWithRoleOfUsers(array $logins, array $roles): array {
+        $logins = array_values(array_unique($logins));
+        $result = array_fill_keys($logins, []);
+        if (!$logins) {
+            return $result;
+        }
+
+        $tableAccess = Common::prefixTable('access');
+        $tableSite = Common::prefixTable('site');
+        $tablePermission = $this->tablePrefixedGroupPermission;
+        $tableUser = $this->tablePrefixedGroupUser;
+
+        foreach (array_chunk($logins, 100) as $chunk) {
+            $case = 'CASE';
+            foreach (array_keys($chunk) as $index) {
+                $case .= ' WHEN {column} = ? THEN ' . (int) $index;
+            }
+            $case .= ' END';
+            $in = Common::getSqlStringFieldsArray($chunk);
+
+            $queries = [[
+                'SELECT ' . str_replace('{column}', 'gu.login', $case) . " AS idx, ga.idsite FROM $tablePermission AS ga
+                    INNER JOIN $tableUser AS gu ON ga.idgroup = gu.idgroup
+                    INNER JOIN $tableSite AS s ON s.idsite = ga.idsite
+                    WHERE gu.login IN ($in)",
+                array_merge($chunk, $chunk),
+            ]];
+            if ($roles) {
+                $queries[] = [
+                    'SELECT ' . str_replace('{column}', 'a.login', $case) . " AS idx, a.idsite FROM $tableAccess AS a
+                        INNER JOIN $tableSite AS s ON s.idsite = a.idsite
+                        WHERE a.login IN ($in) AND a.access IN (" . Common::getSqlStringFieldsArray($roles) . ')',
+                    array_merge($chunk, $chunk, array_values($roles)),
+                ];
+            }
+
+            foreach ($queries as [$sql, $bind]) {
+                foreach (Rows::list(Db::fetchAll($sql, $bind)) as $row) {
+                    if (!is_numeric($row['idx'] ?? null) || !isset($chunk[(int) $row['idx']])) {
+                        continue;
+                    }
+                    $idSite = Rows::int($row, 'idsite');
+                    $result[$chunk[(int) $row['idx']]][$idSite] = $idSite;
+                }
+            }
+        }
+
+        return array_map('array_values', $result);
+    }
+
+    /**
      * Logins of the members of groups that have one of the given roles for a website.
      *
      * @param array<string> $roles

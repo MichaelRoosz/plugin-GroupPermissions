@@ -101,6 +101,25 @@ test.describe('Group sync from external directories', () => {
     expect(await sync(user, [adminsDn, editorsName])).toEqual({ added: [], removed: [] });
   });
 
+  test('a DN with escaped characters matches the plain name, case-insensitively', async () => {
+    const group = await su.createGroup('Sync Escaped');
+    await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: `Escaped Team ${RUN_ID}` });
+    const user = await su.createUser('sync_escaped');
+
+    // `\45` is `E`, `\c3\89` is `É`: they decode to uppercase characters after the DN was lowercased
+    expect((await sync(user, [`CN=\\45scaped Team ${RUN_ID},OU=Groups,DC=example,DC=com`])).added).toEqual([group.name]);
+
+    await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: `équipe ${RUN_ID}` });
+    expect(await sync(user, [`CN=\\c3\\89quipe ${RUN_ID},OU=Groups,DC=example,DC=com`])).toEqual({ added: [], removed: [] });
+    expect(await su.members(group.idGroup)).toContain(user);
+    // still matched through the second mapping when the first one is gone
+    await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: `Escaped Team ${RUN_ID}` });
+    expect(await sync(user, [`CN=\\C3\\89QUIPE ${RUN_ID},OU=Groups,DC=example,DC=com`])).toEqual({ added: [], removed: [] });
+    expect(await su.members(group.idGroup)).toContain(user);
+
+    await su.call('GroupPermissions.deleteGroup', { idGroup: group.idGroup });
+  });
+
   test('sync removes synced memberships that no longer match, but keeps manual ones', async () => {
     const user = await su.createUser('sync_keep');
     await su.addMembers(manual.idGroup, [user]);

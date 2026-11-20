@@ -77,7 +77,8 @@ test.describe('Share segments with groups', () => {
     expect(await visibleTo(member, idSite)).not.toContain(idSegment);
 
     await share(api[owner], idSegment);
-    await share(api[owner], idSegment, noSiteTeam.idGroup);
+    // only super users can share with a group without a role for the website of the segment
+    await share(su, idSegment, noSiteTeam.idGroup);
 
     expect(await visibleTo(member, idSite)).toContain(idSegment);
     expect(await visibleTo(member)).toContain(idSegment);
@@ -145,6 +146,24 @@ test.describe('Share segments with groups', () => {
     await expect(api[owner].expectError('GroupPermissions.getSegmentsForGroup', { idGroup: team.idGroup }))
       .resolves.toMatch(/super ?user/i);
 
+    // groups without a role for the website of the segment, or for a website the owner administers (segments of all
+    // websites); unsharing is always possible
+    await expect(api[owner].expectError('GroupPermissions.shareSegmentWithGroup', { idSegment: ownSegment, idGroup: noSiteTeam.idGroup }))
+      .resolves.toContain('has no access to the website of the segment');
+    await api[owner].call('GroupPermissions.unshareSegmentFromGroup', { idSegment: ownSegment, idGroup: noSiteTeam.idGroup });
+    // only super users can make a segment available on all websites: Matomo keeps the creator
+    const allSitesSegment = await addSegment(api[owner], 'All Sites Permission Segment');
+    await su.call('SegmentEditor.update', {
+      idSegment: allSitesSegment, name: `All Sites Permission Segment ${RUN_ID}`, definition: `pageUrl=@all-sites-permission-${RUN_ID}`,
+    });
+    expect(Number((await su.call('SegmentEditor.get', { idSegment: allSitesSegment })).enable_only_idsite)).toBe(0);
+    await expect(api[owner].expectError('GroupPermissions.shareSegmentWithGroup', { idSegment: allSitesSegment, idGroup: noSiteTeam.idGroup }))
+      .resolves.toContain('has no access to the website of the segment');
+    await share(api[owner], allSitesSegment);
+    expect(await api[owner].call('GroupPermissions.getGroupsOfSegment', { idSegment: allSitesSegment }))
+      .toEqual([{ idGroup: team.idGroup, name: team.name }]);
+    await share(su, allSitesSegment, noSiteTeam.idGroup);
+
     await share(su, outsiderSegment);
     expect(await visibleTo(member, idSite)).toContain(outsiderSegment);
     const listed: GroupSegment[] = await su.call('GroupPermissions.getSegmentsForGroup', { idGroup: team.idGroup, filter_limit: -1 });
@@ -165,7 +184,7 @@ test.describe('Share segments with groups', () => {
     const tempGroup = await su.createGroup('Segment Temp');
     await su.addMembers(tempGroup.idGroup, [outsider]);
     const keptSegment = await addSegment(api[owner], 'Kept Segment');
-    await share(api[owner], keptSegment, tempGroup.idGroup);
+    await share(su, keptSegment, tempGroup.idGroup);
     expect(await visibleTo(outsider, idSite)).toContain(keptSegment);
     await su.call('GroupPermissions.deleteGroup', { idGroup: tempGroup.idGroup });
     expect(await visibleTo(outsider, idSite)).not.toContain(keptSegment);

@@ -196,6 +196,17 @@ class Model {
         return $user->getGroupsOfUser($login);
     }
 
+    /**
+     * @param string $login the login as stored in Matomo's user table, or the given login for deleted users
+     *
+     * @return array<string> the logins stored for the memberships of the user in the group
+     */
+    public function getStoredLoginsOfMember(int $idGroup, string $login): array {
+        $user = new GroupUser();
+
+        return $user->getStoredLoginsOfMember($idGroup, $login);
+    }
+
     public function removeUserFromGroup(int $idGroup, string $login): void {
         $user = new GroupUser();
         $user->removeUserFromGroup($idGroup, $login);
@@ -481,6 +492,18 @@ class Model {
         $multiTable = new MultiTable();
 
         return $multiTable->getPermissionsOfUser($login);
+    }
+
+    /**
+     * @param array<string> $logins
+     * @param array<string> $roles the roles of Matomo's access table to consider
+     *
+     * @return array<string, array<int>> ids of the websites each user has a role for, directly or through groups
+     */
+    public function getIdSitesWithRoleOfUsers(array $logins, array $roles): array {
+        $multiTable = new MultiTable();
+
+        return $multiTable->getIdSitesWithRoleOfUsers($logins, $roles);
     }
 
     /**

@@ -142,6 +142,36 @@ class GroupUser {
         return $memberships;
     }
 
+    /**
+     * The logins stored for the memberships of a user in a group, compared in PHP rather than with `login = ?` (the
+     * result of the SQL comparison depends on the collation of the column, e.g. a binary one never finds `BOB` for
+     * `bob`). Matches the spellings that belong to the user (see getExistingLogins), and for users that no longer
+     * exist the login itself, case-insensitively.
+     *
+     * @param string $login the login as stored in Matomo's user table, or the given login for deleted users
+     *
+     * @return array<string>
+     */
+    public function getStoredLoginsOfMember(int $idGroup, string $login): array {
+        $table = $this->tablePrefixed;
+
+        $storedLogins = array_values(array_unique(array_map(static function (array $row): string {
+            return Rows::string($row, 'login');
+        }, Rows::list(Db::fetchAll("SELECT login FROM $table WHERE idgroup = ?", [$idGroup])))));
+        $existing = $this->getExistingLogins($storedLogins);
+
+        $folded = mb_strtolower($login);
+        $result = [];
+        foreach ($storedLogins as $storedLogin) {
+            $user = $existing[$storedLogin] ?? null;
+            if ($user !== null ? $user === $login : mb_strtolower($storedLogin) === $folded) {
+                $result[] = $storedLogin;
+            }
+        }
+
+        return $result;
+    }
+
     public function removeUserFromGroup(int $idGroup, string $login): void {
         $table = $this->tablePrefixed;
         $query = "DELETE FROM $table WHERE idgroup = ? AND login = ?";

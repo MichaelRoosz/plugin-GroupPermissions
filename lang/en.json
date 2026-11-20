@@ -60,6 +60,7 @@
         "ExceptionReportTypeNotCopyable": "Only email reports can be copied to groups.",
         "ExceptionRuleDoesExist": "This group already has a rule with this pattern.",
         "ExceptionRuleDoesNotExist": "The rule %s does not exist.",
+        "ExceptionSegmentGroupWithoutAccess": "The group %s has no access to the website of the segment. You can only share segments with groups that have a role for the website of the segment, or, for segments of all websites, for a website you administer.",
         "ExceptionSegmentNotFound": "The segment %s does not exist or you are not allowed to share it. You can only share segments you created yourself.",
         "ExceptionUserAlreadyInGroup": "User is already in group",
         "ExceptionUserNotInGroup": "User %s is not in the group",

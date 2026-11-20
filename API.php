@@ -407,17 +407,23 @@ class API extends \Piwik\Plugin\API {
         $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
 
-        // memberships of users deleted while this plugin was deactivated can still be removed
-        if (!array_key_exists($idGroup, $this->model->getMembershipsOfUser($login))) {
-            if ($this->model->getUserLogin($login) === null) {
+        // memberships are stored with the login of the user table (e.g. `bob` when `BOB` is given); memberships of
+        // users deleted while this plugin was deactivated can still be removed
+        $userLogin = $this->model->getUserLogin($login);
+        $storedLogins = $this->model->getStoredLoginsOfMember($idGroup, $userLogin ?? $login);
+        if (!$storedLogins) {
+            if ($userLogin === null) {
                 throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
             }
 
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionUserNotInGroup', $login));
         }
 
-        SiteAccessLoss::notifyAfter([$login], function () use ($idGroup, $login): void {
-            $this->model->removeUserFromGroup($idGroup, $login);
+        SiteAccessLoss::notifyAfter([$userLogin ?? $login], function () use ($idGroup, $storedLogins): void {
+            // with a binary collation, several spellings of one user could be stored
+            foreach ($storedLogins as $storedLogin) {
+                $this->model->removeUserFromGroup($idGroup, $storedLogin);
+            }
 
             GroupAccessUpdater::reloadAccess();
         });
@@ -898,7 +904,9 @@ class API extends \Piwik\Plugin\API {
      * Members of the group see the segment in the segment selector (and in `SegmentEditor.getAll` /
      * `SegmentEditor.get`) as long as they have view access to the website the segment is restricted to.
      * Like segments shared with all users, only the creator and super users can edit or delete the segment.
-     * Super users can share any segment, users with admin access to at least one website their own segments.
+     * Super users can share any segment with any group. Users with admin access to at least one website can share
+     * their own segments with groups that have a role for the website of the segment, or, for segments available on
+     * all websites, for a website they administer.
      */
     public function shareSegmentWithGroup(int $idSegment, int $idGroup): void {
         Piwik::checkUserHasSomeAdminAccess();
@@ -907,11 +915,19 @@ class API extends \Piwik\Plugin\API {
         $segment = $this->getSegmentOrFailForSharing($idSegment);
         $group = $this->getGroupOrFail($idGroup);
 
+        if (!Piwik::hasUserSuperUserAccess() && !$this->canShareSegmentWithGroup($segment['idsite'], $group['idgroup'])) {
+            throw new Exception(Piwik::translate(
+                'GroupPermissions_ExceptionSegmentGroupWithoutAccess',
+                [Common::unsanitizeInputValue($group['name'])]
+            ));
+        }
+
         $this->model->shareSegment($group['idgroup'], $segment['idsegment']);
     }
 
     /**
-     * Stops sharing a stored segment with a group. Same permissions as `shareSegmentWithGroup`.
+     * Stops sharing a stored segment with a group. Same permissions as `shareSegmentWithGroup`, except that
+     * segments can be unshared from any group.
      */
     public function unshareSegmentFromGroup(int $idSegment, int $idGroup): void {
         Piwik::checkUserHasSomeAdminAccess();
@@ -1195,51 +1211,73 @@ class API extends \Piwik\Plugin\API {
             }
         }
 
-        $logins = [];
+        $members = [];
+        $hidden = [];
         foreach ($this->model->getMembersOfGroup($idGroup) as $member) {
             $login = $member['login'];
 
             if ($login === $currentLogin || $login === 'anonymous') {
                 continue;
             }
-            if (!isset($visibleLogins[$login]) && !$this->isVisibleThroughGroups($login, $adminIdSites, $currentLogin)) {
-                continue;
-            }
 
-            $logins[] = $login;
+            $members[] = $login;
+            if (!isset($visibleLogins[$login])) {
+                $hidden[] = $login;
+            }
         }
 
-        return $logins;
+        $visibleThroughGroups = array_flip($this->getLoginsVisibleThroughGroups($hidden, $adminIdSites, $currentLogin));
+
+        return array_values(array_filter($members, static function (string $login) use ($visibleLogins, $visibleThroughGroups): bool {
+            return isset($visibleLogins[$login]) || isset($visibleThroughGroups[$login]);
+        }));
     }
 
     /**
-     * Whether a user that Matomo's user list hides from the current (non super) user may be seen anyway, because
+     * The users that Matomo's user list hides from the current (non super) user but that may be seen anyway, because
      * a group gives them a role for a website the current user administers. Matomo only considers its own access
-     * table there. Like Matomo, pending invitations are only visible to the user who sent them.
+     * table there. Like Matomo, pending invitations are only visible to the user who sent them. Looked up in a few
+     * queries for all users.
      *
+     * @param array<string> $logins logins as stored in Matomo's user table
      * @param array<int, true>|null $adminIdSites ids of the websites the current user administers as keys, null for
      *                                           super users
+     *
+     * @return array<string>
      */
-    private function isVisibleThroughGroups(string $login, ?array $adminIdSites, string $currentLogin): bool {
-        if (!$adminIdSites) {
-            return false;
+    private function getLoginsVisibleThroughGroups(array $logins, ?array $adminIdSites, string $currentLogin): array {
+        if (!$logins || !$adminIdSites) {
+            return [];
         }
 
-        $user = (new UsersModel())->getUser($login);
-        if (!is_array($user) || !$user) {
-            return false; // deleted
+        $candidates = [];
+        $users = (new UsersModel())->getUsers($logins);
+        foreach (is_array($users) ? $users : [] as $user) {
+            if (!is_array($user) || !is_string($user['login'] ?? null)) {
+                continue;
+            }
+            if (!empty($user['invite_token']) && ($user['invited_by'] ?? null) !== $currentLogin) {
+                continue;
+            }
+            $candidates[] = $user['login'];
         }
-        if (!empty($user['invite_token']) && ($user['invited_by'] ?? null) !== $currentLogin) {
-            return false;
+        if (!$candidates) {
+            return []; // deleted or invited by someone else
         }
 
-        foreach ($this->model->getPermissionsOfUser($login) as $permission) {
-            if (isset($adminIdSites[$permission['idsite']])) {
-                return true;
+        // only the access through groups is missing from Matomo's user list
+        $visible = [];
+        foreach ($this->model->getIdSitesWithRoleOfUsers($candidates, []) as $login => $idSites) {
+            foreach ($idSites as $idSite) {
+                if (isset($adminIdSites[$idSite])) {
+                    $visible[] = (string) $login;
+
+                    break;
+                }
             }
         }
 
-        return false;
+        return $visible;
     }
 
     /**
@@ -1247,8 +1285,9 @@ class API extends \Piwik\Plugin\API {
      *
      * @return array{
      *   idsegment: int,
-     *   login: string
-     * }
+     *   login: string,
+     *   idsite: int
+     * } `idsite` is 0 for segments available on all websites
      */
     private function getSegmentOrFailForSharing(int $idSegment): array {
         if (!SegmentSharing::isSegmentEditorActivated()) {
@@ -1266,7 +1305,28 @@ class API extends \Piwik\Plugin\API {
         return [
             'idsegment' => $idSegment,
             'login' => $login,
+            'idsite' => is_numeric($segment['enable_only_idsite'] ?? null) ? (int) $segment['enable_only_idsite'] : 0,
         ];
+    }
+
+    /**
+     * Whether a user without super user access may share a segment with a group: the group needs a role for the
+     * website of the segment, or, for segments available on all websites (`$idSite` 0), for a website the current
+     * user administers. Otherwise segments could be pushed to the segment lists of any group.
+     */
+    private function canShareSegmentWithGroup(int $idSite, int $idGroup): bool {
+        $groupIdSites = array_column($this->model->getPermissionsOfGroup($idGroup), 'idsite');
+
+        if ($idSite > 0) {
+            return in_array($idSite, $groupIdSites, true);
+        }
+
+        $adminIdSites = array_map('intval', array_filter(
+            Access::getInstance()->getSitesIdWithAdminAccess(),
+            'is_numeric'
+        ));
+
+        return (bool) array_intersect($groupIdSites, $adminIdSites);
     }
 
     /**

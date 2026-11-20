@@ -10,6 +10,8 @@
 
 namespace Piwik\Plugins\GroupPermissions;
 
+use Piwik\Access\RolesProvider;
+use Piwik\Container\StaticContainer;
 use Piwik\Piwik;
 use Piwik\Plugins\UsersManager\Model as UsersModel;
 
@@ -33,17 +35,17 @@ class SiteAccessLoss {
      * @return T
      */
     public static function notifyAfter(array $logins, callable $change) {
-        $before = [];
-        foreach (self::getAffectedLogins($logins) as $login) {
-            $before[$login] = self::getIdSitesWithAccess($login);
-        }
+        $affected = self::getAffectedLogins($logins);
+        $before = self::getIdSitesWithAccess($affected);
 
         $result = $change();
 
+        $after = self::getIdSitesWithAccess($affected);
         foreach ($before as $login => $idSites) {
-            $lost = array_values(array_diff($idSites, self::getIdSitesWithAccess($login)));
+            $lost = array_values(array_diff($idSites, $after[$login] ?? []));
             if ($lost) {
-                Piwik::postEvent('UsersManager.removeSiteAccess', [$login, $lost]);
+                // numeric logins become integer array keys
+                Piwik::postEvent('UsersManager.removeSiteAccess', [(string) $login, $lost]);
             }
         }
 
@@ -79,16 +81,21 @@ class SiteAccessLoss {
     }
 
     /**
-     * Websites the user has any role for, directly or through groups
+     * Websites the users have any role for, directly or through groups (capabilities only apply with a role), in a
+     * few queries for all users instead of some per user
      *
-     * @return array<int>
+     * @param array<string> $logins
+     *
+     * @return array<string, array<int>> by login
      */
-    private static function getIdSitesWithAccess(string $login): array {
-        $idSites = [];
-        foreach ((new Access())->getRawSitesWithSomeViewAccess($login) as $siteAccess) {
-            $idSites[$siteAccess['idsite']] = $siteAccess['idsite'];
+    private static function getIdSitesWithAccess(array $logins): array {
+        if (!$logins) {
+            return [];
         }
 
-        return array_values($idSites);
+        $roleProvider = StaticContainer::get(RolesProvider::class);
+        $roles = $roleProvider instanceof RolesProvider ? $roleProvider->getAllRoleIds() : ['view', 'write', 'admin'];
+
+        return (new Model())->getIdSitesWithRoleOfUsers($logins, array_values(array_filter($roles, 'is_string')));
     }
 }
