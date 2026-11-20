@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "Pattern": "ნიმუში",
+        "ScheduledReport": "რეპორტი",
         "Users": "მომხმარებლები",
         "Websites": "ვებ საიტები"
     }

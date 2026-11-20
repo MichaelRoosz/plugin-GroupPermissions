@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "RemoveFromGroup": "Tanggalin",
+        "ScheduledReport": "Ulat",
         "Segment": "Bahagi",
         "Users": "Users",
         "Websites": "Websites"

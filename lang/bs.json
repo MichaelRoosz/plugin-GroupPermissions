@@ -1,5 +1,6 @@
 {
     "GroupPermissions": {
-        "RemoveFromGroup": "Ukloni"
+        "RemoveFromGroup": "Ukloni",
+        "ScheduledReport": "Report"
     }
 }

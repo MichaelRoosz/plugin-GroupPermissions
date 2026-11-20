@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "Pattern": "Vzorec",
         "RemoveFromGroup": "Odstrani",
+        "ScheduledReport": "Poročilo",
         "Segment": "Segment",
         "Users": "Uporabniki",
         "Websites": "Spletne strani"

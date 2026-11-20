@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "Pattern": "Mynstur",
+        "ScheduledReport": "Skýrsla",
         "Users": "Notendur",
         "Websites": "Vefir"
     }

@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "Pattern": "Mẫu",
         "RemoveFromGroup": "Tháo bỏ",
+        "ScheduledReport": "Báo cáo",
         "Users": "Các người dùng",
         "Websites": "Websites"
     }

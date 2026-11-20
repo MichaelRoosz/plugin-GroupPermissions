@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "Pattern": "แบบแผน",
         "RemoveFromGroup": "ลบออก",
+        "ScheduledReport": "ส่งออก",
         "Users": "ผู้ใช้",
         "Websites": "เว็บไซต์"
     }

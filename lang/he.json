@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "RemoveFromGroup": "מחיקה",
+        "ScheduledReport": "לדווח",
         "Segment": "מקטע",
         "Users": "משתמשים",
         "Websites": "אתרים"
