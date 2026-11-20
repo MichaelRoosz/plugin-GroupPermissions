@@ -77,6 +77,46 @@ test.describe('Group access in the website form', () => {
     expect((await su.groupAccess(idSite))[group.name]).toBe('write');
   });
 
+  test('with the roles loaded by the form, only the roles changed in the form are saved', async () => {
+    const [edited, removed, concurrent, concurrentRemoved] = [
+      await su.createGroup('Form merge edited'), await su.createGroup('Form merge removed'),
+      await su.createGroup('Form merge concurrent'), await su.createGroup('Form merge concurrent removed'),
+    ];
+    const idSite = await addSite('Form Merge', [
+      { group: edited.idGroup, role: 'view' }, { group: removed.idGroup, role: 'view' }, { group: concurrentRemoved.idGroup, role: 'view' },
+    ]);
+
+    // the form is loaded
+    const plugins: Array<{ pluginName: string; settings: Array<{ name: string; value: unknown }> }> =
+      await su.call('SitesManager.getSiteSettings', { idSite });
+    const settings = plugins.find((p) => p.pluginName === 'GroupPermissions')!.settings;
+    const loaded = settings.find((s) => s.name === 'group_access_loaded')!.value as string;
+    const rows = (settings.find((s) => s.name === 'group_access')!.value as Row[]);
+    expect(rows).toHaveLength(3);
+
+    // meanwhile, someone else changes the access of other groups
+    await su.call('GroupPermissions.setGroupAccessById', { idGroup: concurrent.idGroup, access: 'write', idSites: String(idSite) });
+    await su.call('GroupPermissions.setGroupAccessById', { idGroup: concurrentRemoved.idGroup, access: 'noaccess', idSites: String(idSite) });
+
+    // the form is saved with the loaded rows: one role changed, one row removed
+    const formRows: Row[] = rows
+      .filter((row) => Number(row.group) !== removed.idGroup)
+      .map((row) => (Number(row.group) === edited.idGroup ? { ...row, role: 'admin' } : row));
+    await su.call('SitesManager.updateSite', {
+      idSite,
+      ...groupAccessParams(formRows),
+      'settingValues[GroupPermissions][1][name]': 'group_access_loaded',
+      'settingValues[GroupPermissions][1][value]': loaded,
+    });
+
+    const access = await su.groupAccess(idSite);
+    expect(access[edited.name]).toBe('admin');
+    expect(access[removed.name]).toBe('noaccess');
+    // the changes made while the form was open are kept
+    expect(access[concurrent.name]).toBe('write');
+    expect(access[concurrentRemoved.name]).toBe('noaccess');
+  });
+
   test('invalid values are rejected without creating the website', async () => {
     const group = await su.createGroup('Form invalid');
     const sitesBefore = (await su.call('SitesManager.getAllSitesId', { filter_limit: -1 })).length;
@@ -134,10 +174,15 @@ test.describe('Group access in the website form', () => {
       await expect(roleSelect(firstRow.locator('.fieldUiControl2'))).toHaveValue('View');
       await screenshot(field, 'site-form-group-access');
 
+      // changed by someone else while the form is open: kept when the form is saved
+      const concurrent = await su.createGroup('Form UI concurrent');
+      await su.call('GroupPermissions.setGroupAccessById', { idGroup: concurrent.idGroup, access: 'view', idSites: String(idSite) });
+
       await chooseOption(firstRow.locator('.fieldUiControl2'), 'Admin');
       await page.locator('.editingSiteFooter input[type=submit]').click();
       await waitForIdle(page);
       await expect.poll(async () => (await su.groupAccess(idSite))[group.name]).toBe('admin');
+      expect((await su.groupAccess(idSite))[concurrent.name]).toBe('view');
     });
   });
 });

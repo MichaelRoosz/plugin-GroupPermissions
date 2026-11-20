@@ -388,8 +388,10 @@ class API extends \Piwik\Plugin\API {
                 $this->model->addUserToGroup($idGroup, $userLogin);
             }
 
-            // permissions are granted through the groups only, remove the initial direct access again
+            // permissions are granted through the groups only, remove the initial direct access again (called
+            // directly, so the API.UsersManager.setUserAccess.end event that restores kept reports is not posted)
             $usersManagerApi->setUserAccess($userLogin, 'noaccess', $initialIdSite);
+            ReportKeeper::restoreKeptReports();
         } catch (\Throwable $e) {
             // do not leave an invited user with direct website access or only some of the groups behind
             if (!$this->rollBackInvite($userLogin, $passwordConfirmation)) {
@@ -632,7 +634,8 @@ class API extends \Piwik\Plugin\API {
      * @param string $pattern Website group name or URL, case-insensitive, `*` matches any characters. URL patterns
      *                        without `/` are compared with the host only (e.g. `*.example.com`), others with host and
      *                        path (e.g. `example.com/shop*`). The port of the URLs is only compared for patterns
-     *                        with a port (e.g. `example.com:8080`)
+     *                        with a port (e.g. `example.com:8080`), URLs without a port have the default port
+     *                        of their scheme (80 or 443)
      * @param string $access Role to give, e.g. "view", "write" or "admin"
      * @param string|array<string> $capabilities Optional capabilities to give in addition to the role (e.g.
      *                                           `tagmanager_write`), see "UsersManager.getAvailableCapabilities"
@@ -716,6 +719,10 @@ class API extends \Piwik\Plugin\API {
         GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
+
+        if (!$this->model->getAutoAccessRule($group['idgroup'], $idRule)) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionRuleDoesNotExist', $idRule));
+        }
 
         $this->model->removeAutoAccessRule($group['idgroup'], $idRule);
     }
@@ -906,6 +913,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function shareSegmentWithGroup(int $idSegment, int $idGroup): void {
         Piwik::checkUserHasSomeAdminAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $segment = $this->getSegmentOrFailForSharing($idSegment);
         $group = $this->getGroupOrFail($idGroup);
@@ -918,6 +926,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function unshareSegmentFromGroup(int $idSegment, int $idGroup): void {
         Piwik::checkUserHasSomeAdminAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $segment = $this->getSegmentOrFailForSharing($idSegment);
         $group = $this->getGroupOrFail($idGroup);

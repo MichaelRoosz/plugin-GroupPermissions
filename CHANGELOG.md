@@ -12,7 +12,7 @@ New features (requires a database update):
   - Invite new users directly into groups
   - Copy dashboards to all members of a group
   - New API methods for all of the above
-  - `[GroupPermissions] enable_groups_admin = 0` in the config disables changing groups, like `enable_users_admin` for users
+  - `[GroupPermissions] enable_groups_admin = 0` in the config disables changing groups (including the segments shared with them), like `enable_users_admin` for users
   - `setGroupAccessById` sets the role of a group by its ID (the UI uses it, so groups with the same name from older versions are no longer mixed up)
 
 Security:
@@ -30,8 +30,11 @@ Fixes:
   - Adding a member that the directory sync added makes the membership a manual one, which the sync keeps
   - Users deleted while the plugin was deactivated are no longer listed as members (they were shown as active and removing them failed); their memberships can still be removed via the API
   - Users losing all access to a website through a group change trigger `UsersManager.removeSiteAccess` like direct access changes, so e.g. their scheduled reports for the website are deleted
-  - Automatic access URL patterns with a port (e.g. `example.com:8080`) match websites with that port
-  - `removeExternalGroupMapping` fails for external groups that are not mapped, `getMembersOfGroup` for groups that do not exist
+  - Automatic access URL patterns with a port (e.g. `example.com:8080`) match websites with that port; URLs without a port have the default port of their scheme (`example.com:443` matches `https://example.com`)
+  - Removing the direct access of a user no longer deletes their scheduled reports for websites they can still access through a group
+  - Saving the website form only changes the group roles changed in the form, roles changed by others while it was open are kept
+  - Members are listed and counted when the tables of the plugin and of Matomo have different collations (e.g. after a MySQL upgrade)
+  - `removeExternalGroupMapping` and `removeAutoAccessRule` fail for mappings and rules that do not exist, `getMembersOfGroup` for groups that do not exist
   - `getSitesAccessFromGroup` loads the website names with one query
   - Manage Access with "Apply to all websites" can remove the access of a group from all websites ("No access") and apply the same role again
   - Deleting a group is all or nothing

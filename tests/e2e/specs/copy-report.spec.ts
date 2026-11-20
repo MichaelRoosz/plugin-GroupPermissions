@@ -276,6 +276,31 @@ test.describe('Copy scheduled reports to a group', () => {
     expect(await count(tempOnly, site)).toBe(0);
   });
 
+  test('removing direct access keeps the reports of websites the user can still access through a group', async () => {
+    const site = await su.createSite('Report Direct Removal Site');
+    const group = await su.createGroup('Report Direct Removal');
+    const [withGroup, withoutGroup] = [await su.createUser('rdir_group'), await su.createUser('rdir_nogroup')];
+    await su.addMembers(group.idGroup, [withGroup]);
+    await su.setGroupAccess(group.name, 'view', site);
+    await su.setUserAccess(withGroup, 'admin', site);
+    await su.setUserAccess(withoutGroup, 'view', site);
+
+    const description = `Direct Removal ${RUN_ID}`;
+    const ids: Record<string, number> = {};
+    for (const login of [withGroup, withoutGroup]) {
+      ids[login] = await addReport(await MatomoApi.forUser(login, DEFAULT_PASSWORD), 'Direct Removal', site);
+    }
+
+    // Matomo posts UsersManager.removeSiteAccess for both, ScheduledReports deletes the reports on it
+    await su.setUserAccess(withGroup, 'noaccess', site);
+    await su.setUserAccess(withoutGroup, 'noaccess', site);
+
+    const kept = await reportsOf(withGroup, description);
+    expect(kept.map((r) => Number(r.idreport))).toEqual([ids[withGroup]]);
+    expect(kept[0].reports).toEqual(['VisitsSummary_get', 'UserCountry_getCountry']);
+    expect(await reportsOf(withoutGroup, description)).toEqual([]);
+  });
+
   test.describe('UI', () => {
     test.use({ storageState: superUserStorageState });
 

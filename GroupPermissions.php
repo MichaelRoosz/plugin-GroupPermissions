@@ -70,6 +70,7 @@ class GroupPermissions extends Plugin {
             'API.SegmentEditor.getAll.end'           => 'addSharedSegments',
             'API.SegmentEditor.delete.end'           => 'deleteSegment',
             'API.SitesManager.getSitesIdFromSiteUrl.end' => 'addGroupSitesFromSiteUrl',
+            'API.UsersManager.setUserAccess.end'     => 'restoreKeptReports',
             // integration point for login plugins (e.g. SAML): sync the groups of a user with their external groups
             'GroupPermissions.syncUserGroups'        => 'syncUserGroups',
             'Login.authenticate.successful'          => 'syncGroupsAfterLogin',
@@ -79,6 +80,8 @@ class GroupPermissions extends Plugin {
             // after the UsersManager plugin, which resets the list
             'Tracker.Cache.getSiteAttributes'        => ['function' => 'addGroupTrackingTokens', 'after' => true],
             'UsersManager.deleteUser'                => 'deleteUser',
+            // before the ScheduledReports plugin, which deletes the reports of the user for the websites
+            'UsersManager.removeSiteAccess'          => ['function' => 'keepReportsOfAccessibleSites', 'before' => true],
             'UsersManager.addUser.end'               => 'removeStaleMemberships',
             'UsersManager.inviteUser.end'            => 'removeStaleMemberships',
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
@@ -486,6 +489,29 @@ class GroupPermissions extends Plugin {
                 );
             }
         }
+    }
+
+    /**
+     * Matomo posts `UsersManager.removeSiteAccess` when direct access is removed, even if the user can still access
+     * the websites through a group. Saves the scheduled reports of the user for those websites, which the
+     * ScheduledReports plugin deletes on this event, see restoreKeptReports.
+     *
+     * @param mixed $login
+     * @param mixed $idSites
+     */
+    public function keepReportsOfAccessibleSites($login, $idSites): void {
+        if (!is_string($login) || !is_array($idSites)) {
+            return;
+        }
+
+        ReportKeeper::keepReportsOfAccessibleSites($login, $idSites);
+    }
+
+    /**
+     * Restores the reports saved by keepReportsOfAccessibleSites once `UsersManager.setUserAccess` is done
+     */
+    public function restoreKeptReports(): void {
+        ReportKeeper::restoreKeptReports();
     }
 
     /**

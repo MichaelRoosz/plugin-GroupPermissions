@@ -81,6 +81,22 @@ test.describe('Automatic access for new websites', () => {
     expect((await su.groupAccess(anyPort))[group.name]).toBe('view');
   });
 
+  test('URLs without a port have the default port of their scheme', async () => {
+    const group = await su.createGroup('Auto default port');
+    await addRule(group.idGroup, 'url', `https-${RUN_ID}.example.org:443`, 'view');
+    await addRule(group.idGroup, 'url', `http-${RUN_ID}.example.org:80/shop*`, 'write');
+
+    const https = await addSite('Auto Default Https', [`https://https-${RUN_ID}.example.org`]);
+    const httpOnHttpsPort = await addSite('Auto Http On 443', [`http://https-${RUN_ID}.example.org`]);
+    const http = await addSite('Auto Default Http', [`http://http-${RUN_ID}.example.org/shop/`]);
+    const explicit = await addSite('Auto Explicit Http', [`http://http-${RUN_ID}.example.org:80/shop`]);
+
+    expect((await su.groupAccess(https))[group.name]).toBe('view');
+    expect((await su.groupAccess(httpOnHttpsPort))[group.name]).toBe('noaccess');
+    expect((await su.groupAccess(http))[group.name]).toBe('write');
+    expect((await su.groupAccess(explicit))[group.name]).toBe('write');
+  });
+
   test('the highest role of all matching rules wins, existing websites are not changed', async () => {
     const group = await su.createGroup('Auto highest');
     const existing = await addSite('Auto Existing', [`https://multi-${RUN_ID}.example.org`], `Multi ${RUN_ID}`);
@@ -110,10 +126,13 @@ test.describe('Automatic access for new websites', () => {
 
     // removing needs the right group
     const otherGroup = await su.createGroup('Auto validate other');
-    await su.call('GroupPermissions.removeAutoAccessRule', { idGroup: otherGroup.idGroup, idRule });
+    expect(await su.expectError('GroupPermissions.removeAutoAccessRule', { idGroup: otherGroup.idGroup, idRule }))
+      .toMatch(/rule .*does not exist|does not exist/i);
     expect(await rules(group.idGroup)).toHaveLength(1);
     await su.call('GroupPermissions.removeAutoAccessRule', { idGroup: group.idGroup, idRule });
     expect(await rules(group.idGroup)).toEqual([]);
+    expect(await su.expectError('GroupPermissions.removeAutoAccessRule', { idGroup: group.idGroup, idRule }))
+      .toMatch(/does not exist/i);
 
     // deleting the group removes its rules: a new matching website must not get a permission for the old group id
     await addRule(group.idGroup, 'url', `deleted-${RUN_ID}.example.org`, 'admin');

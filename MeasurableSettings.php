@@ -31,10 +31,17 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings {
     /** @var MeasurableSetting */
     public $groupAccess;
 
+    /** @var MeasurableSetting the roles when the form was loaded, see GroupAccessBackend */
+    public $groupAccessLoaded;
+
     protected function init(): void {
         $this->title = Piwik::translate('GroupPermissions_GroupPermissions');
 
-        $setting = $this->makeSetting(GroupAccessBackend::SETTING_NAME, [], FieldConfig::TYPE_ARRAY, function (FieldConfig $field): void {
+        // one storage for both settings, so the backend gets both values when saving
+        $backend = new GroupAccessBackend($this->idSite);
+        $storage = new Storage($backend);
+
+        $setting = $this->makeSetting(GroupAccessBackend::SETTING_NAME, [], FieldConfig::TYPE_ARRAY, function (FieldConfig $field) use ($backend): void {
             $groups = $this->getGroupOptions();
             $roles = $this->getRoleOptions();
 
@@ -58,6 +65,11 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings {
             $field->uiControlAttributes['field1'] = $groupField->toArray();
             $field->uiControlAttributes['field2'] = $roleField->toArray();
 
+            $field->transform = static function ($value) use ($backend) {
+                $backend->markSubmitted(GroupAccessBackend::SETTING_NAME);
+
+                return $value;
+            };
             $field->validate = static function ($value) use ($groups, $roles): void {
                 if (!is_array($value)) {
                     throw new Exception(Piwik::translate('GroupPermissions_SiteFormGroupAccessInvalid'));
@@ -87,13 +99,26 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings {
                 }
             };
         });
-        $setting->setStorage(new Storage(new GroupAccessBackend($this->idSite)));
+        $setting->setStorage($storage);
+
+        $loadedSetting = $this->makeSetting(GroupAccessBackend::LOADED_SETTING_NAME, '', FieldConfig::TYPE_STRING, static function (FieldConfig $field) use ($backend): void {
+            $field->uiControl = FieldConfig::UI_CONTROL_HIDDEN;
+            $field->transform = static function ($value) use ($backend) {
+                $backend->markSubmitted(GroupAccessBackend::LOADED_SETTING_NAME);
+
+                return $value;
+            };
+        });
+        $loadedSetting->setStorage($storage);
+
         if (!GroupPermissions::isGroupsAdminEnabled()) {
             // not shown in the website form, and never saved
             $setting->setIsWritableByCurrentUser(false);
+            $loadedSetting->setIsWritableByCurrentUser(false);
         }
 
         $this->groupAccess = $setting;
+        $this->groupAccessLoaded = $loadedSetting;
     }
 
     /**

@@ -69,20 +69,22 @@ class GroupUser {
      * }>
      */
     public function getMembersOfGroup(int $idGroup): array {
-        $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
-        $tableUser = Common::prefixTable('user');
 
-        $rows = Rows::list(Db::fetchAll(
-            "SELECT gu.login, gu.synced FROM $table AS gu
-                INNER JOIN $tableUser AS u ON u.login = gu.login
-                WHERE gu.idgroup = ?",
-            [$idGroup]
-        ));
+        $rows = Rows::list(Db::fetchAll("SELECT login, synced FROM $table WHERE idgroup = ?", [$idGroup]));
+        $existing = $this->getExistingLogins(array_map(static function (array $row): string {
+            return Rows::string($row, 'login');
+        }, $rows));
 
-        return array_map(static function (array $row): array {
-            return ['login' => Rows::string($row, 'login'), 'synced' => Rows::int($row, 'synced') === 1];
-        }, $rows);
+        $members = [];
+        foreach ($rows as $row) {
+            $login = Rows::string($row, 'login');
+            if (isset($existing[mb_strtolower($login)])) {
+                $members[] = ['login' => $login, 'synced' => Rows::int($row, 'synced') === 1];
+            }
+        }
+
+        return $members;
     }
 
     /**
@@ -92,14 +94,17 @@ class GroupUser {
      * @return array<int, int> number of members by group id (groups without members are missing)
      */
     public function countMembersPerGroup(): array {
-        $table = $this->tablePrefixed;
-        $tableUser = Common::prefixTable('user');
-        $sql = "SELECT gu.idgroup, COUNT(*) AS cnt FROM $table AS gu
-                INNER JOIN $tableUser AS u ON u.login = gu.login
-                GROUP BY gu.idgroup";
+        $rows = Rows::list(Db::fetchAll("SELECT idgroup, login FROM {$this->tablePrefixed}"));
+        $existing = $this->getExistingLogins(array_map(static function (array $row): string {
+            return Rows::string($row, 'login');
+        }, $rows));
+
         $counts = [];
-        foreach (Rows::list(Db::fetchAll($sql)) as $row) {
-            $counts[Rows::int($row, 'idgroup')] = Rows::int($row, 'cnt');
+        foreach ($rows as $row) {
+            if (isset($existing[mb_strtolower(Rows::string($row, 'login'))])) {
+                $idGroup = Rows::int($row, 'idgroup');
+                $counts[$idGroup] = ($counts[$idGroup] ?? 0) + 1;
+            }
         }
 
         return $counts;
@@ -152,5 +157,34 @@ class GroupUser {
         $query = "DELETE FROM $table WHERE login = ?";
         $bind = [$login];
         Db::query($query, $bind);
+    }
+
+    /**
+     * Which of the logins belong to existing users. Looked up with the logins as values instead of joining the
+     * user table: the login columns of this plugin's and Matomo's tables can have different collations (e.g. tables
+     * created before and after a MySQL upgrade), which makes MySQL reject a join ("Illegal mix of collations").
+     * Like the join, the lookup uses the collation of the user table, e.g. it is case-insensitive.
+     *
+     * @param array<string> $logins
+     *
+     * @return array<string, true> the lowercased logins of existing users as keys
+     */
+    private function getExistingLogins(array $logins): array {
+        $logins = array_values(array_unique($logins));
+        $tableUser = Common::prefixTable('user');
+
+        $existing = [];
+        foreach (array_chunk($logins, 500) as $chunk) {
+            $rows = Rows::list(Db::fetchAll(
+                "SELECT login FROM $tableUser WHERE login IN (" . Common::getSqlStringFieldsArray($chunk) . ')',
+                $chunk
+            ));
+            foreach ($rows as $row) {
+                $existing[mb_strtolower(Rows::string($row, 'login'))] = true;
+            }
+        }
+
+        // lowercased, so with a case-insensitive collation a membership of `Bob` finds the user `bob`
+        return $existing;
     }
 }

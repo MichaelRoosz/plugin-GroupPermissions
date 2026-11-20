@@ -124,11 +124,24 @@ check "group access cannot be changed" "1" "$(su GroupPermissions.setGroupAccess
     --data-urlencode "access=admin" --data-urlencode "idSites=$id_site" | grep -c 'has been disabled' || true)"
 check "members cannot be removed" "1" "$(su GroupPermissions.removeUserFromGroup --data-urlencode "idGroup=$id_group" \
     --data-urlencode "login=$member" | grep -c 'has been disabled' || true)"
+check "segments cannot be shared" "1" "$(su GroupPermissions.shareSegmentWithGroup --data-urlencode "idGroup=$id_group" \
+    --data-urlencode "idSegment=1" | grep -c 'has been disabled' || true)"
 check "groups can still be listed" "1" "$(su GroupPermissions.getAllGroups --data-urlencode "filter_limit=-1" | grep -c "\"$group\"" || true)"
 check "group access still applies" "$id_site" "$(member_sites)"
 mexec ./console config:set --section=GroupPermissions --key=enable_groups_admin --value=1 >/dev/null
 check "groups can be managed again" "1" "$(su GroupPermissions.setGroupAccessById --data-urlencode "idGroup=$id_group" \
     --data-urlencode "access=view" --data-urlencode "idSites=$id_site" | grep -c '"success"' || true)"
+
+echo "==> Members are listed when the login columns of the plugin and of Matomo have different collations"
+user_collation=$(sql "SELECT COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'matomo_user' AND COLUMN_NAME = 'login'")
+user_charset=$(sql "SELECT CHARACTER_SET_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'matomo_user' AND COLUMN_NAME = 'login'")
+other_collation="${user_charset}_unicode_ci"
+[ "$user_collation" = "$other_collation" ] && other_collation="${user_charset}_general_ci"
+sql "ALTER TABLE matomo_gpermissions_user MODIFY login VARCHAR(100) CHARACTER SET $user_charset COLLATE $other_collation NOT NULL"
+check "the collations differ" "1" "$(sql "SELECT COUNT(DISTINCT COLLATION_NAME) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND COLUMN_NAME = 'login' AND TABLE_NAME IN ('matomo_user', 'matomo_gpermissions_user')" | grep -c '^2$' || true)"
+check "members are listed" "1" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$member\"" || true)"
+check "members are counted" "1" "$(su GroupPermissions.getGroupsOverview --data-urlencode "filter_limit=-1" | grep -oE "\"idGroup\":$id_group,[^}]*\"memberCount\":1[,}]" | wc -l)"
+sql "ALTER TABLE matomo_gpermissions_user MODIFY login VARCHAR(100) CHARACTER SET $user_charset COLLATE $user_collation NOT NULL"
 
 echo "==> Creating a website without the automatic access table (e.g. update not run yet) does not fail"
 sql "DROP TABLE matomo_gpermissions_autoaccess"

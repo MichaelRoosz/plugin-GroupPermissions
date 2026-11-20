@@ -25,12 +25,22 @@ use Piwik\Settings\Storage\Backend\BackendInterface;
  * current roles, and there is no second copy of the permissions that could get out of sync.
  *
  * The value is a list of rows `['group' => idGroup, 'role' => role]`. Groups without a row have no access.
+ *
+ * A second, hidden setting holds the roles as they were when the form was loaded (`idGroup:role,...`). When both are
+ * sent, only the groups whose role was changed in the form are updated, so changes made by others while the form was
+ * open are kept. Without it (e.g. API calls that only send the roles), the roles sent replace all roles.
  */
 class GroupAccessBackend implements BackendInterface {
     public const SETTING_NAME = 'group_access';
+    public const LOADED_SETTING_NAME = 'group_access_loaded';
 
     /** @var int */
     private $idSite;
+
+    /**
+     * @var array<string, true> names of the settings set in this request
+     */
+    private $submitted = [];
 
     public function __construct(int $idSite) {
         $this->idSite = $idSite;
@@ -41,12 +51,12 @@ class GroupAccessBackend implements BackendInterface {
     }
 
     /**
-     * @return array<string, array<array{group: string, role: string}>>
+     * @return array{group_access: array<array{group: string, role: string}>, group_access_loaded: string}
      */
     public function load() {
         // a website that is being created has no group access yet
         if ($this->idSite <= 0) {
-            return [self::SETTING_NAME => []];
+            return [self::SETTING_NAME => [], self::LOADED_SETTING_NAME => ''];
         }
 
         $model = new Model();
@@ -68,7 +78,14 @@ class GroupAccessBackend implements BackendInterface {
             return strcasecmp($names[(int) $a['group']], $names[(int) $b['group']]);
         });
 
-        return [self::SETTING_NAME => $rows];
+        return [self::SETTING_NAME => $rows, self::LOADED_SETTING_NAME => self::formatSnapshot($rows)];
+    }
+
+    /**
+     * Called when a value is set for one of the settings of this backend in the current request
+     */
+    public function markSubmitted(string $settingName): void {
+        $this->submitted[$settingName] = true;
     }
 
     /**
@@ -81,6 +98,10 @@ class GroupAccessBackend implements BackendInterface {
             return;
         }
 
+        if (!isset($this->submitted[self::SETTING_NAME])) {
+            return;
+        }
+
         $rows = $values[self::SETTING_NAME] ?? [];
         $wanted = self::parseRows(is_array($rows) ? $rows : []);
 
@@ -88,6 +109,13 @@ class GroupAccessBackend implements BackendInterface {
         $current = [];
         foreach ($model->getPermissionsOfSite($this->idSite) as $permission) {
             $current[$permission['idgroup']] = $permission['access'];
+        }
+
+        $loaded = isset($this->submitted[self::LOADED_SETTING_NAME])
+            ? self::parseSnapshot($values[self::LOADED_SETTING_NAME] ?? null)
+            : null;
+        if ($loaded !== null) {
+            $wanted = self::mergeChanges($current, $loaded, $wanted);
         }
 
         $capabilityProvider = StaticContainer::get(CapabilitiesProvider::class);
@@ -128,6 +156,65 @@ class GroupAccessBackend implements BackendInterface {
 
     public function delete(): void {
         // the permissions of a deleted website are removed by the SitesManager.deleteSite.end event
+    }
+
+    /**
+     * Applies the changes made in the form (from the loaded roles to the wanted ones) to the current roles.
+     *
+     * @param array<int, string> $current
+     * @param array<int, string> $loaded
+     * @param array<int, string> $wanted
+     *
+     * @return array<int, string>
+     */
+    public static function mergeChanges(array $current, array $loaded, array $wanted): array {
+        $result = $current;
+        foreach (array_keys($loaded + $wanted) as $idGroup) {
+            if (($wanted[$idGroup] ?? null) === ($loaded[$idGroup] ?? null)) {
+                continue;
+            }
+
+            if (isset($wanted[$idGroup])) {
+                $result[$idGroup] = $wanted[$idGroup];
+            } else {
+                unset($result[$idGroup]);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<array{group: string, role: string}> $rows
+     */
+    public static function formatSnapshot(array $rows): string {
+        $parts = [];
+        foreach ($rows as $row) {
+            $parts[] = $row['group'] . ':' . $row['role'];
+        }
+
+        return implode(',', $parts);
+    }
+
+    /**
+     * @param mixed $snapshot
+     *
+     * @return array<int, string>|null the role per group id, null if the value is not a snapshot
+     */
+    public static function parseSnapshot($snapshot): ?array {
+        if (!is_string($snapshot)) {
+            return null;
+        }
+
+        $roles = [];
+        foreach ($snapshot === '' ? [] : explode(',', $snapshot) as $part) {
+            if (!preg_match('/^([1-9][0-9]*):([a-z_]+)$/', $part, $matches)) {
+                return null;
+            }
+            $roles[(int) $matches[1]] = $matches[2];
+        }
+
+        return $roles;
     }
 
     /**

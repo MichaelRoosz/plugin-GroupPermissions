@@ -21,7 +21,8 @@ use Piwik\Plugins\SitesManager\Model as SitesModel;
  * A rule matches either the Matomo website group of the new website or one of its URLs (main URL and alias URLs).
  * Patterns are case-insensitive and support `*` as wildcard. A URL pattern without `/` is compared with the host of
  * the URLs only (e.g. `*.example.com`), a pattern with `/` with host and path (e.g. `example.com/shop*`). The port of
- * the URLs is only compared for patterns with a port (e.g. `example.com:8080`).
+ * the URLs is only compared for patterns with a port (e.g. `example.com:8080`); URLs without a port have the default
+ * port of their scheme (80 for http, 443 for https).
  */
 class AutoAccess {
     /** @var Model */
@@ -209,14 +210,25 @@ class AutoAccess {
         }
 
         $subject = $parts['host'];
-        if ($withPort && !empty($parts['port'])) {
-            $subject .= ':' . $parts['port'];
+        if ($withPort) {
+            // URLs without a port use the default port of their scheme, so `example.com:443` matches
+            // `https://example.com`
+            $port = !empty($parts['port']) ? (int) $parts['port'] : self::getDefaultPort($parts['scheme'] ?? '');
+            if ($port !== null) {
+                $subject .= ':' . $port;
+            }
         }
         if ($withPath && !empty($parts['path'])) {
             $subject .= rtrim($parts['path'], '/');
         }
 
         return $subject;
+    }
+
+    private static function getDefaultPort(string $scheme): ?int {
+        $defaultPorts = ['http' => 80, 'https' => 443];
+
+        return $defaultPorts[strtolower($scheme)] ?? null;
     }
 
     private static function wildcardMatches(string $pattern, string $subject): bool {
