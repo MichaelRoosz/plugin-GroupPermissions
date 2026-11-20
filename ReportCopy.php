@@ -40,7 +40,8 @@ class ReportCopy {
     }
 
     /**
-     * Returns the email reports the current user may copy: super users all reports, other users their own.
+     * Returns the email reports the current user may copy: super users all reports, other users their own. Reports
+     * using a segment that is not shared with all users are left out, see getReportOrFail.
      *
      * @return array<array{
      *   idReport: int,
@@ -72,6 +73,12 @@ class ReportCopy {
                 continue;
             }
 
+            $idSegment = is_numeric($report['idsegment'] ?? null) ? (int) $report['idsegment'] : 0;
+            // copying would fail, see getReportOrFail
+            if (!self::isSegmentCopyable($idSegment)) {
+                continue;
+            }
+
             $idSite = (int) $report['idsite'];
             if (!isset($siteNames[$idSite])) {
                 try {
@@ -88,7 +95,7 @@ class ReportCopy {
                 'idSite' => $idSite,
                 'siteName' => $siteNames[$idSite],
                 'period' => is_string($report['period'] ?? null) ? $report['period'] : '',
-                'idSegment' => is_numeric($report['idsegment'] ?? null) ? (int) $report['idsegment'] : 0,
+                'idSegment' => $idSegment,
             ];
         }
 
@@ -130,12 +137,8 @@ class ReportCopy {
         }
 
         $idSegment = is_numeric($row['idsegment'] ?? null) ? (int) $row['idsegment'] : 0;
-        if ($idSegment > 0) {
-            // Matomo only lets members use their own segments and segments shared with all users in their reports
-            $segment = SegmentSharing::getStoredSegment($idSegment);
-            if ($segment === null || empty($segment['enable_all_users'])) {
-                throw new Exception(Piwik::translate('GroupPermissions_ExceptionReportSegmentNotCopyable'));
-            }
+        if (!self::isSegmentCopyable($idSegment)) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionReportSegmentNotCopyable'));
         }
 
         return $row;
@@ -210,5 +213,19 @@ class ReportCopy {
         }
 
         return false;
+    }
+
+    /**
+     * Whether a report with this segment (0 for none) can be copied: Matomo only lets members use their own segments
+     * and segments shared with all users in their reports
+     */
+    private static function isSegmentCopyable(int $idSegment): bool {
+        if ($idSegment <= 0) {
+            return true;
+        }
+
+        $segment = SegmentSharing::getStoredSegment($idSegment);
+
+        return $segment !== null && !empty($segment['enable_all_users']);
     }
 }

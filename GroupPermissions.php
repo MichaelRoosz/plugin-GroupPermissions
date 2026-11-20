@@ -47,6 +47,7 @@ class GroupPermissions extends Plugin {
             // integration point for login plugins (e.g. SAML): sync the groups of a user with their external groups
             'GroupPermissions.syncUserGroups'        => 'syncUserGroups',
             'Login.authenticate.successful'          => 'syncGroupsAfterLogin',
+            'Request.dispatch'                       => 'rememberDispatchedModule',
             'SitesManager.addSite.end'               => 'addSite',
             'SitesManager.deleteSite.end'            => 'deleteSite',
             // after the UsersManager plugin, which resets the list
@@ -296,6 +297,13 @@ class GroupPermissions extends Plugin {
             $ldapGroupSync = new LdapGroupSync(new SystemSettings(), new GroupSync(new Model()));
             $ldapGroupSync->syncUserAfterLogin($login);
         }
+    }
+
+    /**
+     * @param mixed $module
+     */
+    public function rememberDispatchedModule($module): void {
+        SegmentSharing::rememberDispatchedModule($module);
     }
 
     /**

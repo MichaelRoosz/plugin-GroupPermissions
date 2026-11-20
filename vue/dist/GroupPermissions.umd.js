@@ -147,7 +147,7 @@ if (typeof window !== 'undefined') {
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=6607e31e
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=18efc300
 
 var _hoisted_1 = {
   class: "groupPermissionsManageAccess"
@@ -352,7 +352,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: _ctx.translate('General_No')
   }, null, 8, _hoisted_31)], 512)]);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=6607e31e
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroupAccess.vue?vue&type=template&id=18efc300
 
 // EXTERNAL MODULE: external "CoreHome"
 var external_CoreHome_ = __webpack_require__("19dc");
@@ -881,7 +881,11 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
       .catch(function () {
         return undefined;
       }).finally(function () {
-        _this2.isLoading = false;
+        // with a website, updateGroupAccessList() loads its groups and resets the flag itself
+        if (!_this2.site) {
+          _this2.isLoading = false;
+        }
+
         _this2.isInitialSiteResolved = true;
       });
     },
@@ -990,7 +994,10 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
             });
           });
         }).finally(function () {
-          _this5.isLoading = false;
+          // a request for the newly selected website is still running
+          if (!isStale()) {
+            _this5.isLoading = false;
+          }
         });
       } else {
         external_CoreHome_["AjaxHelper"].post({
@@ -1013,7 +1020,10 @@ function TabManageGroupAccessvue_type_script_lang_ts_arrayLikeToArray(arr, len) 
             _this5.groupAccess.set(group.idGroup, group);
           });
         }).finally(function () {
-          _this5.isLoading = false;
+          // a request for the newly selected website is still running
+          if (!isStale()) {
+            _this5.isLoading = false;
+          }
         });
       }
     }

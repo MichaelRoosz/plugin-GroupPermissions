@@ -20,14 +20,22 @@ use Piwik\Segment;
  *
  * Matomo's SegmentEditor only knows two visibilities: the creator ("me") and all users. Segments shared with a
  * group stay "visible to me" in the SegmentEditor and are added for the group members to the results of the
- * `SegmentEditor.getAll` and `SegmentEditor.get` API calls, which the segment selector, the scheduled reports
- * UI and segment name lookups use. Like segments shared with all users, only the creator (and super users) can
- * edit or delete them.
+ * `SegmentEditor.getAll` and `SegmentEditor.get` API calls, which the segment selector and segment name lookups
+ * use. Like segments shared with all users, only the creator (and super users) can edit or delete them.
+ *
+ * They are not offered in the scheduled reports UI: ScheduledReports validates the segment of a report by calling
+ * the SegmentEditor API class directly (not through the API proxy), which only accepts the user's own segments and
+ * segments shared with all users, so saving a report with a group segment would fail.
  *
  * Matomo only filters the segments a user may see, using any segment definition in a report is allowed anyway,
  * so this is a visibility feature, not an access control.
  */
 class SegmentSharing {
+    /**
+     * @var ?string
+     */
+    private static $dispatchedModule = null;
+
     /**
      * @var Model
      */
@@ -66,7 +74,7 @@ class SegmentSharing {
      * @param mixed $idSite
      */
     public function addSharedSegmentsToList(&$segments, $idSite): void {
-        if (!is_array($segments) || !$this->isApplicableToCurrentUser()) {
+        if (!is_array($segments) || !$this->isApplicableToCurrentUser() || self::isScheduledReportsRequest()) {
             return;
         }
 
@@ -129,6 +137,27 @@ class SegmentSharing {
         }
 
         return $segment;
+    }
+
+    /**
+     * Remembers the module of the controller the current HTTP request was dispatched to (the first dispatch).
+     * `$_GET` cannot be used for this: API calls made while handling the request (`Request::processRequest`)
+     * replace it with their own parameters.
+     *
+     * @param mixed $module
+     */
+    public static function rememberDispatchedModule($module): void {
+        if (self::$dispatchedModule === null && is_string($module)) {
+            self::$dispatchedModule = $module;
+        }
+    }
+
+    /**
+     * Whether the current request renders the scheduled reports UI (its report form lists the segments of
+     * `SegmentEditor.getAll`)
+     */
+    private static function isScheduledReportsRequest(): bool {
+        return self::$dispatchedModule === 'ScheduledReports';
     }
 
     private function isApplicableToCurrentUser(): bool {

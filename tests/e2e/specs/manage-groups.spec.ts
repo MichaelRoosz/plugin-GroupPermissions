@@ -155,7 +155,8 @@ test.describe('Manage Groups tab', () => {
     expect(await allGroupNames()).toContain(name);
 
     await groupEditor(page).locator('.groupPermissionsBackToGroups').click();
-    expect(await groupListNames(page)).toContain(name);
+    // the list is loaded after switching back
+    await expect.poll(() => groupListNames(page)).toContain(name);
   });
 
   test('creating a group with an existing or too long name shows an error', async ({ page }) => {

@@ -301,7 +301,10 @@ export default defineComponent({
         // on errors the site selector falls back to the first website
         .catch(() => undefined)
         .finally(() => {
-          this.isLoading = false;
+          // with a website, updateGroupAccessList() loads its groups and resets the flag itself
+          if (!this.site) {
+            this.isLoading = false;
+          }
           this.isInitialSiteResolved = true;
         });
     },
@@ -401,7 +404,10 @@ export default defineComponent({
               });
             });
         }).finally(() => {
-          this.isLoading = false;
+          // a request for the newly selected website is still running
+          if (!isStale()) {
+            this.isLoading = false;
+          }
         });
       } else {
         AjaxHelper.post({
@@ -422,7 +428,10 @@ export default defineComponent({
               this.groupAccess.set(group.idGroup, group);
             });
         }).finally(() => {
-          this.isLoading = false;
+          // a request for the newly selected website is still running
+          if (!isStale()) {
+            this.isLoading = false;
+          }
         });
       }
     },

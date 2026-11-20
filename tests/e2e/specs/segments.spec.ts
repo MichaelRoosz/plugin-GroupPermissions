@@ -199,6 +199,27 @@ test.describe('Share segments with groups', () => {
     await page.context().close();
   });
 
+  test('the scheduled reports form of a member does not offer group segments, which Matomo cannot save', async ({ browser }) => {
+    const idGroupSegment = await addSegment(api[owner], 'Report Form Group Segment');
+    await share(api[owner], idGroupSegment);
+    const idAllUsersSegment = Number((await su.call('SegmentEditor.add', {
+      name: `Report Form All Users ${RUN_ID}`, definition: `pageUrl=@report-form-all-${RUN_ID}`, idSite, enabledAllUsers: 1,
+    })).value);
+
+    // still listed outside of the scheduled reports UI
+    expect(await visibleTo(member, idSite)).toContain(idGroupSegment);
+
+    const page = await pageAs(browser, member);
+    await page.goto(`/index.php?module=ScheduledReports&action=index&idSite=${idSite}&period=day&date=yesterday`);
+    await waitForIdle(page);
+    const html = await page.content();
+    expect(html).toContain(`Report Form All Users ${RUN_ID}`);
+    expect(html).not.toContain(`Report Form Group Segment ${RUN_ID}`);
+    await page.context().close();
+
+    await su.call('SegmentEditor.delete', { idSegment: idAllUsersSegment });
+  });
+
   test.describe('UI', () => {
     test.use({ storageState: superUserStorageState });
 

@@ -252,10 +252,7 @@ class API extends \Piwik\Plugin\API {
     public function getSitesAccessFromGroup(int $idGroup): array {
         Piwik::checkUserHasSuperUserAccess();
 
-        $group = $this->model->getGroupWithId($idGroup);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
+        $group = $this->getGroupOrFail($idGroup);
 
         $capabilities = $this->model->getCapabilitiesOfGroup($group['idgroup']);
 
@@ -323,10 +320,7 @@ class API extends \Piwik\Plugin\API {
     public function addUserToGroup(int $idGroup, string $login): void {
         Piwik::checkUserHasSuperUserAccess();
 
-        $group = $this->model->getGroupWithId($idGroup);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
+        $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
 
         if ($login === 'anonymous') {
@@ -385,10 +379,7 @@ class API extends \Piwik\Plugin\API {
         }
 
         foreach ($idGroups as $idGroup) {
-            $group = $this->model->getGroupWithId($idGroup);
-            if (empty($group['idgroup'])) {
-                throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-            }
+            $this->getGroupOrFail($idGroup);
         }
 
         $initialIdSite = $this->getInitialIdSiteForGroups($idGroups);
@@ -423,10 +414,7 @@ class API extends \Piwik\Plugin\API {
     public function removeUserFromGroup(int $idGroup, string $login): void {
         Piwik::checkUserHasSuperUserAccess();
 
-        $group = $this->model->getGroupWithId($idGroup);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
+        $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
 
         // memberships of users deleted while this plugin was deactivated can still be removed
@@ -453,10 +441,8 @@ class API extends \Piwik\Plugin\API {
     public function setGroupAccess(string $name, string $access, string $idSites): void {
         Piwik::checkUserHasSomeAdminAccess();
 
+        // throws for groups that do not exist
         $group = $this->model->getGroupWithName($name);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $name));
-        }
 
         $this->updateGroupAccess($group['idgroup'], $access, $idSites);
     }
@@ -494,9 +480,6 @@ class API extends \Piwik\Plugin\API {
 
             return $this->model->createGroup($groupName);
         });
-        if (!$idGroup) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
 
         return [
             'idGroup' => $idGroup,
@@ -509,10 +492,7 @@ class API extends \Piwik\Plugin\API {
 
         $newName = $this->checkGroupName($newName);
 
-        $group = $this->model->getGroupWithId($idGroup);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
+        $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
 
         $this->withGroupNameLock(function () use ($idGroup, $newName): void {
@@ -528,10 +508,7 @@ class API extends \Piwik\Plugin\API {
     public function deleteGroup(int $idGroup): void {
         Piwik::checkUserHasSuperUserAccess();
 
-        $group = $this->model->getGroupWithId($idGroup);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
+        $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
 
         // all or nothing, so a failure never leaves a group with only part of its data behind
@@ -900,10 +877,7 @@ class API extends \Piwik\Plugin\API {
             throw new Exception('The Dashboard plugin is not activated.');
         }
 
-        $group = $this->model->getGroupWithId($idGroup);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
+        $group = $this->getGroupOrFail($idGroup);
 
         $currentLogin = Piwik::getCurrentUserLogin();
 
@@ -1091,7 +1065,8 @@ class API extends \Piwik\Plugin\API {
 
     /**
      * Returns the scheduled email reports the current user can copy to a group, sorted by description: super users
-     * get the reports of all users, other users their own. `idSegment` is 0 for reports without segment.
+     * get the reports of all users, other users their own. `idSegment` is 0 for reports without segment. Reports using
+     * a segment that is not shared with all users cannot be copied and are left out.
      *
      * @return array<array{
      *   idReport: int,
@@ -1262,12 +1237,8 @@ class API extends \Piwik\Plugin\API {
      * }
      */
     private function getGroupOrFail(int $idGroup): array {
-        $group = $this->model->getGroupWithId($idGroup);
-        if (empty($group['idgroup'])) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
-
-        return $group;
+        // throws for groups that do not exist
+        return $this->model->getGroupWithId($idGroup);
     }
 
     /**

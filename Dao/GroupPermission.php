@@ -58,8 +58,15 @@ class GroupPermission {
     public function getPermissionsOfGroup(int $idGroup): array {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
+        $tableSite = Common::prefixTable('site');
 
-        $rows = Rows::list(Db::fetchAll("SELECT idsite, access FROM $table WHERE idgroup = ?", [$idGroup]));
+        // websites deleted while this plugin was deactivated can leave permissions behind, skip them
+        $rows = Rows::list(Db::fetchAll(
+            "SELECT ga.idsite, ga.access FROM $table AS ga
+                INNER JOIN $tableSite AS s ON s.idsite = ga.idsite
+                WHERE ga.idgroup = ?",
+            [$idGroup]
+        ));
 
         return array_map(static function (array $row): array {
             return [

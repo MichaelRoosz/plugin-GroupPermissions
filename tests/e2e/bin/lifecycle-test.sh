@@ -70,6 +70,10 @@ echo "==> Preparing a website and users that are deleted while the plugin is dea
 gone_site=$(su SitesManager.addSite --data-urlencode "siteName=Lifecycle gone $run_id" --data-urlencode "urls=https://gone-$run_id.example.org" \
     | sed -E 's/.*"value":([0-9]+).*/\1/')
 su GroupPermissions.setGroupAccess --data-urlencode "name=$group" --data-urlencode "access=view" --data-urlencode "idSites=$gone_site" >/dev/null
+# a group with access to the deleted website only
+gone_group="Lifecycle gone $run_id"
+id_gone_group=$(su GroupPermissions.createGroup --data-urlencode "groupName=$gone_group" | sed -E 's/.*"idGroup":([0-9]+).*/\1/')
+su GroupPermissions.setGroupAccessById --data-urlencode "idGroup=$id_gone_group" --data-urlencode "access=view" --data-urlencode "idSites=$gone_site" >/dev/null
 gone_member="lifecycle_gone_$run_id"
 reborn_member="lifecycle_reborn_$run_id"
 for login in "$gone_member" "$reborn_member"; do
@@ -88,13 +92,22 @@ su SitesManager.deleteSite --data-urlencode "idSite=$gone_site" --data-urlencode
 for login in "$gone_member" "$reborn_member"; do
     su UsersManager.deleteUser --data-urlencode "userLogin=$login" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
 done
-check "group access to the deleted website is left behind" "1" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_access WHERE idsite = $gone_site")"
+check "group access to the deleted website is left behind" "2" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_access WHERE idsite = $gone_site")"
 
 echo "==> Activating the plugin again"
 mexec ./console plugin:activate GroupPermissions >/dev/null
 check "group access applies again" "$id_site" "$(member_sites)"
 check "the overview does not count the deleted website" "1" "$(su GroupPermissions.getGroupsOverview --data-urlencode "filter_limit=-1" \
     | grep -cE "\"idGroup\":$id_group,\"name\":\"[^\"]*\",\"memberCount\":[0-9]+,\"siteCount\":1}" || true)"
+check "the websites of the group leave out the deleted website" "$id_site" "$(su GroupPermissions.getSitesAccessFromGroup \
+    --data-urlencode "idGroup=$id_group" | grep -oE '"idSite":[0-9]+' | sed -E 's/.*://' | tr '\n' ',' | sed 's/,$//')"
+check "the websites of a group with only the deleted website are empty" "[]" "$(su GroupPermissions.getSitesAccessFromGroup \
+    --data-urlencode "idGroup=$id_gone_group")"
+invited="lifecycle_invited_$run_id"
+check "users can be invited to a group with only the deleted website" "1" "$(su GroupPermissions.inviteUserToGroups \
+    --data-urlencode "userLogin=$invited" --data-urlencode "email=$invited@example.org" --data-urlencode "idGroups=$id_gone_group" \
+    --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" | grep -c '"success"' || true)"
+su UsersManager.deleteUser --data-urlencode "userLogin=$invited" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
 check "group still has its member" "1" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$member\"")"
 check "membership of a deleted user can be removed" "1" "$(su GroupPermissions.removeUserFromGroup --data-urlencode "idGroup=$id_group" \
     --data-urlencode "login=$gone_member" | grep -c '"success"' || true)"

@@ -159,6 +159,12 @@ test.describe('Copy scheduled reports to a group', () => {
       name: `All Users ${RUN_ID}`, definition: `pageUrl=@all-users-${RUN_ID}`, idSite, enabledAllUsers: 1,
     })).value);
     const idShared = await addReport(api[owner], 'All Users Segment', idSite, { idSegment: allUsersSegment });
+
+    // only reports that can be copied are offered
+    const copyable: CopyableReport[] = await api[owner].call('GroupPermissions.getCopyableReports', { filter_limit: -1 });
+    expect(copyable.map((r) => r.idReport)).not.toContain(idPrivate);
+    expect(copyable.find((r) => r.idReport === idShared)?.idSegment).toBe(allUsersSegment);
+
     expect(await copy(api[owner], idShared)).toEqual([member]);
     const [memberCopy] = await reportsOf(member, `All Users Segment ${RUN_ID}`);
     expect(Number(memberCopy.idsegment)).toBe(allUsersSegment);
