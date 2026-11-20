@@ -77,6 +77,35 @@ class GroupPermission {
     }
 
     /**
+     * Like getPermissionsOfGroup, with the name of each website
+     *
+     * @return array<array{
+     *  idsite: int,
+     *  name: string,
+     *  access: string
+     * }>
+     */
+    public function getPermissionsWithSiteNamesOfGroup(int $idGroup): array {
+        $table = $this->tablePrefixed;
+        $tableSite = Common::prefixTable('site');
+
+        $rows = Rows::list(Db::fetchAll(
+            "SELECT ga.idsite, s.name, ga.access FROM $table AS ga
+                INNER JOIN $tableSite AS s ON s.idsite = ga.idsite
+                WHERE ga.idgroup = ?",
+            [$idGroup]
+        ));
+
+        return array_map(static function (array $row): array {
+            return [
+                'idsite' => Rows::int($row, 'idsite'),
+                'name' => Rows::string($row, 'name'),
+                'access' => Rows::string($row, 'access'),
+            ];
+        }, $rows);
+    }
+
+    /**
      * Websites deleted while this plugin was deactivated are not counted (their rows never grant access).
      *
      * @return array<int, int> number of websites with access by group id (groups without access are missing)

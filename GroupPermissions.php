@@ -12,6 +12,7 @@ namespace Piwik\Plugins\GroupPermissions;
 
 use Piwik\Access as PiwikAccess;
 use Piwik\Access\CapabilitiesProvider;
+use Piwik\Config;
 use Piwik\Container\StaticContainer;
 use Piwik\Log\LoggerInterface;
 use Piwik\Piwik;
@@ -21,6 +22,31 @@ use Piwik\Plugins\UsersManager\Model as UsersModel;
 use Piwik\Plugins\UsersManager\UsersManager;
 
 class GroupPermissions extends Plugin {
+    /**
+     * Whether groups, their members and their access can be changed. Disabled with
+     *
+     *     [GroupPermissions]
+     *     enable_groups_admin = 0
+     *
+     * in config/config.ini.php, like `enable_users_admin` disables the user management of Matomo. The group sync on
+     * login and the automatic access to new websites keep working, they only apply what is already configured.
+     */
+    public static function isGroupsAdminEnabled(): bool {
+        // the section of all config files merged (config.ini.php, common.config.ini.php, ...)
+        $section = Config::getInstance()->__get('GroupPermissions');
+        if (!is_array($section) || !array_key_exists('enable_groups_admin', $section)) {
+            return true;
+        }
+
+        return (bool) $section['enable_groups_admin'];
+    }
+
+    public static function dieIfGroupsAdminIsDisabled(): void {
+        if (!self::isGroupsAdminEnabled()) {
+            throw new \Exception(Piwik::translate('GroupPermissions_ExceptionGroupsAdminDisabled'));
+        }
+    }
+
     public function install(): void {
         $model = new Model();
         $model->install();

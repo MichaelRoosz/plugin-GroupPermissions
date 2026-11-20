@@ -49,20 +49,34 @@ class GroupSync {
 
         foreach ($targetGroups as $idGroup) {
             if (!array_key_exists($idGroup, $memberships)) {
-                $this->model->addUserToGroup($idGroup, $login, true);
                 $result['added'][] = $idGroup;
             }
         }
-
         foreach ($memberships as $idGroup => $synced) {
             if ($synced && !in_array($idGroup, $targetGroups, true)) {
-                $this->model->removeUserFromGroup($idGroup, $login);
                 $result['removed'][] = $idGroup;
             }
         }
 
-        if ($result['added'] || $result['removed']) {
+        if (!$result['added'] && !$result['removed']) {
+            return $result;
+        }
+
+        $apply = function () use ($login, $result): void {
+            foreach ($result['added'] as $idGroup) {
+                $this->model->addUserToGroup($idGroup, $login, true);
+            }
+            foreach ($result['removed'] as $idGroup) {
+                $this->model->removeUserFromGroup($idGroup, $login);
+            }
+
             GroupAccessUpdater::reloadAccess();
+        };
+
+        if ($result['removed']) {
+            SiteAccessLoss::notifyAfter([$login], $apply);
+        } else {
+            $apply();
         }
 
         return $result;

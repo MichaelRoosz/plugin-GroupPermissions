@@ -109,12 +109,26 @@ check "users can be invited to a group with only the deleted website" "1" "$(su 
     --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" | grep -c '"success"' || true)"
 su UsersManager.deleteUser --data-urlencode "userLogin=$invited" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
 check "group still has its member" "1" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$member\"")"
+check "the members of the group leave out the deleted user" "0" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$gone_member\"" || true)"
 check "membership of a deleted user can be removed" "1" "$(su GroupPermissions.removeUserFromGroup --data-urlencode "idGroup=$id_group" \
     --data-urlencode "login=$gone_member" | grep -c '"success"' || true)"
 check "membership of the deleted user is gone" "0" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_user WHERE login = '$gone_member'")"
 su UsersManager.addUser --data-urlencode "userLogin=$reborn_member" --data-urlencode "password=lifecyclePass1!" \
     --data-urlencode "email=$reborn_member@example.org" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
 check "a new user with the login of a deleted member is in no group" "0" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_user WHERE login = '$reborn_member'")"
+
+echo "==> Disabling the management of groups (enable_groups_admin = 0)"
+mexec ./console config:set --section=GroupPermissions --key=enable_groups_admin --value=0 >/dev/null
+check "groups cannot be created" "1" "$(su GroupPermissions.createGroup --data-urlencode "groupName=Lifecycle disabled $run_id" | grep -c 'has been disabled' || true)"
+check "group access cannot be changed" "1" "$(su GroupPermissions.setGroupAccessById --data-urlencode "idGroup=$id_group" \
+    --data-urlencode "access=admin" --data-urlencode "idSites=$id_site" | grep -c 'has been disabled' || true)"
+check "members cannot be removed" "1" "$(su GroupPermissions.removeUserFromGroup --data-urlencode "idGroup=$id_group" \
+    --data-urlencode "login=$member" | grep -c 'has been disabled' || true)"
+check "groups can still be listed" "1" "$(su GroupPermissions.getAllGroups --data-urlencode "filter_limit=-1" | grep -c "\"$group\"" || true)"
+check "group access still applies" "$id_site" "$(member_sites)"
+mexec ./console config:set --section=GroupPermissions --key=enable_groups_admin --value=1 >/dev/null
+check "groups can be managed again" "1" "$(su GroupPermissions.setGroupAccessById --data-urlencode "idGroup=$id_group" \
+    --data-urlencode "access=view" --data-urlencode "idSites=$id_site" | grep -c '"success"' || true)"
 
 echo "==> Creating a website without the automatic access table (e.g. update not run yet) does not fail"
 sql "DROP TABLE matomo_gpermissions_autoaccess"

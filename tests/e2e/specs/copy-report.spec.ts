@@ -232,6 +232,50 @@ test.describe('Copy scheduled reports to a group', () => {
     expect(html).not.toContain(`Copy Report Other Site ${RUN_ID}`);
   });
 
+  test('losing all access to a website through groups deletes the reports of the website, like removing direct access', async () => {
+    const site = await su.createSite('Report Access Loss Site');
+    const keptSite = await su.createSite('Report Access Loss Kept Site');
+    const [group, other, temp] = [
+      await su.createGroup('Report Loss'), await su.createGroup('Report Loss Other'), await su.createGroup('Report Loss Temp'),
+    ];
+    const [groupOnly, direct, twoGroups, tempOnly] = [
+      await su.createUser('rloss_group'), await su.createUser('rloss_direct'),
+      await su.createUser('rloss_two'), await su.createUser('rloss_temp'),
+    ];
+    await su.addMembers(group.idGroup, [groupOnly, direct, twoGroups]);
+    await su.addMembers(other.idGroup, [twoGroups]);
+    await su.addMembers(temp.idGroup, [tempOnly]);
+    await su.setGroupAccess(group.name, 'write', `${site},${keptSite}`);
+    await su.setGroupAccess(other.name, 'view', site);
+    await su.setGroupAccess(temp.name, 'view', site);
+    await su.setUserAccess(direct, 'view', site);
+
+    const description = `Access Loss ${RUN_ID}`;
+    for (const login of [groupOnly, direct, twoGroups, tempOnly]) {
+      await addReport(await MatomoApi.forUser(login, DEFAULT_PASSWORD), 'Access Loss', site);
+    }
+    await addReport(await MatomoApi.forUser(groupOnly, DEFAULT_PASSWORD), 'Access Loss', keptSite);
+    const count = async (login: string, inSite: number) =>
+      (await reportsOf(login, description)).filter((r) => Number(r.idsite) === inSite).length;
+
+    // a lower role keeps the access
+    await su.setGroupAccess(group.name, 'view', site);
+    expect(await count(groupOnly, site)).toBe(1);
+
+    await su.setGroupAccess(group.name, 'noaccess', site);
+    expect(await count(groupOnly, site)).toBe(0);
+    expect(await count(groupOnly, keptSite)).toBe(1);
+    // still have access directly or through another group
+    expect(await count(direct, site)).toBe(1);
+    expect(await count(twoGroups, site)).toBe(1);
+
+    await su.call('GroupPermissions.removeUserFromGroup', { idGroup: other.idGroup, login: twoGroups });
+    expect(await count(twoGroups, site)).toBe(0);
+
+    await su.call('GroupPermissions.deleteGroup', { idGroup: temp.idGroup });
+    expect(await count(tempOnly, site)).toBe(0);
+  });
+
   test.describe('UI', () => {
     test.use({ storageState: superUserStorageState });
 

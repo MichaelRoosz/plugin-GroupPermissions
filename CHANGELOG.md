@@ -12,6 +12,7 @@ New features (requires a database update):
   - Invite new users directly into groups
   - Copy dashboards to all members of a group
   - New API methods for all of the above
+  - `[GroupPermissions] enable_groups_admin = 0` in the config disables changing groups, like `enable_users_admin` for users
   - `setGroupAccessById` sets the role of a group by its ID (the UI uses it, so groups with the same name from older versions are no longer mixed up)
 
 Security:
@@ -27,7 +28,11 @@ Fixes:
   - Group names with `&`, quotes or `<`/`>` could not be managed on Manage Access; names are trimmed, empty or overlong names are rejected, case-only renames work
   - Group names must be unique (case-insensitive), also when groups are created or renamed at the same time; names are no longer matched accent-insensitively depending on the database collation
   - Adding a member that the directory sync added makes the membership a manual one, which the sync keeps
-  - Users deleted while the plugin was deactivated can be removed from their groups (they stayed listed as members, and removing them failed)
+  - Users deleted while the plugin was deactivated are no longer listed as members (they were shown as active and removing them failed); their memberships can still be removed via the API
+  - Users losing all access to a website through a group change trigger `UsersManager.removeSiteAccess` like direct access changes, so e.g. their scheduled reports for the website are deleted
+  - Automatic access URL patterns with a port (e.g. `example.com:8080`) match websites with that port
+  - `removeExternalGroupMapping` fails for external groups that are not mapped, `getMembersOfGroup` for groups that do not exist
+  - `getSitesAccessFromGroup` loads the website names with one query
   - Manage Access with "Apply to all websites" can remove the access of a group from all websites ("No access") and apply the same role again
   - Deleting a group is all or nothing
   - Website IDs that do not exist are rejected; better error messages for invalid access values

@@ -257,15 +257,10 @@ class API extends \Piwik\Plugin\API {
         $capabilities = $this->model->getCapabilitiesOfGroup($group['idgroup']);
 
         $sites = [];
-        foreach ($this->model->getPermissionsOfGroup($group['idgroup']) as $permission) {
-            $site = SitesManagerAPI::getInstance()->getSiteFromId($permission['idsite']);
-            if (!is_array($site) || !isset($site['name']) || !is_string($site['name'])) {
-                continue;
-            }
-
+        foreach ($this->model->getPermissionsWithSiteNamesOfGroup($group['idgroup']) as $permission) {
             $sites[] = [
                 'idSite' => $permission['idsite'],
-                'name' => $site['name'],
+                'name' => $permission['name'],
                 'access' => $permission['access'],
                 'capabilities' => $this->filterCapabilities(
                     $capabilities[$permission['idsite']] ?? [],
@@ -290,10 +285,7 @@ class API extends \Piwik\Plugin\API {
     public function getGroupWithId(int $idGroup): array {
         Piwik::checkUserHasSomeAdminAccess();
 
-        $group = $this->model->getGroupWithId($idGroup);
-        if (!$group) {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionGroupDoesNotExist', $idGroup));
-        }
+        $group = $this->getGroupOrFail($idGroup);
 
         return [
             'idGroup' => intval($group['idgroup']),
@@ -310,7 +302,9 @@ class API extends \Piwik\Plugin\API {
     public function getMembersOfGroup(int $idGroup): array {
         Piwik::checkUserHasSuperUserAccess();
 
-        return $this->model->getMembersOfGroup($idGroup);
+        $group = $this->getGroupOrFail($idGroup);
+
+        return $this->model->getMembersOfGroup($group['idgroup']);
     }
 
     /**
@@ -319,6 +313,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function addUserToGroup(int $idGroup, string $login): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
@@ -372,6 +367,7 @@ class API extends \Piwik\Plugin\API {
         ?string $passwordConfirmation = null
     ): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $idGroups = $this->parseIdGroups($idGroups);
         if (!$idGroups) {
@@ -413,6 +409,7 @@ class API extends \Piwik\Plugin\API {
 
     public function removeUserFromGroup(int $idGroup, string $login): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
@@ -423,9 +420,11 @@ class API extends \Piwik\Plugin\API {
             throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
         }
 
-        $this->model->removeUserFromGroup($idGroup, $login);
+        SiteAccessLoss::notifyAfter([$login], function () use ($idGroup, $login): void {
+            $this->model->removeUserFromGroup($idGroup, $login);
 
-        GroupAccessUpdater::reloadAccess();
+            GroupAccessUpdater::reloadAccess();
+        });
     }
 
     /**
@@ -440,6 +439,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function setGroupAccess(string $name, string $access, string $idSites): void {
         Piwik::checkUserHasSomeAdminAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         // throws for groups that do not exist
         $group = $this->model->getGroupWithName($name);
@@ -456,6 +456,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function setGroupAccessById(int $idGroup, string $access, string $idSites): void {
         Piwik::checkUserHasSomeAdminAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
 
@@ -470,6 +471,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function createGroup(string $groupName): array {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $groupName = $this->checkGroupName($groupName);
 
@@ -489,6 +491,7 @@ class API extends \Piwik\Plugin\API {
 
     public function renameGroup(int $idGroup, string $newName): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $newName = $this->checkGroupName($newName);
 
@@ -507,40 +510,14 @@ class API extends \Piwik\Plugin\API {
 
     public function deleteGroup(int $idGroup): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
 
-        // all or nothing, so a failure never leaves a group with only part of its data behind
-        // (the API always uses Matomo's Zend based adapter, the tracker one is only used while tracking)
-        $db = Db::get();
-        $db = $db instanceof \Zend_Db_Adapter_Abstract ? $db : null;
-        if ($db) {
-            $db->beginTransaction();
-        }
-
-        try {
-            $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
-            $this->model->removeAllExternalGroupMappingsOfGroup($idGroup);
-            $this->model->removeAllSegmentSharesOfGroup($idGroup);
-            $this->model->removeAllCapabilitiesOfGroup($idGroup);
-            $this->model->removeAllPermissionsOfGroup($idGroup);
-            $this->model->removeAllUsersOfGroup($idGroup);
-
-            $this->model->deleteGroup($idGroup);
-
-            if ($db) {
-                $db->commit();
-            }
-        } catch (\Throwable $e) {
-            if ($db) {
-                $db->rollBack();
-            }
-
-            throw $e;
-        }
-
-        GroupAccessUpdater::reloadAccess();
+        SiteAccessLoss::notifyAfter($this->getMemberLogins($idGroup), function () use ($idGroup): void {
+            $this->deleteGroupData($idGroup);
+        });
     }
 
     /**
@@ -556,6 +533,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function addGroupCapabilities(int $idGroup, $capabilities, string $idSites): void {
         Piwik::checkUserHasSomeAdminAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $capabilities = $this->parseCapabilities($capabilities);
         $group = $this->getGroupOrFail($idGroup);
@@ -601,6 +579,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function removeGroupCapabilities(int $idGroup, $capabilities, string $idSites): void {
         Piwik::checkUserHasSomeAdminAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $capabilities = $this->parseCapabilities($capabilities);
         $group = $this->getGroupOrFail($idGroup);
@@ -652,7 +631,8 @@ class API extends \Piwik\Plugin\API {
      *                          its URLs (main URL and alias URLs)
      * @param string $pattern Website group name or URL, case-insensitive, `*` matches any characters. URL patterns
      *                        without `/` are compared with the host only (e.g. `*.example.com`), others with host and
-     *                        path (e.g. `example.com/shop*`)
+     *                        path (e.g. `example.com/shop*`). The port of the URLs is only compared for patterns
+     *                        with a port (e.g. `example.com:8080`)
      * @param string $access Role to give, e.g. "view", "write" or "admin"
      * @param string|array<string> $capabilities Optional capabilities to give in addition to the role (e.g.
      *                                           `tagmanager_write`), see "UsersManager.getAvailableCapabilities"
@@ -661,6 +641,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function addAutoAccessRule(int $idGroup, string $matchType, string $pattern, string $access, $capabilities = []): int {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
 
@@ -713,6 +694,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function applyAutoAccessRule(int $idGroup, int $idRule): array {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
 
@@ -731,6 +713,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function removeAutoAccessRule(int $idGroup, int $idRule): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
 
@@ -764,6 +747,7 @@ class API extends \Piwik\Plugin\API {
      */
     public function addExternalGroupMapping(int $idGroup, string $externalGroup): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
 
@@ -797,14 +781,21 @@ class API extends \Piwik\Plugin\API {
      */
     public function removeExternalGroupMapping(int $idGroup, string $externalGroup): void {
         Piwik::checkUserHasSuperUserAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $group = $this->getGroupOrFail($idGroup);
         $externalGroup = Common::unsanitizeInputValue($externalGroup);
 
+        $removed = false;
         foreach ($this->model->getExternalGroupMappingsOfGroup($group['idgroup']) as $existing) {
             if (GroupSync::normalize($existing) === GroupSync::normalize($externalGroup)) {
                 $this->model->removeExternalGroupMapping($group['idgroup'], $existing);
+                $removed = true;
             }
+        }
+
+        if (!$removed) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionExternalGroupDoesNotExist', $externalGroup));
         }
     }
 
@@ -1084,6 +1075,39 @@ class API extends \Piwik\Plugin\API {
         return (new ReportCopy())->getCopyableReports();
     }
 
+    private function deleteGroupData(int $idGroup): void {
+        // all or nothing, so a failure never leaves a group with only part of its data behind
+        // (the API always uses Matomo's Zend based adapter, the tracker one is only used while tracking)
+        $db = Db::get();
+        $db = $db instanceof \Zend_Db_Adapter_Abstract ? $db : null;
+        if ($db) {
+            $db->beginTransaction();
+        }
+
+        try {
+            $this->model->removeAllAutoAccessRulesOfGroup($idGroup);
+            $this->model->removeAllExternalGroupMappingsOfGroup($idGroup);
+            $this->model->removeAllSegmentSharesOfGroup($idGroup);
+            $this->model->removeAllCapabilitiesOfGroup($idGroup);
+            $this->model->removeAllPermissionsOfGroup($idGroup);
+            $this->model->removeAllUsersOfGroup($idGroup);
+
+            $this->model->deleteGroup($idGroup);
+
+            if ($db) {
+                $db->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($db) {
+                $db->rollBack();
+            }
+
+            throw $e;
+        }
+
+        GroupAccessUpdater::reloadAccess();
+    }
+
     /**
      * Removes a user invited by inviteUserToGroups again after a later step failed.
      *
@@ -1120,7 +1144,24 @@ class API extends \Piwik\Plugin\API {
         $idSites = $this->getIdSitesCheckAdminAccess($idSites);
 
         $updater = new GroupAccessUpdater($this->model, $this->capabilityProvider);
-        $updater->setAccess($idGroup, $idSites, $access);
+
+        if ($access !== 'noaccess') {
+            // members keep at least view access to the websites
+            $updater->setAccess($idGroup, $idSites, $access);
+
+            return;
+        }
+
+        SiteAccessLoss::notifyAfter($this->getMemberLogins($idGroup), static function () use ($updater, $idGroup, $idSites): void {
+            $updater->setAccess($idGroup, $idSites, 'noaccess');
+        });
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getMemberLogins(int $idGroup): array {
+        return array_column($this->model->getMembersOfGroup($idGroup), 'login');
     }
 
     /**

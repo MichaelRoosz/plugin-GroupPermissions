@@ -77,6 +77,9 @@ test.describe('Group sync from external directories', () => {
 
     await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'R&D "TEAM" <X>' });
     expect(await mappings(group.idGroup)).toEqual([]);
+    expect(await su.expectError('GroupPermissions.removeExternalGroupMapping', {
+      idGroup: group.idGroup, externalGroup: 'R&D "TEAM" <X>',
+    })).toContain('is not mapped to this group');
   });
 
   test('sync adds the user to mapped groups, matching a DN by its first value and names case-insensitively', async () => {

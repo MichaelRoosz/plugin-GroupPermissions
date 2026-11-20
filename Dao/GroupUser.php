@@ -60,6 +60,9 @@ class GroupUser {
     }
 
     /**
+     * Members that are existing users: users deleted while this plugin was deactivated can leave memberships behind,
+     * they are left out (like in countMembersPerGroup).
+     *
      * @return array<array{
      *    login: string,
      *    synced: bool
@@ -68,8 +71,14 @@ class GroupUser {
     public function getMembersOfGroup(int $idGroup): array {
         $idGroup = intval($idGroup);
         $table = $this->tablePrefixed;
+        $tableUser = Common::prefixTable('user');
 
-        $rows = Rows::list(Db::fetchAll("SELECT login, synced FROM $table WHERE idgroup = ?", [$idGroup]));
+        $rows = Rows::list(Db::fetchAll(
+            "SELECT gu.login, gu.synced FROM $table AS gu
+                INNER JOIN $tableUser AS u ON u.login = gu.login
+                WHERE gu.idgroup = ?",
+            [$idGroup]
+        ));
 
         return array_map(static function (array $row): array {
             return ['login' => Rows::string($row, 'login'), 'synced' => Rows::int($row, 'synced') === 1];

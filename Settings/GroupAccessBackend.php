@@ -16,6 +16,7 @@ use Piwik\Container\StaticContainer;
 use Piwik\Plugins\GroupPermissions\Access;
 use Piwik\Plugins\GroupPermissions\GroupAccessUpdater;
 use Piwik\Plugins\GroupPermissions\Model;
+use Piwik\Plugins\GroupPermissions\SiteAccessLoss;
 use Piwik\Settings\Storage\Backend\BackendInterface;
 
 /**
@@ -95,23 +96,34 @@ class GroupAccessBackend implements BackendInterface {
         }
         $updater = new GroupAccessUpdater($model, $capabilityProvider);
 
-        $changed = false;
-        foreach ($current as $idGroup => $access) {
-            if (!isset($wanted[$idGroup])) {
-                $updater->setAccess($idGroup, [$this->idSite], 'noaccess', false);
-                $changed = true;
-            }
-        }
+        $removedGroups = array_keys(array_diff_key($current, $wanted));
+        $changedGroups = [];
         foreach ($wanted as $idGroup => $access) {
             if (($current[$idGroup] ?? null) !== $access) {
-                $updater->setAccess($idGroup, [$this->idSite], $access, false);
-                $changed = true;
+                $changedGroups[$idGroup] = $access;
             }
         }
-
-        if ($changed) {
-            GroupAccessUpdater::reloadAccess();
+        if (!$removedGroups && !$changedGroups) {
+            return;
         }
+
+        $apply = function () use ($updater, $removedGroups, $changedGroups): void {
+            foreach ($removedGroups as $idGroup) {
+                $updater->setAccess($idGroup, [$this->idSite], 'noaccess', false);
+            }
+            foreach ($changedGroups as $idGroup => $access) {
+                $updater->setAccess($idGroup, [$this->idSite], $access, false);
+            }
+
+            GroupAccessUpdater::reloadAccess();
+        };
+
+        // members of groups that no longer have access may lose access to the website
+        $logins = [];
+        foreach ($removedGroups as $idGroup) {
+            $logins = array_merge($logins, array_column($model->getMembersOfGroup($idGroup), 'login'));
+        }
+        SiteAccessLoss::notifyAfter($logins, $apply);
     }
 
     public function delete(): void {

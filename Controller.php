@@ -26,6 +26,7 @@ class Controller extends ControllerAdmin {
     public function index(): string {
         Piwik::checkUserIsNotAnonymous();
         Piwik::checkUserHasSomeAdminAccess();
+        GroupPermissions::dieIfGroupsAdminIsDisabled();
 
         $view = new View('@GroupPermissions/index');
 

@@ -65,6 +65,22 @@ test.describe('Automatic access for new websites', () => {
     expect((await su.groupAccess(apex))[group.name]).toBe('noaccess');
   });
 
+  test('the port of the URLs is only compared for patterns with a port', async () => {
+    const group = await su.createGroup('Auto port');
+    await addRule(group.idGroup, 'url', `port-${RUN_ID}.example.org:8080`, 'write');
+    await addRule(group.idGroup, 'url', `anyport-${RUN_ID}.example.org`, 'view');
+
+    const withPort = await addSite('Auto Port', [`https://port-${RUN_ID}.example.org:8080/`]);
+    const otherPort = await addSite('Auto Other Port', [`https://port-${RUN_ID}.example.org:9090`]);
+    const noPort = await addSite('Auto No Port', [`https://port-${RUN_ID}.example.org`]);
+    const anyPort = await addSite('Auto Any Port', [`https://anyport-${RUN_ID}.example.org:8443`]);
+
+    expect((await su.groupAccess(withPort))[group.name]).toBe('write');
+    expect((await su.groupAccess(otherPort))[group.name]).toBe('noaccess');
+    expect((await su.groupAccess(noPort))[group.name]).toBe('noaccess');
+    expect((await su.groupAccess(anyPort))[group.name]).toBe('view');
+  });
+
   test('the highest role of all matching rules wins, existing websites are not changed', async () => {
     const group = await su.createGroup('Auto highest');
     const existing = await addSite('Auto Existing', [`https://multi-${RUN_ID}.example.org`], `Multi ${RUN_ID}`);

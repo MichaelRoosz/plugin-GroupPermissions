@@ -215,6 +215,19 @@ class Model {
 
     /**
      * @return array<array{
+     *  idsite: int,
+     *  name: string,
+     *  access: string
+     * }>
+     */
+    public function getPermissionsWithSiteNamesOfGroup(int $idGroup): array {
+        $permission = new GroupPermission();
+
+        return $permission->getPermissionsWithSiteNamesOfGroup($idGroup);
+    }
+
+    /**
+     * @return array<array{
      *   idgroup: int,
      *   access: string
      * }>

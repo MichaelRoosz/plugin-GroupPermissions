@@ -15,7 +15,8 @@ use Piwik\Piwik;
 
 class Menu extends \Piwik\Plugin\Menu {
     public function configureAdminMenu(MenuAdmin $menu): void {
-        if (Piwik::isUserHasSomeAdminAccess()) {
+        // like the user management of Matomo, the page is hidden while managing groups is disabled
+        if (Piwik::isUserHasSomeAdminAccess() && GroupPermissions::isGroupsAdminEnabled()) {
             $menu->addSystemItem('GroupPermissions_MenuGroupPermissions', $this->urlForAction('index'), $order = 17);
         }
     }

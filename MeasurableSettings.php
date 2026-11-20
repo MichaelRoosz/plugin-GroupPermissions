@@ -88,6 +88,10 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings {
             };
         });
         $setting->setStorage(new Storage(new GroupAccessBackend($this->idSite)));
+        if (!GroupPermissions::isGroupsAdminEnabled()) {
+            // not shown in the website form, and never saved
+            $setting->setIsWritableByCurrentUser(false);
+        }
 
         $this->groupAccess = $setting;
     }

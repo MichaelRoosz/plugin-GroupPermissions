@@ -96,6 +96,7 @@ test.describe('Group management API', () => {
 
   test('getGroupWithId rejects unknown groups', async () => {
     expect(await su.expectError('GroupPermissions.getGroupWithId', { idGroup: 999999 })).toMatch(/Group does not exist/);
+    expect(await su.expectError('GroupPermissions.getMembersOfGroup', { idGroup: 999999 })).toMatch(/Group does not exist/);
   });
 
   test('renameGroup renames and rejects existing names and unknown groups', async () => {
@@ -203,7 +204,7 @@ test.describe('Group management API', () => {
 
     expect(await su.groupByName(group.name)).toBeUndefined();
     expect((await su.groupAccess(idSite))[group.name]).toBeUndefined();
-    expect(await su.members(group.idGroup)).toEqual([]);
+    expect(await su.expectError('GroupPermissions.getMembersOfGroup', { idGroup: group.idGroup })).toMatch(/Group does not exist/);
     // the user lost the access he had through the group
     const member = await MatomoApi.forUser(login, 'secretPass1!');
     expect((await member.call('SitesManager.getSitesIdWithAtLeastViewAccess')).map(Number)).not.toContain(idSite);

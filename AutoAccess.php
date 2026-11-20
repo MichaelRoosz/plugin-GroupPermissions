@@ -20,7 +20,8 @@ use Piwik\Plugins\SitesManager\Model as SitesModel;
  *
  * A rule matches either the Matomo website group of the new website or one of its URLs (main URL and alias URLs).
  * Patterns are case-insensitive and support `*` as wildcard. A URL pattern without `/` is compared with the host of
- * the URLs only (e.g. `*.example.com`), a pattern with `/` with host and path (e.g. `example.com/shop*`).
+ * the URLs only (e.g. `*.example.com`), a pattern with `/` with host and path (e.g. `example.com/shop*`). The port of
+ * the URLs is only compared for patterns with a port (e.g. `example.com:8080`).
  */
 class AutoAccess {
     /** @var Model */
@@ -99,9 +100,11 @@ class AutoAccess {
         if ($matchType === GroupAutoAccess::MATCH_URL) {
             $pattern = self::normalizeUrlPattern($pattern);
             $withPath = strpos($pattern, '/') !== false;
+            // a pattern with a port (e.g. `example.com:8080`) is compared with the port of the URLs too
+            $withPort = strpos(explode('/', $pattern, 2)[0], ':') !== false;
 
             foreach ($urls as $url) {
-                $subject = self::normalizeUrl(Common::unsanitizeInputValue($url), $withPath);
+                $subject = self::normalizeUrl(Common::unsanitizeInputValue($url), $withPath, $withPort);
                 if ($subject !== null && self::wildcardMatches($pattern, $subject)) {
                     return true;
                 }
@@ -192,9 +195,9 @@ class AutoAccess {
     }
 
     /**
-     * Returns the host (and path) of a URL, or null for URLs without host.
+     * Returns the host (with port and path, if requested and the URL has them) of a URL, or null for URLs without host.
      */
-    private static function normalizeUrl(string $url, bool $withPath): ?string {
+    private static function normalizeUrl(string $url, bool $withPath, bool $withPort): ?string {
         $url = trim($url);
         if (!preg_match('~^[a-z][a-z0-9+.-]*://~i', $url)) {
             $url = 'http://' . $url;
@@ -206,6 +209,9 @@ class AutoAccess {
         }
 
         $subject = $parts['host'];
+        if ($withPort && !empty($parts['port'])) {
+            $subject .= ':' . $parts['port'];
+        }
         if ($withPath && !empty($parts['path'])) {
             $subject .= rtrim($parts['path'], '/');
         }
