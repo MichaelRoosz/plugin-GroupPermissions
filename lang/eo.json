@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "RemoveFromGroup": "Forigi",
+        "ScheduledReport": "Raporto",
         "Users": "Uzantoj"
     }
 }

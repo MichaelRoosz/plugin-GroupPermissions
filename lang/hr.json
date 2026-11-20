@@ -1,6 +1,7 @@
 {
     "GroupPermissions": {
         "RemoveFromGroup": "Ukloni",
+        "ScheduledReport": "Izvještaj",
         "Users": "Korisnici"
     }
 }

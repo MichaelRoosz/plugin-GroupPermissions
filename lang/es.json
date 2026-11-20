@@ -28,6 +28,7 @@
         "RenameGroup": "Cambiar el nombre de este grupo",
         "RenameGroupButton": "Cambiar nombre del grupo",
         "RenameGroupConfirm": "¿Está seguro de que desea cambiar el nombre del grupo '%1$s' a '%2$s'?",
+        "ScheduledReport": "Informe",
         "Segment": "Segmento",
         "Segments": "Segmentos",
         "SelectNewUser": "Seleccionar nuevo usuario",

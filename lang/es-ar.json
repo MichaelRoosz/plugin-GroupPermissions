@@ -3,6 +3,7 @@
         "MatchTypeUrl": "Dirección web del sitio",
         "Pattern": "Patrón",
         "RemoveFromGroup": "Quitar",
+        "ScheduledReport": "Informe",
         "Segment": "Segmento",
         "Segments": "Segmentos",
         "Users": "Usuarios",

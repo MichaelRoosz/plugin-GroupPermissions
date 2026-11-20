@@ -2,6 +2,7 @@
     "GroupPermissions": {
         "Pattern": "Egyezési minta",
         "RemoveFromGroup": "törlés",
+        "ScheduledReport": "Jelentés",
         "Segment": "szegmens",
         "Segments": "Szegmensek",
         "Users": "Felhasználók",
