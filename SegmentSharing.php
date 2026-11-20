@@ -13,6 +13,7 @@ namespace Piwik\Plugins\GroupPermissions;
 use Piwik\Piwik;
 use Piwik\Plugin\Manager as PluginManager;
 use Piwik\Plugins\SegmentEditor\Model as SegmentEditorModel;
+use Piwik\Plugins\UsersManager\Model as UsersModel;
 use Piwik\Segment;
 
 /**
@@ -40,6 +41,16 @@ class SegmentSharing {
      * @var Model
      */
     private $model;
+
+    /**
+     * @var array<string, array{login: string, superuser: bool, adminIdSites: array<int>}|null> by login, see getSharer
+     */
+    private $sharers = [];
+
+    /**
+     * @var array<int, array<int>> websites with a role by group id, see isShareValid
+     */
+    private $groupIdSites = [];
 
     public function __construct(Model $model) {
         $this->model = $model;
@@ -166,8 +177,30 @@ class SegmentSharing {
     }
 
     /**
+     * Whether a user without super user access may share a segment with a group, see API::shareSegmentWithGroup:
+     * the user needs admin access to some website, and the group a role for the website of the segment, or, for
+     * segments available on all websites (`$segmentIdSite` 0), for a website the user administers. Otherwise segments
+     * could be pushed to the segment lists of any group.
+     *
+     * @param array<int> $groupIdSites websites the group has a role for
+     * @param array<int> $adminIdSites websites the user administers
+     */
+    public static function isSharingAllowed(int $segmentIdSite, array $groupIdSites, array $adminIdSites): bool {
+        if (!$adminIdSites) {
+            return false;
+        }
+
+        if ($segmentIdSite > 0) {
+            return in_array($segmentIdSite, $groupIdSites, true);
+        }
+
+        return (bool) array_intersect($groupIdSites, $adminIdSites);
+    }
+
+    /**
      * Segments shared with any group of the current user that were not created by the user and are not shared
-     * with all users (Matomo shows those anyway).
+     * with all users (Matomo shows those anyway). A share only applies while the user who shared the segment may
+     * still share it (see isShareValid).
      *
      * @return array<int, array<mixed>> segments by id
      */
@@ -175,13 +208,24 @@ class SegmentSharing {
         $login = Piwik::getCurrentUserLogin();
 
         $segments = [];
-        foreach ($this->model->getSegmentsSharedWithUser($login) as $idSegment) {
-            $segment = self::getStoredSegment($idSegment);
-            if ($segment === null || !empty($segment['enable_all_users']) || ($segment['login'] ?? null) === $login) {
+        $skipped = [];
+        foreach ($this->model->getSegmentSharesForUser($login) as $share) {
+            $idSegment = $share['idsegment'];
+            if (isset($segments[$idSegment]) || isset($skipped[$idSegment])) {
                 continue;
             }
 
-            $segments[$idSegment] = $segment;
+            $segment = self::getStoredSegment($idSegment);
+            if ($segment === null || !empty($segment['enable_all_users']) || ($segment['login'] ?? null) === $login) {
+                $skipped[$idSegment] = true;
+
+                continue;
+            }
+
+            // the segment may be shared with several groups of the user, by different users
+            if ($this->isShareValid($share, $segment)) {
+                $segments[$idSegment] = $segment;
+            }
         }
 
         uasort($segments, static function (array $a, array $b): int {
@@ -189,6 +233,65 @@ class SegmentSharing {
         });
 
         return $segments;
+    }
+
+    /**
+     * Whether the user who shared the segment with the group may still do so: super users always, other users
+     * only their own segments, under the conditions of isSharingAllowed. So a share ends when e.g. its creator
+     * no longer administers the websites it was shared for, or was deleted.
+     *
+     * @param array{idsegment: int, idgroup: int, shared_by: string} $share
+     * @param array<mixed> $segment
+     */
+    private function isShareValid(array $share, array $segment): bool {
+        $sharer = $this->getSharer($share['shared_by']);
+        if ($sharer === null) {
+            return false;
+        }
+        if ($sharer['superuser']) {
+            return true;
+        }
+        if (($segment['login'] ?? null) !== $sharer['login']) {
+            return false;
+        }
+
+        if (!isset($this->groupIdSites[$share['idgroup']])) {
+            $this->groupIdSites[$share['idgroup']] = array_column(
+                $this->model->getPermissionsOfGroup($share['idgroup']),
+                'idsite'
+            );
+        }
+
+        $segmentIdSite = is_numeric($segment['enable_only_idsite'] ?? null) ? (int) $segment['enable_only_idsite'] : 0;
+
+        return self::isSharingAllowed($segmentIdSite, $this->groupIdSites[$share['idgroup']], $sharer['adminIdSites']);
+    }
+
+    /**
+     * @return array{login: string, superuser: bool, adminIdSites: array<int>}|null null for users that do not exist
+     */
+    private function getSharer(string $login): ?array {
+        if (array_key_exists($login, $this->sharers)) {
+            return $this->sharers[$login];
+        }
+
+        $sharer = null;
+        $user = $login !== '' ? (new UsersModel())->getUser($login) : null;
+        if (is_array($user) && is_string($user['login'] ?? null) && $user['login'] !== '') {
+            $superuser = !empty($user['superuser_access']);
+            $adminIdSites = [];
+            if (!$superuser) {
+                // this plugin's Access: includes the access the user has through groups
+                foreach ((new Access())->getRawSitesWithSomeViewAccess($user['login']) as $siteAccess) {
+                    if ($siteAccess['access'] === 'admin') {
+                        $adminIdSites[] = $siteAccess['idsite'];
+                    }
+                }
+            }
+            $sharer = ['login' => $user['login'], 'superuser' => $superuser, 'adminIdSites' => $adminIdSites];
+        }
+
+        return $this->sharers[$login] = $sharer;
     }
 
     /**

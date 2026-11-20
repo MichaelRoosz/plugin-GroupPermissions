@@ -6,7 +6,7 @@ New features (requires a database update):
   - Capabilities per group (e.g. Tag Manager `tagmanager_write`, `tagmanager_publish_live_container`)
   - Automatic access: give groups a role on new websites matching a Matomo website group or URL pattern (e.g. `*.example.com`), optionally applied to existing websites
   - "Group access" field in Matomo's website create/edit form
-  - Share stored segments with groups
+  - Share stored segments with groups (a share applies while the user who shared the segment may still share it)
   - Copy scheduled email reports to all members of a group: every member with access to the website gets a copy of their own, sent to them only
   - Group sync from LDAP, OIDC and SAML: map external directory groups to groups, memberships are synchronized on login (LoginLdap, LoginOIDC / RebelOIDC, LoginSaml; event `GroupPermissions.syncUserGroups` for other login plugins)
   - Invite new users directly into groups

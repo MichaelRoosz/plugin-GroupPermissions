@@ -220,24 +220,57 @@ class GroupUser {
         }
 
         $existing = [];
+        $unmatched = [];
         foreach ($logins as $login) {
             if (isset($usersByFolded[mb_strtolower($login)])) {
                 $existing[$login] = $usersByFolded[mb_strtolower($login)];
-
-                continue;
-            }
-            if (!$usersByFolded) {
-                continue;
-            }
-
-            // the collation may consider logins equal that differ by more than case (e.g. `bób` and `bob` with an
-            // accent-insensitive collation), and so grant the membership to the user: ask the database which user
-            $user = Db::fetchOne("SELECT login FROM $tableUser WHERE login = ?", [$login]);
-            if (is_string($user)) {
-                $existing[$login] = $user;
+            } else {
+                $unmatched[] = $login;
             }
         }
 
+        // the collation may consider logins equal that differ by more than case (e.g. `bób` and `bob` with an
+        // accent-insensitive collation), and so grant the membership to the user: ask the database which user. Not
+        // needed if no user was found at all (most unmatched logins are of deleted users).
+        if ($usersByFolded && $unmatched) {
+            $existing += $this->getUsersEqualToLogins($unmatched);
+        }
+
         return $existing;
+    }
+
+    /**
+     * The user each login is equal to according to the collation of the user table, in one query per chunk: one
+     * `login = ?` column per given login (a comparison of the column with a value uses the collation of the column).
+     *
+     * @param array<string> $logins
+     *
+     * @return array<string, string> the login of the user (as stored in Matomo's user table) by given login
+     */
+    private function getUsersEqualToLogins(array $logins): array {
+        $tableUser = Common::prefixTable('user');
+
+        $result = [];
+        foreach (array_chunk($logins, 50) as $chunk) {
+            $columns = [];
+            foreach (array_keys($chunk) as $index) {
+                $columns[] = 'login = ? AS m' . (int) $index;
+            }
+
+            $rows = Rows::list(Db::fetchAll(
+                'SELECT login, ' . implode(', ', $columns) . " FROM $tableUser
+                    WHERE login IN (" . Common::getSqlStringFieldsArray($chunk) . ')',
+                array_merge($chunk, $chunk)
+            ));
+            foreach ($rows as $row) {
+                foreach ($chunk as $index => $login) {
+                    if (!isset($result[$login]) && is_numeric($row['m' . $index] ?? null) && (int) $row['m' . $index] === 1) {
+                        $result[$login] = Rows::string($row, 'login');
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 }

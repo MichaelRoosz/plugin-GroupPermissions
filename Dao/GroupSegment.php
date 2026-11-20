@@ -24,6 +24,8 @@ class GroupSegment {
     public const COLUMNS = [
         'idgroup' => 'INT(10) UNSIGNED NOT NULL',
         'idsegment' => 'INT(10) UNSIGNED NOT NULL',
+        // login of the user who shared the segment: shares only apply while that user may still share it
+        'shared_by' => 'VARCHAR(100) NOT NULL',
     ];
 
     public const PRIMARY_KEY = ['idgroup', 'idsegment'];
@@ -49,10 +51,14 @@ class GroupSegment {
         Db::query(sprintf('DROP TABLE IF EXISTS `%s`', $this->tablePrefixed));
     }
 
-    public function shareSegment(int $idGroup, int $idSegment): void {
+    /**
+     * Sharing a segment again records the new user as the one who shared it.
+     */
+    public function shareSegment(int $idGroup, int $idSegment, string $sharedBy): void {
         Db::query(
-            "INSERT IGNORE INTO `{$this->tablePrefixed}` (idgroup, idsegment) VALUES (?, ?)",
-            [$idGroup, $idSegment]
+            "INSERT INTO `{$this->tablePrefixed}` (idgroup, idsegment, shared_by) VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE shared_by = ?",
+            [$idGroup, $idSegment, $sharedBy, $sharedBy]
         );
     }
 
@@ -89,20 +95,28 @@ class GroupSegment {
     }
 
     /**
-     * @return array<int> IDs of the segments shared with any group the user is a member of
+     * @return array<array{
+     *   idsegment: int,
+     *   idgroup: int,
+     *   shared_by: string
+     * }> the shares of segments with any group the user is a member of
      */
-    public function getSegmentsSharedWithUser(string $login): array {
+    public function getSharesForUser(string $login): array {
         $userTable = Common::prefixTable(GroupUser::TABLE);
 
         $rows = Rows::list(Db::fetchAll(
-            "SELECT DISTINCT gs.idsegment FROM `{$this->tablePrefixed}` gs
+            "SELECT DISTINCT gs.idsegment, gs.idgroup, gs.shared_by FROM `{$this->tablePrefixed}` gs
                 INNER JOIN `$userTable` gu ON gu.idgroup = gs.idgroup
                 WHERE gu.login = ?",
             [$login]
         ));
 
-        return array_map(static function (array $row): int {
-            return Rows::int($row, 'idsegment');
+        return array_map(static function (array $row): array {
+            return [
+                'idsegment' => Rows::int($row, 'idsegment'),
+                'idgroup' => Rows::int($row, 'idgroup'),
+                'shared_by' => Rows::string($row, 'shared_by'),
+            ];
         }, $rows);
     }
 

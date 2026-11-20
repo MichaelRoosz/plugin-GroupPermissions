@@ -173,6 +173,28 @@ test.describe('Share segments with groups', () => {
     expect(listed.find((s) => s.idSegment === ownSegment)).toMatchObject({ isShared: false });
   });
 
+  test('a share ends when the user who shared the segment can no longer share it', async () => {
+    const formerAdmin = await su.createUser('seg_former_admin');
+    await su.setUserAccess(formerAdmin, 'admin', idSite);
+    const formerAdminApi = await MatomoApi.forUser(formerAdmin, DEFAULT_PASSWORD);
+
+    const idSegment = await addSegment(formerAdminApi, 'Former Admin Segment');
+    await share(formerAdminApi, idSegment);
+    expect(await visibleTo(member, idSite)).toContain(idSegment);
+
+    // without admin access the user could not share the segment anymore
+    await su.setUserAccess(formerAdmin, 'view', idSite);
+    expect(await visibleTo(member, idSite)).not.toContain(idSegment);
+    await expect(api[member].expectError('SegmentEditor.get', { idSegment })).resolves.toContain('You can only edit and delete');
+    // the share is kept, e.g. for the admin access to come back
+    expect((await su.call('GroupPermissions.getGroupsOfSegment', { idSegment })).map((g: { idGroup: number }) => g.idGroup))
+      .toEqual([team.idGroup]);
+
+    // shared again by a super user, it applies regardless of the creator's access
+    await share(su, idSegment);
+    expect(await visibleTo(member, idSite)).toContain(idSegment);
+  });
+
   test('deleting a segment or a group removes its shares', async () => {
     const idSegment = await addSegment(api[owner], 'Deleted Segment');
     await share(api[owner], idSegment);

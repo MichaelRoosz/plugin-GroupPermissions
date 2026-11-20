@@ -393,9 +393,9 @@ class Model {
     }
 
     // GroupSegment
-    public function shareSegment(int $idGroup, int $idSegment): void {
+    public function shareSegment(int $idGroup, int $idSegment, string $sharedBy): void {
         $groupSegment = new GroupSegment();
-        $groupSegment->shareSegment($idGroup, $idSegment);
+        $groupSegment->shareSegment($idGroup, $idSegment, $sharedBy);
     }
 
     public function unshareSegment(int $idGroup, int $idSegment): void {
@@ -422,12 +422,16 @@ class Model {
     }
 
     /**
-     * @return array<int> segment ids
+     * @return array<array{
+     *   idsegment: int,
+     *   idgroup: int,
+     *   shared_by: string
+     * }>
      */
-    public function getSegmentsSharedWithUser(string $login): array {
+    public function getSegmentSharesForUser(string $login): array {
         $groupSegment = new GroupSegment();
 
-        return $groupSegment->getSegmentsSharedWithUser($login);
+        return $groupSegment->getSharesForUser($login);
     }
 
     public function removeAllSegmentSharesOfGroup(int $idGroup): void {

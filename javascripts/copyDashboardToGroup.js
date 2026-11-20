@@ -64,6 +64,12 @@ $(function () {
             users = $.isArray(response) ? response : [];
             render();
         });
+        // like for the groups below: on errors the dialog still lists the current user and the groups
+        usersRequest.useRegularCallbackInCaseOfError = true;
+        usersRequest.setErrorCallback(function () {
+            users = [];
+            render();
+        });
         usersRequest.send();
 
         var groupsRequest = new ajaxHelper();

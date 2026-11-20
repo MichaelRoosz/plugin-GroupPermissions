@@ -906,7 +906,8 @@ class API extends \Piwik\Plugin\API {
      * Like segments shared with all users, only the creator and super users can edit or delete the segment.
      * Super users can share any segment with any group. Users with admin access to at least one website can share
      * their own segments with groups that have a role for the website of the segment, or, for segments available on
-     * all websites, for a website they administer.
+     * all websites, for a website they administer. The share only applies while the user who shared the segment
+     * still meets these conditions (e.g. not after losing the admin access).
      */
     public function shareSegmentWithGroup(int $idSegment, int $idGroup): void {
         Piwik::checkUserHasSomeAdminAccess();
@@ -922,7 +923,7 @@ class API extends \Piwik\Plugin\API {
             ));
         }
 
-        $this->model->shareSegment($group['idgroup'], $segment['idsegment']);
+        $this->model->shareSegment($group['idgroup'], $segment['idsegment'], Piwik::getCurrentUserLogin());
     }
 
     /**
@@ -1310,23 +1311,20 @@ class API extends \Piwik\Plugin\API {
     }
 
     /**
-     * Whether a user without super user access may share a segment with a group: the group needs a role for the
-     * website of the segment, or, for segments available on all websites (`$idSite` 0), for a website the current
-     * user administers. Otherwise segments could be pushed to the segment lists of any group.
+     * Whether the current user (without super user access) may share a segment with a group, see
+     * SegmentSharing::isSharingAllowed
      */
     private function canShareSegmentWithGroup(int $idSite, int $idGroup): bool {
-        $groupIdSites = array_column($this->model->getPermissionsOfGroup($idGroup), 'idsite');
-
-        if ($idSite > 0) {
-            return in_array($idSite, $groupIdSites, true);
-        }
-
         $adminIdSites = array_map('intval', array_filter(
             Access::getInstance()->getSitesIdWithAdminAccess(),
             'is_numeric'
         ));
 
-        return (bool) array_intersect($groupIdSites, $adminIdSites);
+        return SegmentSharing::isSharingAllowed(
+            $idSite,
+            array_column($this->model->getPermissionsOfGroup($idGroup), 'idsite'),
+            array_values($adminIdSites)
+        );
     }
 
     /**

@@ -230,9 +230,45 @@ class AutoAccess {
         return $defaultPorts[strtolower($scheme)] ?? null;
     }
 
-    private static function wildcardMatches(string $pattern, string $subject): bool {
-        $regex = '/^' . str_replace('\*', '.*', preg_quote($pattern, '/')) . '$/iu';
+    /**
+     * Case-insensitive match of a pattern where `*` matches any characters. Not done with a regular expression:
+     * patterns with many `*` make PCRE backtrack until it gives up, and the rule would silently never match. This
+     * takes at most pattern length × subject length steps.
+     */
+    public static function wildcardMatches(string $pattern, string $subject): bool {
+        $p = preg_split('//u', mb_strtolower($pattern), -1, PREG_SPLIT_NO_EMPTY);
+        $s = preg_split('//u', mb_strtolower($subject), -1, PREG_SPLIT_NO_EMPTY);
+        if ($p === false || $s === false) {
+            return false; // invalid UTF-8
+        }
 
-        return preg_match($regex, $subject) === 1;
+        $patternLength = count($p);
+        $subjectLength = count($s);
+        $pi = 0;
+        $si = 0;
+        $lastStar = -1; // position of the last `*` in the pattern
+        $starSubject = 0; // position in the subject the last `*` currently matches up to
+
+        while ($si < $subjectLength) {
+            if ($pi < $patternLength && $p[$pi] === '*') {
+                $lastStar = $pi++;
+                $starSubject = $si;
+            } elseif ($pi < $patternLength && $p[$pi] === $s[$si]) {
+                $pi++;
+                $si++;
+            } elseif ($lastStar !== -1) {
+                // let the last `*` match one more character and retry from there
+                $pi = $lastStar + 1;
+                $si = ++$starSubject;
+            } else {
+                return false;
+            }
+        }
+
+        while ($pi < $patternLength && $p[$pi] === '*') {
+            $pi++;
+        }
+
+        return $pi === $patternLength;
     }
 }
