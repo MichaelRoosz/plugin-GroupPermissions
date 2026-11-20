@@ -519,8 +519,8 @@ class GroupPermissions extends Plugin {
     }
 
     /**
-     * A new user never inherits the group memberships of a deleted user with the same login: they are left behind
-     * when the user was deleted while this plugin was deactivated.
+     * A new user never inherits the group memberships or segment shares of a deleted user with the same login: they
+     * are left behind when the user was deleted while this plugin was deactivated.
      *
      * @param mixed $login
      */
@@ -531,6 +531,7 @@ class GroupPermissions extends Plugin {
 
         try {
             $model = new Model();
+            $model->removeAllSegmentSharesByUser($login);
             if ($model->getMembershipsOfUser($login)) {
                 $model->removeUserFromAllGroups($login);
                 GroupAccessUpdater::reloadAccess();
@@ -548,10 +549,12 @@ class GroupPermissions extends Plugin {
     }
 
     /**
-     * Delete group preferences associated with a particular user
+     * Delete group preferences associated with a particular user: their memberships and the segment shares they made
+     * (which would otherwise apply again to a new user with the same login)
      */
     public function deleteUser(string $login): void {
         $model = new Model();
         $model->removeUserFromAllGroups($login);
+        $model->removeAllSegmentSharesByUser($login);
     }
 }

@@ -444,6 +444,11 @@ class Model {
         $groupSegment->removeAllSharesOfSegment($idSegment);
     }
 
+    public function removeAllSegmentSharesByUser(string $login): void {
+        $groupSegment = new GroupSegment();
+        $groupSegment->removeAllSharesByUser($login);
+    }
+
     // GroupExternal
     /**
      * @return bool false if the database considers the name equal to an existing mapping of the group

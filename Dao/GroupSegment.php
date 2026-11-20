@@ -127,4 +127,11 @@ class GroupSegment {
     public function removeAllSharesOfSegment(int $idSegment): void {
         Db::query("DELETE FROM `{$this->tablePrefixed}` WHERE idsegment = ?", [$idSegment]);
     }
+
+    /**
+     * Removes the shares made by a user (compared like Matomo compares logins, with the collation of the column)
+     */
+    public function removeAllSharesByUser(string $login): void {
+        Db::query("DELETE FROM `{$this->tablePrefixed}` WHERE shared_by = ?", [$login]);
+    }
 }

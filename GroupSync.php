@@ -151,6 +151,23 @@ class GroupSync {
         return mb_strtolower(trim($name));
     }
 
+    /**
+     * Whether two mapped external groups are the same mapping: compared case-insensitively, and DNs also without the
+     * spaces around their separators (like in matches), so `CN=A, OU=B` and `cn=a,ou=b` are one mapping. A DN and
+     * the plain name of its first value are different mappings (a plain name matches DNs in any location).
+     */
+    public static function isSameMapping(string $group1, string $group2): bool {
+        $name1 = self::normalize($group1);
+        $name2 = self::normalize($group2);
+        if ($name1 === $name2) {
+            return true;
+        }
+
+        return self::getFirstValueOfDn($name1) !== null
+            && self::getFirstValueOfDn($name2) !== null
+            && self::compactDn($name1) === self::compactDn($name2);
+    }
+
     private static function compactDn(string $dn): string {
         return (string) preg_replace('/\\s*([,=+])\\s*/u', '$1', $dn);
     }

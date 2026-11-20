@@ -679,13 +679,18 @@ class API extends \Piwik\Plugin\API {
             return !$capability || !$capability->hasRoleCapability($access);
         }));
 
-        foreach ($this->model->getAutoAccessRulesOfGroup($group['idgroup']) as $rule) {
-            if ($rule['match_type'] === $matchType && mb_strtolower($rule['pattern']) === mb_strtolower($pattern)) {
-                throw new Exception(Piwik::translate('GroupPermissions_ExceptionRuleDoesExist'));
-            }
-        }
+        $idGroup = $group['idgroup'];
 
-        return $this->model->addAutoAccessRule($group['idgroup'], $matchType, $pattern, $access, $capabilities);
+        // locked, so concurrent requests cannot both pass the duplicate check and add the same rule twice
+        return $this->withLock('gpermissions_autoaccess_', Dao\GroupAutoAccess::TABLE, function () use ($idGroup, $matchType, $pattern, $access, $capabilities): int {
+            foreach ($this->model->getAutoAccessRulesOfGroup($idGroup) as $rule) {
+                if ($rule['match_type'] === $matchType && mb_strtolower($rule['pattern']) === mb_strtolower($pattern)) {
+                    throw new Exception(Piwik::translate('GroupPermissions_ExceptionRuleDoesExist'));
+                }
+            }
+
+            return $this->model->addAutoAccessRule($idGroup, $matchType, $pattern, $access, $capabilities);
+        });
     }
 
     /**
@@ -771,7 +776,7 @@ class API extends \Piwik\Plugin\API {
         }
 
         foreach ($this->model->getExternalGroupMappingsOfGroup($group['idgroup']) as $existing) {
-            if (GroupSync::normalize($existing) === GroupSync::normalize($externalGroup)) {
+            if (GroupSync::isSameMapping($existing, $externalGroup)) {
                 throw new Exception(Piwik::translate('GroupPermissions_ExceptionExternalGroupDoesExist', $externalGroup));
             }
         }
@@ -795,7 +800,7 @@ class API extends \Piwik\Plugin\API {
 
         $removed = false;
         foreach ($this->model->getExternalGroupMappingsOfGroup($group['idgroup']) as $existing) {
-            if (GroupSync::normalize($existing) === GroupSync::normalize($externalGroup)) {
+            if (GroupSync::isSameMapping($existing, $externalGroup)) {
                 $this->model->removeExternalGroupMapping($group['idgroup'], $existing);
                 $removed = true;
             }
@@ -1529,10 +1534,25 @@ class API extends \Piwik\Plugin\API {
      * @return T
      */
     private function withGroupNameLock(callable $callback) {
-        // per Matomo installation, several may share a database server
-        $lockName = 'gpermissions_group_name_' . md5(Common::prefixTable(Dao\Group::TABLE));
+        return $this->withLock('gpermissions_group_name_', Dao\Group::TABLE, $callback);
+    }
+
+    /**
+     * Runs the callback while holding a named database lock.
+     *
+     * @template T
+     *
+     * @param string $prefix name of the lock
+     * @param string $table unprefixed table the lock protects: the lock is per Matomo installation, several may share
+     *                      a database server
+     * @param callable(): T $callback
+     *
+     * @return T
+     */
+    private function withLock(string $prefix, string $table, callable $callback) {
+        $lockName = $prefix . md5(Common::prefixTable($table));
         if (!Db::getDbLock($lockName)) {
-            throw new Exception('Could not acquire the lock for group names, please try again.');
+            throw new Exception('Could not acquire a database lock, please try again.');
         }
 
         try {

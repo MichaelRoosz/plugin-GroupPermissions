@@ -75,6 +75,20 @@ test.describe('Group sync from external directories', () => {
     await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'ä'.repeat(190) });
     await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'ä'.repeat(190) });
 
+    // DNs that differ only in the spaces around their separators are the same mapping
+    const dn = `CN=Spaced ${RUN_ID}, OU=Groups, DC=example, DC=com`;
+    await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: dn });
+    expect(await su.expectError('GroupPermissions.addExternalGroupMapping', {
+      idGroup: group.idGroup, externalGroup: `cn=spaced ${RUN_ID},ou=groups,dc=example,dc=com`,
+    })).toContain('already mapped');
+    // the plain name of its first value is a different mapping (it matches DNs anywhere)
+    await su.call('GroupPermissions.addExternalGroupMapping', { idGroup: group.idGroup, externalGroup: `Spaced ${RUN_ID}` });
+    await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: `Spaced ${RUN_ID}` });
+    await su.call('GroupPermissions.removeExternalGroupMapping', {
+      idGroup: group.idGroup, externalGroup: `CN=Spaced ${RUN_ID},OU=Groups,DC=example,DC=com`,
+    });
+    expect(await mappings(group.idGroup)).toEqual(['R&D "Team" <x>']);
+
     await su.call('GroupPermissions.removeExternalGroupMapping', { idGroup: group.idGroup, externalGroup: 'R&D "TEAM" <X>' });
     expect(await mappings(group.idGroup)).toEqual([]);
     expect(await su.expectError('GroupPermissions.removeExternalGroupMapping', {

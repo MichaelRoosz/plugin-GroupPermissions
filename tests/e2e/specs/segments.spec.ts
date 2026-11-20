@@ -1,6 +1,6 @@
 import { test, expect, Browser } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
-import { DEFAULT_PASSWORD, MATOMO_URL, RUN_ID, superUserStorageState } from '../helpers/env';
+import { DEFAULT_PASSWORD, MATOMO_URL, RUN_ID, SUPERUSER, superUserStorageState } from '../helpers/env';
 import {
   chooseOption, clickModalButton, login, openGroupEditor, saveButton, screenshot, switchEditorTab, toast, waitForIdle,
 } from '../helpers/ui';
@@ -193,6 +193,32 @@ test.describe('Share segments with groups', () => {
     // shared again by a super user, it applies regardless of the creator's access
     await share(su, idSegment);
     expect(await visibleTo(member, idSite)).toContain(idSegment);
+  });
+
+  test('deleting the user who shared a segment removes the share, a new user with that login does not get it back', async () => {
+    const sharerLogin = await su.createUser('seg_deleted_sharer');
+    const idSegment = await addSegment(su, 'Deleted Sharer Segment');
+    // shared on behalf of a super user that is then deleted
+    await su.call('UsersManager.setSuperUserAccess', {
+      userLogin: sharerLogin, hasSuperUserAccess: 1, passwordConfirmation: SUPERUSER.password,
+    });
+    const sharerApi = await MatomoApi.forUser(sharerLogin, DEFAULT_PASSWORD);
+    await share(sharerApi, idSegment);
+    expect(await visibleTo(member, idSite)).toContain(idSegment);
+
+    await su.deleteUser(sharerLogin);
+    expect(await visibleTo(member, idSite)).not.toContain(idSegment);
+    expect(await su.call('GroupPermissions.getGroupsOfSegment', { idSegment })).toEqual([]);
+
+    // recreated with super user access, the old share must not apply again
+    await su.call('UsersManager.addUser', {
+      userLogin: sharerLogin, password: DEFAULT_PASSWORD, email: `${sharerLogin}@example.org`,
+      passwordConfirmation: SUPERUSER.password,
+    });
+    await su.call('UsersManager.setSuperUserAccess', {
+      userLogin: sharerLogin, hasSuperUserAccess: 1, passwordConfirmation: SUPERUSER.password,
+    });
+    expect(await visibleTo(member, idSite)).not.toContain(idSegment);
   });
 
   test('deleting a segment or a group removes its shares', async () => {

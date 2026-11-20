@@ -108,6 +108,15 @@ test.describe('Automatic access for new websites', () => {
     expect((await su.groupAccess(existing))[group.name]).toBe('noaccess');
   });
 
+  test('concurrent requests adding the same rule add it only once', async () => {
+    const group = await su.createGroup('Auto concurrent');
+    const results = await Promise.allSettled(Array.from({ length: 6 }, () => su.call('GroupPermissions.addAutoAccessRule', {
+      idGroup: group.idGroup, matchType: 'url', pattern: `concurrent-${RUN_ID}.example.org`, access: 'view',
+    })));
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect(await rules(group.idGroup)).toHaveLength(1);
+  });
+
   test('rules are validated, listed and removed; deleting the group removes them', async () => {
     const group = await su.createGroup('Auto validate');
     const params = { idGroup: group.idGroup, matchType: 'url', pattern: `v-${RUN_ID}.example.org`, access: 'view' };
