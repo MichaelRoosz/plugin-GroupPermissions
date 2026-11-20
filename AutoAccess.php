@@ -147,7 +147,7 @@ class AutoAccess {
             $pattern = self::normalizeUrlPattern($pattern);
             $withPath = strpos($pattern, '/') !== false;
             // a pattern with a port (e.g. `example.com:8080`) is compared with the port of the URLs too
-            $withPort = strpos(explode('/', $pattern, 2)[0], ':') !== false;
+            $withPort = self::hasPort(explode('/', $pattern, 2)[0]);
 
             foreach ($urls as $url) {
                 $subject = self::normalizeUrl(Common::unsanitizeInputValue($url), $withPath, $withPort);
@@ -304,6 +304,20 @@ class AutoAccess {
         }
 
         return $subject;
+    }
+
+    /**
+     * Whether the host part of a pattern has a port. IPv6 addresses are enclosed in brackets (e.g. `[2001:db8::1]`),
+     * their colons are not a port separator: only a colon after the closing bracket is.
+     */
+    private static function hasPort(string $host): bool {
+        if (substr($host, 0, 1) === '[') {
+            $closing = strpos($host, ']');
+
+            return $closing !== false && strpos($host, ':', $closing) !== false;
+        }
+
+        return strpos($host, ':') !== false;
     }
 
     private static function getDefaultPort(string $scheme): ?int {

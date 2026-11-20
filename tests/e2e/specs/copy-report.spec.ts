@@ -215,6 +215,10 @@ test.describe('Copy scheduled reports to a group', () => {
     // super users can copy reports of other users; the owner of the original is a member and gets a copy too
     expect((await copy(su, outsiderReport)).sort()).toEqual([member, owner].sort());
     expect(await reportsOf(member, `Outsider Report ${RUN_ID}`)).toHaveLength(1);
+
+    // a member who owns the report never gets a duplicate of it
+    expect(await copy(su, ownReport)).toEqual([member]);
+    expect(await reportsOf(owner, `Permission Report ${RUN_ID}`)).toHaveLength(1);
   });
 
   test('reports with the All Websites dashboard show the websites of the member', async () => {

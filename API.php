@@ -1044,8 +1044,8 @@ class API extends \Piwik\Plugin\API {
      * me"), the additional recipients of the original are not copied.
      *
      * Like copyDashboardToGroup, the report is only copied to members the current user is allowed to see. Members
-     * without view access to the website of the report, invited users that did not accept yet, the current user and
-     * the anonymous user are skipped. Super users can copy any email report, users with admin access to at least
+     * without view access to the website of the report, invited users that did not accept yet, the owner of the
+     * report, the current user and the anonymous user are skipped. Super users can copy any email report, users with admin access to at least
      * one website their own reports. Reports using a segment must use one shared with all users (Matomo does not
      * let members use private segments of other users).
      *
@@ -1058,10 +1058,16 @@ class API extends \Piwik\Plugin\API {
         $report = $reportCopy->getReportOrFail($idReport);
         $group = $this->getGroupOrFail($idGroup);
 
-        $logins = $reportCopy->filterReceivers(
+        // the owner of the report already has it (e.g. when a super user copies the report of a member)
+        $owner = Dao\Rows::string($report, 'login');
+        $members = array_values(array_filter(
             $this->getMembersVisibleToCurrentUser($group['idgroup']),
-            Dao\Rows::int($report, 'idsite')
-        );
+            static function (string $login) use ($owner): bool {
+                return $login !== $owner;
+            }
+        ));
+
+        $logins = $reportCopy->filterReceivers($members, Dao\Rows::int($report, 'idsite'));
 
         return $reportCopy->copyToUsers($report, $logins);
     }
@@ -1186,9 +1192,11 @@ class API extends \Piwik\Plugin\API {
     private function getMembersVisibleToCurrentUser(int $idGroup): array {
         $currentLogin = Piwik::getCurrentUserLogin();
 
-        // UsersManager.getUsers only returns users the current user is allowed to manage
+        // UsersManager.getUsers only returns users the current user is allowed to manage. Called with an empty
+        // default request: otherwise the parameters of the current request (e.g. `filter_offset` or
+        // `filter_pattern`) would also filter the users and silently skip members.
         $visibleLogins = [];
-        $users = Request::processRequest('UsersManager.getUsers', ['filter_limit' => -1]);
+        $users = Request::processRequest('UsersManager.getUsers', ['filter_limit' => -1], []);
         if (is_array($users)) {
             foreach ($users as $user) {
                 if (is_array($user) && isset($user['login']) && is_string($user['login'])) {
