@@ -194,6 +194,40 @@ class GroupUser {
     }
 
     /**
+     * Rewrites memberships stored with another spelling of the login (e.g. `BOB` for the user `bob`, added by versions
+     * before 5.3.0) to the login of Matomo's user table. Access checks compare the login with the collation of this
+     * table: with a binary one, such a membership was listed for the user but never granted access, and the group
+     * sync did not find it. Memberships of users that no longer exist are kept unchanged.
+     */
+    public function normalizeStoredLogins(): void {
+        $table = $this->tablePrefixed;
+
+        $rows = Rows::list(Db::fetchAll("SELECT idgroup, login, synced FROM $table"));
+        $existing = $this->getExistingLogins(array_map(static function (array $row): string {
+            return Rows::string($row, 'login');
+        }, $rows));
+
+        // `login = ?` uses the index, the binary comparison makes sure only this exact spelling matches
+        $whereExact = 'idgroup = ? AND login = ? AND CAST(login AS BINARY) = CAST(? AS BINARY)';
+        foreach ($rows as $row) {
+            $storedLogin = Rows::string($row, 'login');
+            $login = $existing[$storedLogin] ?? null;
+            if ($login === null || $login === $storedLogin) {
+                continue;
+            }
+            $idGroup = Rows::int($row, 'idgroup');
+
+            // renames the row; with a binary collation the user may also have a membership with the right spelling,
+            // then the update is skipped (duplicate key) and the row is merged into that one: a manual membership wins
+            Db::query("UPDATE IGNORE $table SET login = ? WHERE $whereExact", [$login, $idGroup, $storedLogin, $storedLogin]);
+            if (Rows::int($row, 'synced') !== 1) {
+                Db::query("UPDATE $table SET synced = 0 WHERE $whereExact", [$idGroup, $login, $login]);
+            }
+            Db::query("DELETE FROM $table WHERE $whereExact", [$idGroup, $storedLogin, $storedLogin]);
+        }
+    }
+
+    /**
      * Which of the logins belong to existing users. Looked up with the logins as values instead of joining the
      * user table: the login columns of this plugin's and Matomo's tables can have different collations (e.g. tables
      * created before and after a MySQL upgrade), which makes MySQL reject a join ("Illegal mix of collations").

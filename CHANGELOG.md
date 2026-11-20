@@ -32,10 +32,11 @@ Fixes:
   - Users losing all access to a website through a group change trigger `UsersManager.removeSiteAccess` like direct access changes, so e.g. their scheduled reports for the website are deleted
   - Automatic access URL patterns with a port (e.g. `example.com:8080`) match websites with that port; URLs without a port have the default port of their scheme (`example.com:443` matches `https://example.com`)
   - Removing the direct access of a user no longer deletes their scheduled reports for websites they can still access through a group, also when other plugins remove the access directly
-  - Members are stored with the login of the user (adding `BOB` adds the user `bob`), so dashboards and reports copied to a group no longer skip them; existing memberships with a different spelling are listed with the login of the user
+  - Members are stored with the login of the user (adding `BOB` adds the user `bob`), so dashboards and reports copied to a group no longer skip them; the database update converts existing memberships with a different spelling (with a case-sensitive collation they never granted access)
   - `removeUserFromGroup` fails for users that are not in the group
   - Changing the role of a group no longer removes its access for a moment
   - Saving the website form only changes the group roles changed in the form, roles changed by others while it was open are kept
+  - Group sync from OpenID Connect ignores ID tokens without expiry (`exp`), like expired ones
   - Members are listed and counted when the tables of the plugin and of Matomo have different collations (e.g. after a MySQL upgrade)
   - `removeExternalGroupMapping` and `removeAutoAccessRule` fail for mappings and rules that do not exist, `getMembersOfGroup` for groups that do not exist
   - `getSitesAccessFromGroup` loads the website names with one query

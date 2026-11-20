@@ -149,12 +149,19 @@ check "website is created" "1" "$(su SitesManager.addSite --data-urlencode "site
     --data-urlencode "urls=https://no-table-$run_id.example.org" | grep -cE '"value":[0-9]+' || true)"
 
 echo "==> Updating from version 5.2.1 (without the capability, automatic access, segment and external group tables and the synced column)"
+# 5.2.1 stored the login as given (e.g. upper case); with a case-sensitive collation such a membership grants no access
+member_upper=$(echo "$member" | tr '[:lower:]' '[:upper:]')
+sql "ALTER TABLE matomo_gpermissions_user MODIFY login VARCHAR(100) CHARACTER SET $user_charset COLLATE ${user_charset}_bin NOT NULL"
+sql "UPDATE matomo_gpermissions_user SET login = '$member_upper' WHERE login = '$member'"
+check "a membership with another spelling grants no access before the update" "" "$(member_sites)"
 sql "DROP TABLE matomo_gpermissions_capability"
 sql "DROP TABLE matomo_gpermissions_segment"
 sql "DROP TABLE matomo_gpermissions_external"
 sql "ALTER TABLE matomo_gpermissions_user DROP COLUMN synced"
 sql "UPDATE matomo_option SET option_value = '5.2.1' WHERE option_name = 'version_GroupPermissions'"
 mexec ./console core:update --yes >/dev/null
+check "the membership is stored with the login of the user" "$member" "$(sql "SELECT login FROM matomo_gpermissions_user WHERE idgroup = $id_group AND login IN ('$member', '$member_upper')")"
+sql "ALTER TABLE matomo_gpermissions_user MODIFY login VARCHAR(100) CHARACTER SET $user_charset COLLATE $user_collation NOT NULL"
 check "capability table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_capability'" | wc -l)"
 check "automatic access table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_autoaccess'" | wc -l)"
 check "segment table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_segment'" | wc -l)"

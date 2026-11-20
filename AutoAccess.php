@@ -48,7 +48,24 @@ class AutoAccess {
             return [];
         }
 
-        $roles = $this->applyRulesToSite($rules, $idSite);
+        $sitesModel = new SitesModel();
+        $site = $sitesModel->getSiteFromId($idSite);
+        if (!is_array($site)) {
+            return [];
+        }
+
+        $existing = [];
+        foreach ($this->model->getPermissionsOfSite($idSite) as $permission) {
+            $existing[$permission['idgroup']] = $permission['access'];
+        }
+
+        $roles = $this->applyRulesToSite(
+            $rules,
+            $idSite,
+            self::getSiteGroup($site),
+            array_values(array_filter($sitesModel->getSiteUrlsFromId($idSite), 'is_string')),
+            $existing
+        );
         if ($roles) {
             $this->reloadAccess();
         }
@@ -57,22 +74,50 @@ class AutoAccess {
     }
 
     /**
-     * Applies rules to all existing websites (rules normally only apply to websites created after them).
+     * Applies rules to all existing websites (rules normally only apply to websites created after them). The
+     * websites, their URLs and the current roles of the groups are loaded in a few queries, not some per website.
      *
      * @param array<array{idgroup: int, match_type: string, pattern: string, access: string, capabilities: array<string>}> $rules
      *
      * @return array<int> ids of the websites the rules matched
      */
     public function applyToAllSites(array $rules): array {
+        if (!$rules) {
+            return [];
+        }
+
         $sitesModel = new SitesModel();
 
+        $urlsBySite = [];
+        foreach ($sitesModel->getAllKnownUrlsForAllSites() as $row) {
+            if (is_array($row) && is_numeric($row['idsite'] ?? null) && is_string($row['url'] ?? null)) {
+                $urlsBySite[(int) $row['idsite']][] = $row['url'];
+            }
+        }
+
+        $existingBySite = [];
+        foreach (array_unique(array_column($rules, 'idgroup')) as $idGroup) {
+            foreach ($this->model->getPermissionsOfGroup($idGroup) as $permission) {
+                $existingBySite[$permission['idsite']][$idGroup] = $permission['access'];
+            }
+        }
+
         $matched = [];
-        foreach ($sitesModel->getSitesId() as $idSite) {
-            if (!is_numeric($idSite)) {
+        foreach ($sitesModel->getAllSites() as $site) {
+            if (!is_array($site) || !is_numeric($site['idsite'] ?? null)) {
                 continue;
             }
-            if ($this->applyRulesToSite($rules, (int) $idSite)) {
-                $matched[] = (int) $idSite;
+            $idSite = (int) $site['idsite'];
+
+            $roles = $this->applyRulesToSite(
+                $rules,
+                $idSite,
+                self::getSiteGroup($site),
+                $urlsBySite[$idSite] ?? [],
+                $existingBySite[$idSite] ?? []
+            );
+            if ($roles) {
+                $matched[] = $idSite;
             }
         }
 
@@ -125,23 +170,58 @@ class AutoAccess {
     }
 
     /**
+     * Case-insensitive match of a pattern where `*` matches any characters. Not done with a regular expression:
+     * patterns with many `*` make PCRE backtrack until it gives up, and the rule would silently never match. This
+     * takes at most pattern length × subject length steps.
+     */
+    public static function wildcardMatches(string $pattern, string $subject): bool {
+        $p = preg_split('//u', mb_strtolower($pattern), -1, PREG_SPLIT_NO_EMPTY);
+        $s = preg_split('//u', mb_strtolower($subject), -1, PREG_SPLIT_NO_EMPTY);
+        if ($p === false || $s === false) {
+            return false; // invalid UTF-8
+        }
+
+        $patternLength = count($p);
+        $subjectLength = count($s);
+        $pi = 0;
+        $si = 0;
+        $lastStar = -1; // position of the last `*` in the pattern
+        $starSubject = 0; // position in the subject the last `*` currently matches up to
+
+        while ($si < $subjectLength) {
+            if ($pi < $patternLength && $p[$pi] === '*') {
+                $lastStar = $pi++;
+                $starSubject = $si;
+            } elseif ($pi < $patternLength && $p[$pi] === $s[$si]) {
+                $pi++;
+                $si++;
+            } elseif ($lastStar !== -1) {
+                // let the last `*` match one more character and retry from there
+                $pi = $lastStar + 1;
+                $si = ++$starSubject;
+            } else {
+                return false;
+            }
+        }
+
+        while ($pi < $patternLength && $p[$pi] === '*') {
+            $pi++;
+        }
+
+        return $pi === $patternLength;
+    }
+
+    /**
      * Gives every group with a matching rule the highest role of its matching rules (a role the group already has
      * is never downgraded) and the capabilities of these rules that the role does not include already.
      *
      * @param array<array{idgroup: int, match_type: string, pattern: string, access: string, capabilities: array<string>}> $rules
+     * @param array<string> $urls main URL and alias URLs of the website
+     * @param array<int, string> $existing the current role per group id for the website (groups of the rules at least)
      *
      * @return array<int, string> the role per group id of the groups that matched
      */
-    private function applyRulesToSite(array $rules, int $idSite): array {
-        $sitesModel = new SitesModel();
-        $site = $sitesModel->getSiteFromId($idSite);
-        if (!is_array($site)) {
-            return [];
-        }
-
-        $siteGroup = isset($site['group']) && is_scalar($site['group']) ? (string) $site['group'] : '';
-        $urls = array_filter($sitesModel->getSiteUrlsFromId($idSite), 'is_string');
-
+    private function applyRulesToSite(array $rules, int $idSite, string $siteGroup, array $urls, array $existing): array {
         $access = new Access();
         $roles = [];
         $capabilities = [];
@@ -160,11 +240,6 @@ class AutoAccess {
         }
         if (!$roles) {
             return [];
-        }
-
-        $existing = [];
-        foreach ($this->model->getPermissionsOfSite($idSite) as $permission) {
-            $existing[$permission['idgroup']] = $permission['access'];
         }
 
         foreach ($roles as $idGroup => $role) {
@@ -188,6 +263,13 @@ class AutoAccess {
         }
 
         return $roles;
+    }
+
+    /**
+     * @param array<mixed> $site row of the site table
+     */
+    private static function getSiteGroup(array $site): string {
+        return isset($site['group']) && is_scalar($site['group']) ? (string) $site['group'] : '';
     }
 
     private function reloadAccess(): void {
@@ -228,47 +310,5 @@ class AutoAccess {
         $defaultPorts = ['http' => 80, 'https' => 443];
 
         return $defaultPorts[strtolower($scheme)] ?? null;
-    }
-
-    /**
-     * Case-insensitive match of a pattern where `*` matches any characters. Not done with a regular expression:
-     * patterns with many `*` make PCRE backtrack until it gives up, and the rule would silently never match. This
-     * takes at most pattern length × subject length steps.
-     */
-    public static function wildcardMatches(string $pattern, string $subject): bool {
-        $p = preg_split('//u', mb_strtolower($pattern), -1, PREG_SPLIT_NO_EMPTY);
-        $s = preg_split('//u', mb_strtolower($subject), -1, PREG_SPLIT_NO_EMPTY);
-        if ($p === false || $s === false) {
-            return false; // invalid UTF-8
-        }
-
-        $patternLength = count($p);
-        $subjectLength = count($s);
-        $pi = 0;
-        $si = 0;
-        $lastStar = -1; // position of the last `*` in the pattern
-        $starSubject = 0; // position in the subject the last `*` currently matches up to
-
-        while ($si < $subjectLength) {
-            if ($pi < $patternLength && $p[$pi] === '*') {
-                $lastStar = $pi++;
-                $starSubject = $si;
-            } elseif ($pi < $patternLength && $p[$pi] === $s[$si]) {
-                $pi++;
-                $si++;
-            } elseif ($lastStar !== -1) {
-                // let the last `*` match one more character and retry from there
-                $pi = $lastStar + 1;
-                $si = ++$starSubject;
-            } else {
-                return false;
-            }
-        }
-
-        while ($pi < $patternLength && $p[$pi] === '*') {
-            $pi++;
-        }
-
-        return $pi === $patternLength;
     }
 }

@@ -146,7 +146,7 @@ class ReportCopy {
 
     /**
      * Copies the report to the given users, who must exist and have view access to the website of the report
-     * (see canReceiveCopy).
+     * (see filterReceivers).
      *
      * @param array<mixed> $report row of the report table, see getReportOrFail
      * @param array<string> $logins
@@ -184,35 +184,46 @@ class ReportCopy {
     }
 
     /**
-     * Whether the user can get a copy of a report of the website: an active user (not only invited) with view
-     * access to the website, including access through groups.
+     * The users that can get a copy of a report of the website: active users (not only invited) with view access
+     * to the website, including access through groups. Looked up in a few queries for all users.
+     *
+     * @param array<string> $logins logins as stored in Matomo's user table
+     *
+     * @return array<string> the logins of these users, in the given order
      */
-    public function canReceiveCopy(string $login, int $idSite): bool {
-        if ($login === '' || $login === 'anonymous') {
-            return false;
+    public function filterReceivers(array $logins, int $idSite): array {
+        $logins = array_values(array_filter($logins, static function (string $login): bool {
+            return $login !== '' && $login !== 'anonymous';
+        }));
+        // UsersModel::getUsers() returns all users for an empty list
+        if (!$logins) {
+            return [];
         }
 
-        $user = (new UsersModel())->getUser($login);
-        if (!is_array($user) || !$user || !empty($user['invite_token'])) {
-            return false; // deleted or only invited
-        }
-
-        if (!empty($user['superuser_access'])) {
-            return true;
-        }
-
-        // this plugin's Access (see config/config.php): includes the access users get through groups
-        $access = \Piwik\Access::getInstance();
-        if (!($access instanceof Access)) {
-            return false;
-        }
-        foreach ($access->getRawSitesWithSomeViewAccess($login) as $siteAccess) {
-            if ($siteAccess['idsite'] === $idSite) {
-                return true;
+        $receivers = [];
+        $candidates = [];
+        $users = (new UsersModel())->getUsers($logins);
+        foreach (is_array($users) ? $users : [] as $user) {
+            if (!is_array($user) || !is_string($user['login'] ?? null) || !empty($user['invite_token'])) {
+                continue; // only invited
+            }
+            if (!empty($user['superuser_access'])) {
+                $receivers[$user['login']] = true;
+            } else {
+                $candidates[] = $user['login'];
             }
         }
 
-        return false;
+        // any role gives view access, directly or through groups (capabilities only apply with a role)
+        foreach (SiteAccessLoss::getIdSitesWithAccess($candidates) as $login => $idSites) {
+            if (in_array($idSite, $idSites, true)) {
+                $receivers[(string) $login] = true;
+            }
+        }
+
+        return array_values(array_filter($logins, static function (string $login) use ($receivers): bool {
+            return isset($receivers[$login]);
+        }));
     }
 
     /**

@@ -22,8 +22,9 @@ use Piwik\Request;
  * Neither plugin provides an event with the claims of the user. Both store the ID token they got from the token
  * endpoint in the session (`loginoidc_idtoken`) right before they start the Matomo session, which posts
  * `Login.authenticate.successful`. The token is only read while handling the callback request of these plugins,
- * and only if it has not expired and was not used for an earlier sync in the session, so a token left in the
- * session by an earlier login is never used for a different login.
+ * and only if it has an expiry (`exp`, required by OpenID Connect) that has not passed and was not used for an
+ * earlier sync in the session, so a token left in the session by an earlier login is never used for a different
+ * login.
  *
  * The signature of the token is not checked: the plugins received it directly from the token endpoint of the
  * provider over the back channel (authorization code flow), where TLS server validation authenticates the
@@ -114,10 +115,11 @@ class OidcGroupSync {
 
             // the plugins keep the previous token in the session when the provider returns none, which must not
             // be applied to this login (possibly of another user): a token is used only once and while it is valid
+            // (tokens without expiry are never used)
             $tokenHash = hash('sha256', $idToken);
             if (($_SESSION[self::SESSION_KEY_SYNCED_TOKEN] ?? null) === $tokenHash || self::isExpired($claims, time())) {
                 $this->getLogger()->info(
-                    'GroupPermissions: the ID token in the session is not from the login of {login}, groups are not synchronized',
+                    'GroupPermissions: the ID token in the session was already used, has expired or has no expiry, groups of {login} are not synchronized',
                     ['login' => $login]
                 );
 
@@ -150,14 +152,14 @@ class OidcGroupSync {
 
     /**
      * Whether the `exp` claim (required by OpenID Connect) of an ID token lies in the past. Tokens without a numeric
-     * `exp` are not considered expired.
+     * `exp` count as expired: otherwise only the "used once" check would keep a stale token from being applied.
      *
      * @param array<mixed> $claims
      */
     public static function isExpired(array $claims, int $now): bool {
         $exp = $claims['exp'] ?? null;
 
-        return is_numeric($exp) && (int) $exp + self::EXPIRY_LEEWAY < $now;
+        return !is_numeric($exp) || (int) $exp + self::EXPIRY_LEEWAY < $now;
     }
 
     /**

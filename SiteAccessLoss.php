@@ -53,6 +53,25 @@ class SiteAccessLoss {
     }
 
     /**
+     * Websites the users have any role for, directly or through groups (capabilities only apply with a role), in a
+     * few queries for all users instead of some per user
+     *
+     * @param array<string> $logins
+     *
+     * @return array<string, array<int>> by login
+     */
+    public static function getIdSitesWithAccess(array $logins): array {
+        if (!$logins) {
+            return [];
+        }
+
+        $roleProvider = StaticContainer::get(RolesProvider::class);
+        $roles = $roleProvider instanceof RolesProvider ? $roleProvider->getAllRoleIds() : ['view', 'write', 'admin'];
+
+        return (new Model())->getIdSitesWithRoleOfUsers($logins, array_values(array_filter($roles, 'is_string')));
+    }
+
+    /**
      * Existing users without super user access
      *
      * @param array<string> $logins
@@ -78,24 +97,5 @@ class SiteAccessLoss {
         }
 
         return $affected;
-    }
-
-    /**
-     * Websites the users have any role for, directly or through groups (capabilities only apply with a role), in a
-     * few queries for all users instead of some per user
-     *
-     * @param array<string> $logins
-     *
-     * @return array<string, array<int>> by login
-     */
-    private static function getIdSitesWithAccess(array $logins): array {
-        if (!$logins) {
-            return [];
-        }
-
-        $roleProvider = StaticContainer::get(RolesProvider::class);
-        $roles = $roleProvider instanceof RolesProvider ? $roleProvider->getAllRoleIds() : ['view', 'write', 'admin'];
-
-        return (new Model())->getIdSitesWithRoleOfUsers($logins, array_values(array_filter($roles, 'is_string')));
     }
 }

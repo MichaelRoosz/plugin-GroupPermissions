@@ -24,6 +24,7 @@ use Piwik\Updates as PiwikUpdates;
  * Adds the tables storing the capabilities of groups (e.g. Tag Manager capabilities) and the rules giving
  * groups access to new websites, the table storing the segments shared with groups, and the
  * table mapping external directory groups (LDAP, SAML) to groups plus the flag marking memberships added by the sync.
+ * Memberships stored with another spelling of the login are converted to the login of the user.
  */
 class Updates_5_3_0 extends PiwikUpdates {
     /**
@@ -50,5 +51,8 @@ class Updates_5_3_0 extends PiwikUpdates {
 
     public function doUpdate(Updater $updater): void {
         $updater->executeMigrations(__FILE__, $this->getMigrations($updater));
+
+        // memberships are now stored with the login of the user table (see GroupUser::normalizeStoredLogins)
+        (new GroupUser())->normalizeStoredLogins();
     }
 }

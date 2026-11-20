@@ -164,19 +164,6 @@ class SegmentSharing {
     }
 
     /**
-     * Whether the current request renders the scheduled reports UI (its report form lists the segments of
-     * `SegmentEditor.getAll`)
-     */
-    private static function isScheduledReportsRequest(): bool {
-        return self::$dispatchedModule === 'ScheduledReports';
-    }
-
-    private function isApplicableToCurrentUser(): bool {
-        // super users see all segments anyway, group permissions never apply to the anonymous user
-        return !Piwik::hasUserSuperUserAccess() && !Piwik::isUserIsAnonymous();
-    }
-
-    /**
      * Whether a user without super user access may share a segment with a group, see API::shareSegmentWithGroup:
      * the user needs admin access to some website, and the group a role for the website of the segment, or, for
      * segments available on all websites (`$segmentIdSite` 0), for a website the user administers. Otherwise segments
@@ -195,6 +182,19 @@ class SegmentSharing {
         }
 
         return (bool) array_intersect($groupIdSites, $adminIdSites);
+    }
+
+    /**
+     * Whether the current request renders the scheduled reports UI (its report form lists the segments of
+     * `SegmentEditor.getAll`)
+     */
+    private static function isScheduledReportsRequest(): bool {
+        return self::$dispatchedModule === 'ScheduledReports';
+    }
+
+    private function isApplicableToCurrentUser(): bool {
+        // super users see all segments anyway, group permissions never apply to the anonymous user
+        return !Piwik::hasUserSuperUserAccess() && !Piwik::isUserIsAnonymous();
     }
 
     /**

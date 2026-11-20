@@ -1058,13 +1058,10 @@ class API extends \Piwik\Plugin\API {
         $report = $reportCopy->getReportOrFail($idReport);
         $group = $this->getGroupOrFail($idGroup);
 
-        $idSite = Dao\Rows::int($report, 'idsite');
-        $logins = array_values(array_filter(
+        $logins = $reportCopy->filterReceivers(
             $this->getMembersVisibleToCurrentUser($group['idgroup']),
-            static function (string $login) use ($reportCopy, $idSite): bool {
-                return $reportCopy->canReceiveCopy($login, $idSite);
-            }
-        ));
+            Dao\Rows::int($report, 'idsite')
+        );
 
         return $reportCopy->copyToUsers($report, $logins);
     }
