@@ -24,7 +24,7 @@ use Piwik\Plugins\ScheduledReports\API as CoreScheduledReportsAPI;
  * ScheduledReports plugin deletes the user's reports for the websites, even if the user can still access them
  * through a group. The event parameters cannot be changed by other handlers, so this class saves the reports
  * that would be deleted wrongly before ScheduledReports handles the event, and restores them (with their IDs)
- * once the access change is done.
+ * right after it, in an observer of the same event with lower priority (see config/config.php).
  */
 class ReportKeeper {
     /**
@@ -76,7 +76,8 @@ class ReportKeeper {
     }
 
     /**
-     * Restores the reports remembered by keepReportsOfAccessibleSites (reports that still exist are skipped).
+     * After ScheduledReports handled `UsersManager.removeSiteAccess`: restores the reports remembered by
+     * keepReportsOfAccessibleSites (reports that still exist are skipped).
      */
     public static function restoreKeptReports(): void {
         $reports = self::$keptReports;

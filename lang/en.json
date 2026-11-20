@@ -62,6 +62,7 @@
         "ExceptionRuleDoesNotExist": "The rule %s does not exist.",
         "ExceptionSegmentNotFound": "The segment %s does not exist or you are not allowed to share it. You can only share segments you created yourself.",
         "ExceptionUserAlreadyInGroup": "User is already in group",
+        "ExceptionUserNotInGroup": "User %s is not in the group",
         "ExistingSiteGroups": "Existing website groups: %s",
         "ExternalGroup": "External group (name or DN)",
         "ExternalGroupAdded": "Users in the external group '%1$s' now become members of the group '%2$s' on their next sync.",

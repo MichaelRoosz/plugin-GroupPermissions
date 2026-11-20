@@ -35,12 +35,11 @@ class GroupAccessUpdater {
      */
     public function setAccess(int $idGroup, array $idSites, string $access, bool $reloadAccess = true): void {
         foreach ($idSites as $idSite) {
-            $this->model->removePermission($idGroup, $idSite);
-        }
-
-        // "noaccess" is not stored, it is the default when no access is specified
-        if ($access !== 'noaccess') {
-            foreach ($idSites as $idSite) {
+            // "noaccess" is not stored, it is the default when no access is specified. A role replaces the current
+            // one in a single statement, so concurrent requests never see the group without access in between.
+            if ($access === 'noaccess') {
+                $this->model->removePermission($idGroup, $idSite);
+            } else {
                 $this->model->createPermission($idGroup, $idSite, $access);
             }
         }

@@ -174,7 +174,6 @@ class AutoAccess {
             }
 
             if (!isset($existing[$idGroup]) || $role !== $existing[$idGroup]) {
-                $this->model->removePermission($idGroup, $idSite);
                 $this->model->createPermission($idGroup, $idSite, $role);
             }
 

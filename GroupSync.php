@@ -39,8 +39,10 @@ class GroupSync {
     public function syncUser(string $login, array $externalGroups): array {
         $result = ['added' => [], 'removed' => []];
 
-        // groups never apply to the anonymous user
-        if ($login === '' || $login === 'anonymous') {
+        // memberships are stored with the login of the user table (e.g. `bob` when logging in as `BOB`); users
+        // that do not exist get no memberships, and groups never apply to the anonymous user
+        $login = $this->model->getUserLogin($login);
+        if ($login === null || strcasecmp($login, 'anonymous') === 0) {
             return $result;
         }
 

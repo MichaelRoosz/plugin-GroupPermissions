@@ -61,7 +61,8 @@ class GroupUser {
 
     /**
      * Members that are existing users: users deleted while this plugin was deactivated can leave memberships behind,
-     * they are left out (like in countMembersPerGroup).
+     * they are left out (like in countMembersPerGroup). Logins are returned as stored in Matomo's user table, also
+     * for memberships stored with a different spelling (e.g. `BOB` for the user `bob`).
      *
      * @return array<array{
      *    login: string,
@@ -78,13 +79,16 @@ class GroupUser {
 
         $members = [];
         foreach ($rows as $row) {
-            $login = Rows::string($row, 'login');
-            if (isset($existing[mb_strtolower($login)])) {
-                $members[] = ['login' => $login, 'synced' => Rows::int($row, 'synced') === 1];
+            $login = $existing[Rows::string($row, 'login')] ?? null;
+            if ($login === null) {
+                continue;
             }
+            $synced = Rows::int($row, 'synced') === 1;
+            // with a binary collation, several spellings of one user could be stored: a manual membership wins
+            $members[$login] = ['login' => $login, 'synced' => $synced && ($members[$login]['synced'] ?? true)];
         }
 
-        return $members;
+        return array_values($members);
     }
 
     /**
@@ -99,15 +103,15 @@ class GroupUser {
             return Rows::string($row, 'login');
         }, $rows));
 
-        $counts = [];
+        $members = [];
         foreach ($rows as $row) {
-            if (isset($existing[mb_strtolower(Rows::string($row, 'login'))])) {
-                $idGroup = Rows::int($row, 'idgroup');
-                $counts[$idGroup] = ($counts[$idGroup] ?? 0) + 1;
+            $login = $existing[Rows::string($row, 'login')] ?? null;
+            if ($login !== null) {
+                $members[Rows::int($row, 'idgroup')][$login] = true;
             }
         }
 
-        return $counts;
+        return array_map('count', $members);
     }
 
     /**
@@ -167,24 +171,43 @@ class GroupUser {
      *
      * @param array<string> $logins
      *
-     * @return array<string, true> the lowercased logins of existing users as keys
+     * @return array<string, string> the login of the user (as stored in Matomo's user table) by given login
      */
     private function getExistingLogins(array $logins): array {
         $logins = array_values(array_unique($logins));
         $tableUser = Common::prefixTable('user');
 
-        $existing = [];
+        $usersByFolded = [];
         foreach (array_chunk($logins, 500) as $chunk) {
             $rows = Rows::list(Db::fetchAll(
                 "SELECT login FROM $tableUser WHERE login IN (" . Common::getSqlStringFieldsArray($chunk) . ')',
                 $chunk
             ));
             foreach ($rows as $row) {
-                $existing[mb_strtolower(Rows::string($row, 'login'))] = true;
+                $login = Rows::string($row, 'login');
+                $usersByFolded[mb_strtolower($login)] = $login;
             }
         }
 
-        // lowercased, so with a case-insensitive collation a membership of `Bob` finds the user `bob`
+        $existing = [];
+        foreach ($logins as $login) {
+            if (isset($usersByFolded[mb_strtolower($login)])) {
+                $existing[$login] = $usersByFolded[mb_strtolower($login)];
+
+                continue;
+            }
+            if (!$usersByFolded) {
+                continue;
+            }
+
+            // the collation may consider logins equal that differ by more than case (e.g. `bób` and `bob` with an
+            // accent-insensitive collation), and so grant the membership to the user: ask the database which user
+            $user = Db::fetchOne("SELECT login FROM $tableUser WHERE login = ?", [$login]);
+            if (is_string($user)) {
+                $existing[$login] = $user;
+            }
+        }
+
         return $existing;
     }
 }

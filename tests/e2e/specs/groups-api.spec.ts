@@ -245,6 +245,26 @@ test.describe('Group management API', () => {
       .toMatch(/doesn't exist/);
     expect(await su.expectError('GroupPermissions.removeUserFromGroup', { idGroup: 999999, login: bob }))
       .toMatch(/Group does not exist/);
+    expect(await su.expectError('GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: alice }))
+      .toMatch(/is not in the group/);
+  });
+
+  test('members are stored with the login of the user, whatever spelling is used', async () => {
+    const group = await su.createGroup('Member Spelling');
+    const [alice, bob] = [await su.createUser('spelling_alice'), await su.createUser('spelling_bob')];
+
+    await su.call('GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: alice.toUpperCase() });
+    expect(await su.members(group.idGroup)).toEqual([alice]);
+    expect(await su.expectError('GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: alice }))
+      .toMatch(/User is already in group/);
+    expect(await su.expectError('GroupPermissions.addUserToGroup', { idGroup: group.idGroup, login: 'ANONYMOUS' }))
+      .toMatch(/anonymous/i);
+
+    const synced = await su.call('GroupPermissions.syncUserGroups', { userLogin: bob.toUpperCase(), externalGroups: [] });
+    expect(synced).toEqual({ added: [], removed: [] });
+
+    await su.call('GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: alice.toUpperCase() });
+    expect(await su.members(group.idGroup)).toEqual([]);
   });
 
   test('getMembersOfGroup returns more than 100 members', async () => {

@@ -18,6 +18,7 @@ use Piwik\Plugins\GroupPermissions\Dao\GroupPermission;
 use Piwik\Plugins\GroupPermissions\Dao\GroupSegment;
 use Piwik\Plugins\GroupPermissions\Dao\GroupUser;
 use Piwik\Plugins\GroupPermissions\Dao\MultiTable;
+use Piwik\Plugins\UsersManager\Model as UsersModel;
 
 class Model {
     public function install(): void {
@@ -120,6 +121,21 @@ class Model {
     }
 
     // GroupUser
+    /**
+     * The login of a user as stored in Matomo's user table, null if no user has the login. Matomo compares logins
+     * with the collation of that table (e.g. case-insensitively), so `BOB` finds the user `bob`. Memberships are
+     * stored with this login.
+     */
+    public function getUserLogin(string $login): ?string {
+        if ($login === '') {
+            return null;
+        }
+
+        $user = (new UsersModel())->getUser($login);
+
+        return is_array($user) && is_string($user['login'] ?? null) && $user['login'] !== '' ? $user['login'] : null;
+    }
+
     public function addUserToGroup(int $idGroup, string $login, bool $synced = false): void {
         $user = new GroupUser();
         $user->addUserToGroup($idGroup, $login, $synced);

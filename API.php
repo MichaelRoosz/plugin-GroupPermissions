@@ -318,14 +318,7 @@ class API extends \Piwik\Plugin\API {
         $group = $this->getGroupOrFail($idGroup);
         $idGroup = $group['idgroup'];
 
-        if ($login === 'anonymous') {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionAnonymousNotAllowed'));
-        }
-
-        $usersManagerApi = UsersManagerAPI::getInstance();
-        if (!$usersManagerApi->userExists($login)) {
-            throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
-        }
+        $login = $this->getUserLoginOrFail($login);
 
         $memberships = $this->model->getMembershipsOfUser($login);
         if (array_key_exists($idGroup, $memberships)) {
@@ -388,10 +381,8 @@ class API extends \Piwik\Plugin\API {
                 $this->model->addUserToGroup($idGroup, $userLogin);
             }
 
-            // permissions are granted through the groups only, remove the initial direct access again (called
-            // directly, so the API.UsersManager.setUserAccess.end event that restores kept reports is not posted)
+            // permissions are granted through the groups only, remove the initial direct access again
             $usersManagerApi->setUserAccess($userLogin, 'noaccess', $initialIdSite);
-            ReportKeeper::restoreKeptReports();
         } catch (\Throwable $e) {
             // do not leave an invited user with direct website access or only some of the groups behind
             if (!$this->rollBackInvite($userLogin, $passwordConfirmation)) {
@@ -417,9 +408,12 @@ class API extends \Piwik\Plugin\API {
         $idGroup = $group['idgroup'];
 
         // memberships of users deleted while this plugin was deactivated can still be removed
-        $isMember = array_key_exists($idGroup, $this->model->getMembershipsOfUser($login));
-        if (!$isMember && !UsersManagerAPI::getInstance()->userExists($login)) {
-            throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
+        if (!array_key_exists($idGroup, $this->model->getMembershipsOfUser($login))) {
+            if ($this->model->getUserLogin($login) === null) {
+                throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
+            }
+
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionUserNotInGroup', $login));
         }
 
         SiteAccessLoss::notifyAfter([$login], function () use ($idGroup, $login): void {
@@ -822,12 +816,7 @@ class API extends \Piwik\Plugin\API {
     public function syncUserGroups(string $userLogin, $externalGroups = []): array {
         Piwik::checkUserHasSuperUserAccess();
 
-        if ($userLogin === 'anonymous') {
-            throw new Exception(Piwik::translate('GroupPermissions_ExceptionAnonymousNotAllowed'));
-        }
-        if (!UsersManagerAPI::getInstance()->userExists($userLogin)) {
-            throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $userLogin));
-        }
+        $userLogin = $this->getUserLoginOrFail($userLogin);
 
         if (is_string($externalGroups)) {
             $externalGroups = preg_split('/\r\n|\r|\n/', $externalGroups) ?: [];
@@ -1278,6 +1267,21 @@ class API extends \Piwik\Plugin\API {
             'idsegment' => $idSegment,
             'login' => $login,
         ];
+    }
+
+    /**
+     * The login of an existing user other than anonymous, as stored in Matomo's user table (see Model::getUserLogin)
+     */
+    private function getUserLoginOrFail(string $login): string {
+        $userLogin = $this->model->getUserLogin($login);
+        if ($userLogin === null) {
+            throw new Exception(Piwik::translate('UsersManager_ExceptionUserDoesNotExist', $login));
+        }
+        if (strcasecmp($userLogin, 'anonymous') === 0) {
+            throw new Exception(Piwik::translate('GroupPermissions_ExceptionAnonymousNotAllowed'));
+        }
+
+        return $userLogin;
     }
 
     /**

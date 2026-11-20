@@ -156,6 +156,21 @@ test.describe('Copy dashboard to group', () => {
       }
     });
 
+    test('members added with a different spelling of their login get a copy', async () => {
+      const spelling = await su.createGroup('Dashboard Spelling');
+      const login = await su.createUser('dash_spelling');
+      await su.call('GroupPermissions.addUserToGroup', { idGroup: spelling.idGroup, login: login.toUpperCase() });
+
+      const copiedTo = await su.call('GroupPermissions.copyDashboardToGroup', {
+        idDashboard,
+        idGroup: spelling.idGroup,
+        dashboardName: `Spelling copy ${RUN_ID}`,
+      });
+      expect(copiedTo).toEqual([login]);
+      expect(await dashboardNames(su, login)).toContain(`Spelling copy ${RUN_ID}`);
+      await su.call('GroupPermissions.deleteGroup', { idGroup: spelling.idGroup });
+    });
+
     test('empty group copies to nobody', async () => {
       const emptyGroup = await su.createGroup('Empty Dashboard Group');
       expect(await su.call('GroupPermissions.copyDashboardToGroup', { idDashboard, idGroup: emptyGroup.idGroup })).toEqual([]);

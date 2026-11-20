@@ -31,7 +31,10 @@ Fixes:
   - Users deleted while the plugin was deactivated are no longer listed as members (they were shown as active and removing them failed); their memberships can still be removed via the API
   - Users losing all access to a website through a group change trigger `UsersManager.removeSiteAccess` like direct access changes, so e.g. their scheduled reports for the website are deleted
   - Automatic access URL patterns with a port (e.g. `example.com:8080`) match websites with that port; URLs without a port have the default port of their scheme (`example.com:443` matches `https://example.com`)
-  - Removing the direct access of a user no longer deletes their scheduled reports for websites they can still access through a group
+  - Removing the direct access of a user no longer deletes their scheduled reports for websites they can still access through a group, also when other plugins remove the access directly
+  - Members are stored with the login of the user (adding `BOB` adds the user `bob`), so dashboards and reports copied to a group no longer skip them; existing memberships with a different spelling are listed with the login of the user
+  - `removeUserFromGroup` fails for users that are not in the group
+  - Changing the role of a group no longer removes its access for a moment
   - Saving the website form only changes the group roles changed in the form, roles changed by others while it was open are kept
   - Members are listed and counted when the tables of the plugin and of Matomo have different collations (e.g. after a MySQL upgrade)
   - `removeExternalGroupMapping` and `removeAutoAccessRule` fail for mappings and rules that do not exist, `getMembersOfGroup` for groups that do not exist

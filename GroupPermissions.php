@@ -70,7 +70,6 @@ class GroupPermissions extends Plugin {
             'API.SegmentEditor.getAll.end'           => 'addSharedSegments',
             'API.SegmentEditor.delete.end'           => 'deleteSegment',
             'API.SitesManager.getSitesIdFromSiteUrl.end' => 'addGroupSitesFromSiteUrl',
-            'API.UsersManager.setUserAccess.end'     => 'restoreKeptReports',
             // integration point for login plugins (e.g. SAML): sync the groups of a user with their external groups
             'GroupPermissions.syncUserGroups'        => 'syncUserGroups',
             'Login.authenticate.successful'          => 'syncGroupsAfterLogin',
@@ -456,9 +455,11 @@ class GroupPermissions extends Plugin {
         }
 
         try {
-            $logins = array_values(array_diff(
+            $logins = array_values(array_filter(
                 (new Model())->getLoginsWithRoleForSite((int) $idSite, ['write', 'admin']),
-                ['anonymous']
+                static function (string $login): bool {
+                    return strcasecmp($login, 'anonymous') !== 0;
+                }
             ));
             if (!$logins) {
                 return;
@@ -494,7 +495,8 @@ class GroupPermissions extends Plugin {
     /**
      * Matomo posts `UsersManager.removeSiteAccess` when direct access is removed, even if the user can still access
      * the websites through a group. Saves the scheduled reports of the user for those websites, which the
-     * ScheduledReports plugin deletes on this event, see restoreKeptReports.
+     * ScheduledReports plugin deletes on this event. An observer registered in config/config.php restores them
+     * after the ScheduledReports plugin handled the event.
      *
      * @param mixed $login
      * @param mixed $idSites
@@ -505,13 +507,6 @@ class GroupPermissions extends Plugin {
         }
 
         ReportKeeper::keepReportsOfAccessibleSites($login, $idSites);
-    }
-
-    /**
-     * Restores the reports saved by keepReportsOfAccessibleSites once `UsersManager.setUserAccess` is done
-     */
-    public function restoreKeptReports(): void {
-        ReportKeeper::restoreKeptReports();
     }
 
     /**
