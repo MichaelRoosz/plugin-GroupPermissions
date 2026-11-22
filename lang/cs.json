@@ -32,7 +32,7 @@
         "DeleteGroupConfirm": "Opravdu chcete odstranit skupinu \"%s\"?",
         "DeleteGroupDescription": "Smazáním skupiny odeberete přístup, který jejím členům poskytovala. Samotní uživatelé smazáni nebudou.",
         "DescriptionAccessTab": "Rozhodněte, které skupiny mají přístup k vašim webovým stránkám. Přístup ke všem webovým stránkám můžete také udělit najednou výběrem možnosti \"Použít na všechny webové stránky\" ve voliči webových stránek.",
-        "DescriptionGroupsTab": "Zde si můžete prohlédnout členy jednotlivých skupin. Superuživatelé mohou skupiny upravovat.",
+        "DescriptionGroupsTab": "Vytvářejte skupiny, přidávejte do nich uživatele a udělujte skupinám přístup k webům. Každý člen získá přístup všech svých skupin (přednost má nejvyšší role).",
         "EditGroup": "Upravit skupinu ‚%s‘",
         "ExceptionAnonymousNotAllowed": "Anonymního uživatele nelze přidat do skupiny.",
         "ExceptionEmptyExternalGroup": "Zadejte název nebo rozlišující název (DN) externí skupiny.",
