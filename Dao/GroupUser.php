@@ -194,6 +194,62 @@ class GroupUser {
     }
 
     /**
+     * Removes the memberships of a user Matomo has just deleted (`UsersManager.deleteUser` is posted after the user
+     * row is gone, so the login of the user table cannot be looked up anymore). Removes every stored spelling of the
+     * login that no longer belongs to an existing user (see getStoredLoginsOfDeletedUser), compared exactly: a
+     * `login = ?` delete would also remove the memberships of another user the collation of this table considers
+     * equal (e.g. `bob` when `BOB` was deleted from a user table with a binary collation).
+     */
+    public function removeMembershipsOfDeletedUser(string $login): void {
+        $table = $this->tablePrefixed;
+
+        foreach ($this->getStoredLoginsOfDeletedUser($table, 'login', $login) as $storedLogin) {
+            Db::query(
+                "DELETE FROM $table WHERE login = ? AND CAST(login AS BINARY) = CAST(? AS BINARY)",
+                [$storedLogin, $storedLogin]
+            );
+        }
+    }
+
+    /**
+     * The values of a login column that belong to a deleted user: equal to the login case-insensitively or according
+     * to the collation of the column, and not equal to the login of an existing user according to the collation of the
+     * user table.
+     *
+     * @param string $table prefixed table name
+     * @param string $column login column of the table
+     *
+     * @return array<string>
+     */
+    public function getStoredLoginsOfDeletedUser(string $table, string $column, string $login): array {
+        if ($login === '') {
+            return [];
+        }
+
+        $folded = mb_strtolower($login);
+        $candidates = [];
+        $rows = Rows::list(Db::fetchAll("SELECT DISTINCT `$column` AS login, `$column` = ? AS equal FROM $table", [$login]));
+        foreach ($rows as $row) {
+            $storedLogin = Rows::string($row, 'login');
+            $equal = is_numeric($row['equal'] ?? null) && (int) $row['equal'] === 1;
+            if ($equal || mb_strtolower($storedLogin) === $folded) {
+                $candidates[$storedLogin] = $storedLogin;
+            }
+        }
+        if (!$candidates) {
+            return [];
+        }
+
+        // asks the user table itself (not case-folded like getExistingLogins): with a binary collation `bob` and `BOB`
+        // can be two users
+        $existing = $this->getUsersEqualToLogins(array_values($candidates));
+
+        return array_values(array_filter($candidates, static function (string $storedLogin) use ($existing): bool {
+            return !isset($existing[$storedLogin]);
+        }));
+    }
+
+    /**
      * Rewrites memberships stored with another spelling of the login (e.g. `BOB` for the user `bob`, added by versions
      * before 5.3.0) to the login of Matomo's user table. Access checks compare the login with the collation of this
      * table: with a binary one, such a membership was listed for the user but never granted access, and the group

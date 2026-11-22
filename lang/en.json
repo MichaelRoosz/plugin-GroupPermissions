@@ -88,6 +88,7 @@
         "InviteUserButton": "Invite User",
         "InviteUserDescription": "Invite a new user by email and add them directly to the selected groups. The user gets access to websites through these groups only.",
         "InviteUserIntoGroup": "Invite a new user into this group",
+        "InviteUserNoWebsiteWarning": "None of the selected groups has access to a website yet. Matomo requires a website for the invitation, so the invitation email will name another website, which the user will not have access to.",
         "InviteUserSuccess": "The user '%s' has been invited and added to the selected groups.",
         "ManageAccess": "Manage Access",
         "ManageGroup": "Manage group",

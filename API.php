@@ -343,7 +343,8 @@ class API extends \Piwik\Plugin\API {
      * Matomo core requires an initial website when inviting a user. This method picks a website the
      * selected groups have access to (so the invitation email mentions a relevant site), invites the
      * user via UsersManager.inviteUser, then removes that direct website access again so the user's
-     * permissions come only from the groups.
+     * permissions come only from the groups. If none of the groups has access to a website, any existing website
+     * is used: the invitation email then names a website the user has no access to.
      *
      * @param string $userLogin Login name for the invited user.
      * @param string $email Email address for the invited user.
@@ -635,7 +636,8 @@ class API extends \Piwik\Plugin\API {
      *                        without `/` are compared with the host only (e.g. `*.example.com`), others with host and
      *                        path (e.g. `example.com/shop*`). The port of the URLs is only compared for patterns
      *                        with a port (e.g. `example.com:8080`), URLs without a port have the default port
-     *                        of their scheme (80 or 443)
+     *                        of their scheme (80 or 443). At most 255 characters as stored by Matomo, which counts
+     *                        characters like `&` or `"` as their HTML entities (`&amp;`, `&quot;`)
      * @param string $access Role to give, e.g. "view", "write" or "admin"
      * @param string|array<string> $capabilities Optional capabilities to give in addition to the role (e.g.
      *                                           `tagmanager_write`), see "UsersManager.getAvailableCapabilities"
@@ -662,6 +664,8 @@ class API extends \Piwik\Plugin\API {
         if ($pattern === '') {
             throw new Exception(Piwik::translate('GroupPermissions_ExceptionEmptyPattern'));
         }
+        // checked (and below compared with existing rules) on the sanitized value Matomo stores, like group names:
+        // the column holds the sanitized value, and sanitizing is one-to-one, so comparing is the same as unsanitized
         if (mb_strlen($pattern) > Dao\GroupAutoAccess::PATTERN_MAX_LENGTH) {
             throw new Exception(Piwik::translate(
                 'GroupPermissions_ExceptionPatternTooLong',

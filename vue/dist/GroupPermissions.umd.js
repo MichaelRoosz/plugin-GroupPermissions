@@ -5298,31 +5298,33 @@ GroupSettingsvue_type_script_lang_ts.render = GroupSettingsvue_type_template_id_
 GroupEditvue_type_script_lang_ts.render = GroupEditvue_type_template_id_f9e0f616_render
 
 /* harmony default export */ var GroupEdit = (GroupEditvue_type_script_lang_ts);
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/InviteUser.vue?vue&type=template&id=f056124c
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/InviteUser.vue?vue&type=template&id=7c008fa4
 
-var InviteUservue_type_template_id_f056124c_hoisted_1 = {
+var InviteUservue_type_template_id_7c008fa4_hoisted_1 = {
   class: "groupPermissionsIntro"
 };
-var InviteUservue_type_template_id_f056124c_hoisted_2 = {
+var InviteUservue_type_template_id_7c008fa4_hoisted_2 = {
   class: "groupPermissionsInviteGroups"
 };
-var InviteUservue_type_template_id_f056124c_hoisted_3 = {
+var InviteUservue_type_template_id_7c008fa4_hoisted_3 = {
   class: "fieldRadioTitle"
 };
-var InviteUservue_type_template_id_f056124c_hoisted_4 = {
+var InviteUservue_type_template_id_7c008fa4_hoisted_4 = {
   class: "groupPermissionsCheckboxList"
 };
-var InviteUservue_type_template_id_f056124c_hoisted_5 = ["value", "name"];
+var InviteUservue_type_template_id_7c008fa4_hoisted_5 = ["value", "name"];
 
-var InviteUservue_type_template_id_f056124c_hoisted_6 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
+var InviteUservue_type_template_id_7c008fa4_hoisted_6 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", {
   id: "ajaxErrorInviteUser"
 }, null, -1);
 
-var InviteUservue_type_template_id_f056124c_hoisted_7 = {
+var InviteUservue_type_template_id_7c008fa4_hoisted_7 = {
   class: "groupPermissionsFormActions"
 };
-function InviteUservue_type_template_id_f056124c_render(_ctx, _cache, $props, $setup, $data, $options) {
+function InviteUservue_type_template_id_7c008fa4_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_TextField = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("TextField");
+
+  var _component_Notification = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("Notification");
 
   var _component_SaveButton = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("SaveButton");
 
@@ -5335,7 +5337,7 @@ function InviteUservue_type_template_id_f056124c_render(_ctx, _cache, $props, $s
     "content-title": _ctx.translate('GroupPermissions_InviteUser')
   }, {
     default: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withCtx"])(function () {
-      return [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", InviteUservue_type_template_id_f056124c_hoisted_1, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_InviteUserDescription')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("form", {
+      return [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("p", InviteUservue_type_template_id_7c008fa4_hoisted_1, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_InviteUserDescription')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("form", {
         onSubmit: _cache[5] || (_cache[5] = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withModifiers"])(function ($event) {
           return _ctx.requestInvite();
         }, ["prevent"])),
@@ -5357,7 +5359,7 @@ function InviteUservue_type_template_id_f056124c_render(_ctx, _cache, $props, $s
         }),
         title: _ctx.translate('UsersManager_Email'),
         maxlength: 100
-      }, null, 8, ["model-value", "title"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", InviteUservue_type_template_id_f056124c_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("label", InviteUservue_type_template_id_f056124c_hoisted_3, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_Groups')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", InviteUservue_type_template_id_f056124c_hoisted_4, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.groups, function (group) {
+      }, null, 8, ["model-value", "title"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", InviteUservue_type_template_id_7c008fa4_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("label", InviteUservue_type_template_id_7c008fa4_hoisted_3, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_Groups')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", InviteUservue_type_template_id_7c008fa4_hoisted_4, [(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.groups, function (group) {
         return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("p", {
           key: group.idGroup,
           class: "checkbox"
@@ -5368,8 +5370,18 @@ function InviteUservue_type_template_id_f056124c_render(_ctx, _cache, $props, $s
             return _ctx.selectedGroupIds = $event;
           }),
           name: "groupPermissionsInviteGroup".concat(group.idGroup)
-        }, null, 8, InviteUservue_type_template_id_f056124c_hoisted_5), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vModelCheckbox"], _ctx.selectedGroupIds]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(group.name), 1)])]);
-      }), 128))])]), InviteUservue_type_template_id_f056124c_hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", InviteUservue_type_template_id_f056124c_hoisted_7, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_SaveButton, {
+        }, null, 8, InviteUservue_type_template_id_7c008fa4_hoisted_5), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vModelCheckbox"], _ctx.selectedGroupIds]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(group.name), 1)])]);
+      }), 128))])]), _ctx.selectedGroupsHaveNoSites ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_Notification, {
+        key: 0,
+        context: "warning",
+        type: "persistent",
+        noclear: true
+      }, {
+        default: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withCtx"])(function () {
+          return [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('GroupPermissions_InviteUserNoWebsiteWarning')), 1)];
+        }),
+        _: 1
+      })) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), InviteUservue_type_template_id_7c008fa4_hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", InviteUservue_type_template_id_7c008fa4_hoisted_7, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_SaveButton, {
         class: "groupPermissionsSendInvite",
         value: _ctx.translate('GroupPermissions_InviteUserButton'),
         saving: _ctx.isInvitingUser,
@@ -5394,7 +5406,7 @@ function InviteUservue_type_template_id_f056124c_render(_ctx, _cache, $props, $s
     _: 1
   }, 8, ["content-title"]);
 }
-// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/InviteUser.vue?vue&type=template&id=f056124c
+// CONCATENATED MODULE: ./plugins/GroupPermissions/vue/src/GroupPermissions/InviteUser.vue?vue&type=template&id=7c008fa4
 
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/InviteUser.vue?vue&type=script&lang=ts
 function InviteUservue_type_script_lang_ts_toConsumableArray(arr) { return InviteUservue_type_script_lang_ts_arrayWithoutHoles(arr) || InviteUservue_type_script_lang_ts_iterableToArray(arr) || InviteUservue_type_script_lang_ts_unsupportedIterableToArray(arr) || InviteUservue_type_script_lang_ts_nonIterableSpread(); }
@@ -5417,6 +5429,7 @@ function InviteUservue_type_script_lang_ts_arrayLikeToArray(arr, len) { if (len 
 /* harmony default export */ var InviteUservue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
     ContentBlock: external_CoreHome_["ContentBlock"],
+    Notification: external_CoreHome_["Notification"],
     TextField: TextField,
     PasswordConfirmation: external_CorePluginsAdmin_["PasswordConfirmation"],
     SaveButton: external_CorePluginsAdmin_["SaveButton"]
@@ -5446,6 +5459,17 @@ function InviteUservue_type_script_lang_ts_arrayLikeToArray(arr, len) { if (len 
   computed: {
     canInvite: function canInvite() {
       return !this.isInvitingUser && this.userLogin.trim() !== '' && this.email.trim() !== '' && this.selectedGroupIds.length > 0;
+    },
+    selectedGroupsHaveNoSites: function selectedGroupsHaveNoSites() {
+      var _this = this;
+
+      // the server then invites with another website, which Matomo names in the invitation email
+      var selected = this.groups.filter(function (g) {
+        return _this.selectedGroupIds.includes(g.idGroup);
+      });
+      return selected.length > 0 && selected.every(function (g) {
+        return g.siteCount === 0;
+      });
     }
   },
   watch: {
@@ -5465,7 +5489,7 @@ function InviteUservue_type_script_lang_ts_arrayLikeToArray(arr, len) { if (len 
       }
     },
     inviteUser: function inviteUser(passwordConfirmation) {
-      var _this = this;
+      var _this2 = this;
 
       this.isInvitingUser = true;
       var userLogin = this.userLogin.trim();
@@ -5484,12 +5508,12 @@ function InviteUservue_type_script_lang_ts_arrayLikeToArray(arr, len) { if (len 
       }).then(function () {
         notifySuccess('groupPermissionsUserInvited', 'GroupPermissions_InviteUserSuccess', userLogin);
 
-        _this.$emit('user-invited', {
+        _this2.$emit('user-invited', {
           login: userLogin,
           idGroups: idGroups
         });
       }).finally(function () {
-        _this.isInvitingUser = false;
+        _this2.isInvitingUser = false;
       });
     }
   }
@@ -5500,7 +5524,7 @@ function InviteUservue_type_script_lang_ts_arrayLikeToArray(arr, len) { if (len 
 
 
 
-InviteUservue_type_script_lang_ts.render = InviteUservue_type_template_id_f056124c_render
+InviteUservue_type_script_lang_ts.render = InviteUservue_type_template_id_7c008fa4_render
 
 /* harmony default export */ var InviteUser = (InviteUservue_type_script_lang_ts);
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/GroupPermissions/vue/src/GroupPermissions/TabManageGroups.vue?vue&type=script&lang=ts

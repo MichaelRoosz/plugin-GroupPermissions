@@ -42,6 +42,8 @@ Fixes:
   - `getSitesAccessFromGroup` loads the website names with one query
   - Manage Access with "Apply to all websites" can remove the access of a group from all websites ("No access") and apply the same role again
   - Deleting a group is all or nothing
+  - Deleting a user with another spelling of the login (e.g. `BOB` for `bob`) removes their memberships and segment shares, and never those of another user the database considers equal
+  - Inviting a user into groups without website access shows a warning: Matomo's invitation email then names another website
   - Website IDs that do not exist are rejected; better error messages for invalid access values
   - Manage Access opens with the website from the URL
   - Updated translations

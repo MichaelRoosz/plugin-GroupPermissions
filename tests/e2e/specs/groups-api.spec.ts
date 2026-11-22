@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { MatomoApi } from '../helpers/api';
-import { RUN_ID } from '../helpers/env';
+import { DEFAULT_PASSWORD, RUN_ID } from '../helpers/env';
 
 /**
  * Group management API: create, rename, delete groups and manage their members.
@@ -265,6 +265,32 @@ test.describe('Group management API', () => {
 
     await su.call('GroupPermissions.removeUserFromGroup', { idGroup: group.idGroup, login: alice.toUpperCase() });
     expect(await su.members(group.idGroup)).toEqual([]);
+  });
+
+  test('deleting a user with another spelling of the login removes only their memberships', async () => {
+    const group = await su.createGroup('Delete spelling');
+    const gone = await su.createUser('delete_spelling_gone');
+    const kept = await su.createUser('delete_spelling_kept');
+    await su.addMembers(group.idGroup, [gone, kept]);
+    await su.setGroupAccess(group.name, 'admin', 1);
+
+    const idSegment = Number((await su.call('SegmentEditor.add', {
+      name: `Spelling ${RUN_ID}`, definition: `pageUrl=@delete-spelling-${RUN_ID}`, idSite: 1,
+    })).value);
+    await su.call('GroupPermissions.shareSegmentWithGroup', { idSegment, idGroup: group.idGroup });
+
+    await su.deleteUser(gone.toUpperCase());
+
+    expect(await su.members(group.idGroup)).toEqual([kept]);
+    // a new user with the login does not inherit anything
+    await su.call('UsersManager.addUser', {
+      userLogin: gone, password: DEFAULT_PASSWORD, email: `${gone}_new@example.org`, initialIdSite: 1,
+    });
+    expect(await su.members(group.idGroup)).toEqual([kept]);
+    // shares made by other users are kept
+    const shared: Array<{ idGroup: number }> = await su.call('GroupPermissions.getGroupsOfSegment', { idSegment });
+    expect(shared.map((g) => g.idGroup)).toEqual([group.idGroup]);
+    await su.deleteUser(gone);
   });
 
   test('getMembersOfGroup returns more than 100 members', async () => {

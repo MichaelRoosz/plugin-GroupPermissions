@@ -54,6 +54,15 @@
         </div>
       </div>
 
+      <Notification
+        v-if="selectedGroupsHaveNoSites"
+        context="warning"
+        type="persistent"
+        :noclear="true"
+      >
+        {{ translate('GroupPermissions_InviteUserNoWebsiteWarning') }}
+      </Notification>
+
       <div id="ajaxErrorInviteUser"></div>
 
       <div class="groupPermissionsFormActions">
@@ -82,23 +91,25 @@ import { defineComponent, PropType } from 'vue';
 import {
   AjaxHelper,
   ContentBlock,
+  Notification,
   translate,
 } from 'CoreHome';
 import { PasswordConfirmation, SaveButton } from 'CorePluginsAdmin';
 import TextField from './TextField.vue';
 import { notifySuccess } from './notify';
-import { Group } from './types';
+import { GroupOverview } from './types';
 
 export default defineComponent({
   components: {
     ContentBlock,
+    Notification,
     TextField,
     PasswordConfirmation,
     SaveButton,
   },
   props: {
     groups: {
-      type: Array as PropType<Group[]>,
+      type: Array as PropType<GroupOverview[]>,
       required: true,
     },
     preselectedGroupIds: {
@@ -123,12 +134,17 @@ export default defineComponent({
         && this.email.trim() !== ''
         && this.selectedGroupIds.length > 0;
     },
+    selectedGroupsHaveNoSites(): boolean {
+      // the server then invites with another website, which Matomo names in the invitation email
+      const selected = this.groups.filter((g) => this.selectedGroupIds.includes(g.idGroup));
+      return selected.length > 0 && selected.every((g) => g.siteCount === 0);
+    },
   },
   watch: {
-    groups(newGroups: Group[]) {
+    groups(newGroups: GroupOverview[]) {
       // drop selected groups that were deleted in the meantime
       this.selectedGroupIds = this.selectedGroupIds.filter(
-        (id: number) => newGroups.some((g: Group) => g.idGroup === id),
+        (id: number) => newGroups.some((g: GroupOverview) => g.idGroup === id),
       );
     },
   },

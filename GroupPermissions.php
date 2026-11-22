@@ -183,6 +183,7 @@ class GroupPermissions extends Plugin {
         $translations[] = 'GroupPermissions_InviteUserButton';
         $translations[] = 'GroupPermissions_InviteUserDescription';
         $translations[] = 'GroupPermissions_InviteUserIntoGroup';
+        $translations[] = 'GroupPermissions_InviteUserNoWebsiteWarning';
         $translations[] = 'GroupPermissions_InviteUserSuccess';
         $translations[] = 'GroupPermissions_ManageGroups';
         $translations[] = 'GroupPermissions_MatchType';
@@ -550,11 +551,12 @@ class GroupPermissions extends Plugin {
 
     /**
      * Delete group preferences associated with a particular user: their memberships and the segment shares they made
-     * (which would otherwise apply again to a new user with the same login)
+     * (which would otherwise apply again to a new user with the same login). Posted after the user was deleted, with
+     * the login as given to UsersManager.deleteUser, which may be spelled differently than the stored one.
      */
     public function deleteUser(string $login): void {
         $model = new Model();
-        $model->removeUserFromAllGroups($login);
-        $model->removeAllSegmentSharesByUser($login);
+        $model->removeMembershipsOfDeletedUser($login);
+        $model->removeAllSegmentSharesByDeletedUser($login);
     }
 }

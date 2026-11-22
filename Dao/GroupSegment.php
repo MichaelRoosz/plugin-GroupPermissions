@@ -134,4 +134,18 @@ class GroupSegment {
     public function removeAllSharesByUser(string $login): void {
         Db::query("DELETE FROM `{$this->tablePrefixed}` WHERE shared_by = ?", [$login]);
     }
+
+    /**
+     * Removes the shares made by a user Matomo has just deleted, see GroupUser::removeMembershipsOfDeletedUser
+     */
+    public function removeAllSharesByDeletedUser(string $login): void {
+        $table = $this->tablePrefixed;
+
+        foreach ((new GroupUser())->getStoredLoginsOfDeletedUser($table, 'shared_by', $login) as $storedLogin) {
+            Db::query(
+                "DELETE FROM `$table` WHERE shared_by = ? AND CAST(shared_by AS BINARY) = CAST(? AS BINARY)",
+                [$storedLogin, $storedLogin]
+            );
+        }
+    }
 }

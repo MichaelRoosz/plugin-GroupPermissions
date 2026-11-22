@@ -131,6 +131,25 @@ test.describe('Invite user to groups', () => {
       await expect(inviteButton(page)).toBeDisabled();
     });
 
+    test('warns when none of the selected groups has access to a website', async ({ page }) => {
+      await page.goto(inviteUrl);
+      const warning = form(page).locator('.notification', { hasText: 'None of the selected groups has access to a website' });
+      await expect(form(page)).toBeVisible();
+      await expect(warning).toHaveCount(0);
+
+      await toggleGroup(page, empty.idGroup, true);
+      await expect(warning).toBeVisible();
+      await screenshot(form(page), 'invite-user-no-website-warning');
+
+      // one group with website access is enough
+      await toggleGroup(page, sales.idGroup, true);
+      await expect(warning).toHaveCount(0);
+      await toggleGroup(page, sales.idGroup, false);
+      await expect(warning).toBeVisible();
+      await toggleGroup(page, empty.idGroup, false);
+      await expect(warning).toHaveCount(0);
+    });
+
     test('cancelling or a wrong password does not invite anybody', async ({ page }) => {
       const login = `invited_cancel_${RUN_ID}`;
       await page.goto(inviteUrl);
