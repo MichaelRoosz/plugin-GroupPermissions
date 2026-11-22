@@ -76,7 +76,7 @@
         "GroupRenamed": "组已重命名为 '%s'。",
         "GroupSync": "目录同步",
         "GroupSyncDescription": "当用户的组被同步时，属于这些外部组之一的用户会自动成为此组的成员：在他们通过 LDAP、OpenID Connect 或 SAML 登录时（如果已在常规设置中启用），在其他登录插件触发同步时，或通过 API 方法 GroupPermissions.syncUserGroups。由同步添加的成员在不再属于已映射的组时会被再次移除；手动添加的成员将保留。",
-        "GroupSyncHelpNames": "输入身份提供商发送的组名称（例如 groups 声明或 SAML 属性的值），或 LDAP 组的可分辨名称。名称不区分大小写，像 CN=Matomo Admins,OU=Groups,DC=example,DC=com 这样的 DN 也会匹配其第一个值（Matomo Admins）。",
+        "GroupSyncHelpNames": "输入身份提供商发送的组名称（例如 groups 声明或 SAML 属性的值），或 LDAP 组的可分辨名称。名称不区分大小写。像 Matomo Admins 这样的普通名称也会匹配第一个值为此名称的 LDAP 组（例如 CN=Matomo Admins,OU=Groups,DC=example,DC=com），而 DN 只匹配完全相同的 DN。",
         "GroupSyncPlainNameWarning": "%1$s：不带可分辨名称的名称还会匹配目录中任何位置第一个值为此名称的每个 LDAP 组（例如 CN=Admins,OU=Staff,... 和 CN=Admins,OU=Contractors,...）。这些 LDAP 组中任意一个组的用户都会成为成员。如果您从 LDAP 同步，请改为映射完整的可分辨名称。",
         "Groups": "组",
         "IncludedInGroupRole": "已包含在该组的角色中",

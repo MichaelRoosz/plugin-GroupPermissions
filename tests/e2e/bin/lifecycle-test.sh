@@ -82,6 +82,8 @@ for login in "$gone_member" "$reborn_member"; do
     su GroupPermissions.addUserToGroup --data-urlencode "idGroup=$id_group" --data-urlencode "login=$login" >/dev/null
 done
 check "member sees both websites through the group" "$id_site,$gone_site" "$(member_sites)"
+# a segment share made by a user deleted while the plugin is deactivated
+sql "INSERT INTO matomo_gpermissions_segment (idgroup, idsegment, shared_by) VALUES ($id_group, 999999, '$gone_member')"
 
 echo "==> Deactivating the plugin"
 mexec ./console plugin:deactivate GroupPermissions >/dev/null
@@ -93,10 +95,14 @@ for login in "$gone_member" "$reborn_member"; do
     su UsersManager.deleteUser --data-urlencode "userLogin=$login" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
 done
 check "group access to the deleted website is left behind" "2" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_access WHERE idsite = $gone_site")"
+check "memberships of the deleted users are left behind" "2" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_user WHERE login IN ('$gone_member', '$reborn_member')")"
 
 echo "==> Activating the plugin again"
 mexec ./console plugin:activate GroupPermissions >/dev/null
 check "group access applies again" "$id_site" "$(member_sites)"
+check "activating removes the memberships of the deleted users" "0" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_user WHERE login IN ('$gone_member', '$reborn_member')")"
+check "activating removes the segment shares of the deleted users" "0" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_segment WHERE shared_by = '$gone_member'")"
+check "activating keeps the memberships of existing users" "1" "$(sql "SELECT COUNT(*) FROM matomo_gpermissions_user WHERE login = '$member'")"
 check "the overview does not count the deleted website" "1" "$(su GroupPermissions.getGroupsOverview --data-urlencode "filter_limit=-1" \
     | grep -cE "\"idGroup\":$id_group,\"name\":\"[^\"]*\",\"memberCount\":[0-9]+,\"siteCount\":1}" || true)"
 check "the websites of the group leave out the deleted website" "$id_site" "$(su GroupPermissions.getSitesAccessFromGroup \
@@ -109,6 +115,8 @@ check "users can be invited to a group with only the deleted website" "1" "$(su 
     --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" | grep -c '"success"' || true)"
 su UsersManager.deleteUser --data-urlencode "userLogin=$invited" --data-urlencode "passwordConfirmation=$SUPERUSER_PASSWORD" >/dev/null
 check "group still has its member" "1" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$member\"")"
+# e.g. a membership left behind because the cleanup on activation failed
+sql "INSERT INTO matomo_gpermissions_user (idgroup, login) VALUES ($id_group, '$gone_member'), ($id_group, '$reborn_member')"
 check "the members of the group leave out the deleted user" "0" "$(su GroupPermissions.getMembersOfGroup --data-urlencode "idGroup=$id_group" | grep -c "\"$gone_member\"" || true)"
 check "membership of a deleted user can be removed" "1" "$(su GroupPermissions.removeUserFromGroup --data-urlencode "idGroup=$id_group" \
     --data-urlencode "login=$gone_member" | grep -c '"success"' || true)"

@@ -96,13 +96,24 @@ test.describe('Group sync from external directories', () => {
     })).toContain('is not mapped to this group');
   });
 
-  test('sync adds the user to mapped groups, matching a DN by its first value and names case-insensitively', async () => {
+  test('sync adds the user to mapped groups, matching DNs and names case-insensitively', async () => {
     const user = await su.createUser('sync_user');
     const userApi = await MatomoApi.forUser(user, DEFAULT_PASSWORD);
     expect(await userApi.call('SitesManager.getSitesIdWithAdminAccess')).toEqual([]);
 
-    // the IdP sends only the CN of the DN, in a different case; unknown groups are ignored
-    const result = await sync(user, [`matomo admins ${RUN_ID}`, editorsName.toUpperCase(), 'Unrelated']);
+    // a mapped DN pins the group to one location: neither its plain first value nor the same CN elsewhere match
+    expect(await sync(user, [
+      `matomo admins ${RUN_ID}`,
+      `CN=Matomo Admins ${RUN_ID},OU=Other,DC=example,DC=com`,
+    ])).toEqual({ added: [], removed: [] });
+
+    // the DN in a different case and with spaces after the separators, a name in a different case; unknown groups
+    // are ignored
+    const result = await sync(user, [
+      `cn=matomo admins ${RUN_ID}, ou=groups, dc=example, dc=com`,
+      editorsName.toUpperCase(),
+      'Unrelated',
+    ]);
     expect(result.added.sort()).toEqual([admins.name, editors.name].sort());
     expect(result.removed).toEqual([]);
 
@@ -111,7 +122,7 @@ test.describe('Group sync from external directories', () => {
     // the synced membership grants the access of the group
     expect(await userApi.call('SitesManager.getSitesIdWithAdminAccess')).toEqual([idSite]);
 
-    // a second sync with the same groups changes nothing; the full DN matches too
+    // a second sync with the same groups changes nothing
     expect(await sync(user, [adminsDn, editorsName])).toEqual({ added: [], removed: [] });
   });
 
@@ -263,7 +274,7 @@ test.describe('Group sync from external directories', () => {
       // a synced member is marked in the member list, a manual one is not
       const syncedUser = await su.createUser('sync_ui_synced');
       const manualUser = await su.createUser('sync_ui_manual');
-      await sync(syncedUser, [`sync ui ${RUN_ID}`]);
+      await sync(syncedUser, [external.toLowerCase()]);
       await su.addMembers(group.idGroup, [manualUser]);
       await switchEditorTab(page, 'members');
       await expect(memberRow(page, syncedUser).locator('.groupPermissionsSyncedBadge')).toHaveText('synced');

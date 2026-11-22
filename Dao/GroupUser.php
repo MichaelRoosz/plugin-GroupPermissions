@@ -212,6 +212,47 @@ class GroupUser {
     }
 
     /**
+     * Removes the memberships of all users that no longer exist, e.g. deleted while this plugin was deactivated (the
+     * `UsersManager.deleteUser` event that removes them was not handled then).
+     */
+    public function removeMembershipsOfMissingUsers(): void {
+        $table = $this->tablePrefixed;
+
+        foreach ($this->getStoredLoginsOfMissingUsers($table, 'login') as $storedLogin) {
+            Db::query(
+                "DELETE FROM $table WHERE login = ? AND CAST(login AS BINARY) = CAST(? AS BINARY)",
+                [$storedLogin, $storedLogin]
+            );
+        }
+    }
+
+    /**
+     * The values of a login column that do not belong to an existing user (compared like getExistingLogins)
+     *
+     * @param string $table prefixed table name
+     * @param string $column login column of the table
+     *
+     * @return array<string>
+     */
+    public function getStoredLoginsOfMissingUsers(string $table, string $column): array {
+        // not `SELECT DISTINCT`, see getStoredLoginsOfDeletedUser
+        $storedLogins = [];
+        foreach (Rows::list(Db::fetchAll("SELECT `$column` AS login FROM $table")) as $row) {
+            $storedLogin = Rows::string($row, 'login');
+            $storedLogins[$storedLogin] = $storedLogin;
+        }
+        if (!$storedLogins) {
+            return [];
+        }
+
+        $existing = $this->getExistingLogins(array_values($storedLogins));
+
+        return array_values(array_filter($storedLogins, static function (string $storedLogin) use ($existing): bool {
+            return !isset($existing[$storedLogin]);
+        }));
+    }
+
+    /**
      * The values of a login column that belong to a deleted user: equal to the login case-insensitively or according
      * to the collation of the column, and not equal to the login of an existing user according to the collation of the
      * user table.

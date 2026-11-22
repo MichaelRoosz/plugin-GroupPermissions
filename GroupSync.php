@@ -17,9 +17,10 @@ namespace Piwik\Plugins\GroupPermissions;
  * member of every group mapped to one of their external groups and removes them from groups they were added to
  * by an earlier sync but are no longer entitled to. Memberships added manually are never removed.
  *
- * External group names are compared case-insensitively. For a distinguished name like
- * `CN=Matomo Admins,OU=Groups,DC=example,DC=com` both the full DN and the value of its first component
- * (`Matomo Admins`) match.
+ * External group names are compared case-insensitively. A mapped plain name like `Matomo Admins` also matches
+ * distinguished names whose first component has this value (e.g. `CN=Matomo Admins,OU=Groups,DC=example,DC=com`).
+ * A mapped DN only matches that DN: it pins the group to one location in the directory, so a plain name (e.g. sent
+ * by an identity provider where users can name their own groups) never matches it.
  *
  * Callers are responsible for access checks.
  */
@@ -117,9 +118,10 @@ class GroupSync {
 
     /**
      * Whether a mapped external group matches a group of the user: names are compared case-insensitively, and a
-     * distinguished name also matches the value of its first component when the other side is a plain name
-     * (e.g. `CN=Matomo Admins,OU=Groups,DC=example,DC=com` and `Matomo Admins`). Two DNs must match completely,
-     * so `CN=Admins,OU=Team A,...` (spaces after separators are ignored) never matches `CN=Admins,OU=Team B,...`.
+     * mapped plain name also matches a DN of the user whose first component has this value (e.g. the mapping
+     * `Matomo Admins` matches `CN=Matomo Admins,OU=Groups,DC=example,DC=com`). A mapped DN only matches the same
+     * DN (spaces around separators are ignored), never a plain name or a DN in another location, so
+     * `CN=Admins,OU=Team A,...` matches neither `Admins` nor `CN=Admins,OU=Team B,...`.
      */
     public static function matches(string $mappedGroup, string $userGroup): bool {
         $mapped = self::normalize($mappedGroup);
@@ -138,7 +140,8 @@ class GroupSync {
             return self::compactDn($mapped) === self::compactDn($user);
         }
         if ($mappedFirstValue !== null) {
-            return $mappedFirstValue === $user;
+            // a mapped DN pins the group to one location in the directory
+            return false;
         }
         if ($userFirstValue !== null) {
             return $userFirstValue === $mapped;

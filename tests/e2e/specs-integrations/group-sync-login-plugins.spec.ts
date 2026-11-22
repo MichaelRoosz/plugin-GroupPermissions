@@ -216,8 +216,9 @@ test.describe('Group sync with login plugins', () => {
 
     test('a SAML login adds the user to the mapped groups and removes outdated synced memberships', async ({ browser }) => {
       const admins = await createMappedGroup('SAML Admins', 'Matomo Admins');
-      // a DN-style mapping matches the plain group name of the SAML attribute by its first value
-      const editors = await createMappedGroup('SAML Editors', 'CN=Matomo Editors,OU=Groups,DC=example,DC=org');
+      const editors = await createMappedGroup('SAML Editors', 'Matomo Editors');
+      // a DN mapping never matches the plain group name of the SAML attribute
+      const dnMapped = await createMappedGroup('SAML DN', 'CN=Matomo Editors,OU=Groups,DC=example,DC=org');
       const stale = await createMappedGroup('SAML Stale', `saml-stale-${RUN_ID}`);
       const manual = await su.createGroup('SAML Manual');
       await setSyncSettings(su, { samlGroupSyncEnabled: true, samlGroupsAttribute: 'groups' });
@@ -227,6 +228,7 @@ test.describe('Group sync with login plugins', () => {
       await samlLogin(page, 'samlalice');
       expect(await members(admins)).toEqual(['samlalice']);
       expect(await members(editors)).toEqual(['samlalice']);
+      expect(await members(dnMapped)).toEqual([]);
       await page.context().close();
 
       await su.call('GroupPermissions.syncUserGroups', { userLogin: 'samlalice', externalGroups: [`saml-stale-${RUN_ID}`] });

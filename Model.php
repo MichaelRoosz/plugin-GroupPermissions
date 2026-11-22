@@ -230,6 +230,14 @@ class Model {
         $user->removeMembershipsOfDeletedUser($login);
     }
 
+    /**
+     * @see GroupUser::removeMembershipsOfMissingUsers
+     */
+    public function removeMembershipsOfMissingUsers(): void {
+        $user = new GroupUser();
+        $user->removeMembershipsOfMissingUsers();
+    }
+
     // GroupPermission
     public function createPermission(int $idGroup, int $idSite, string $access): void {
         $permission = new GroupPermission();
@@ -463,6 +471,14 @@ class Model {
     public function removeAllSegmentSharesByDeletedUser(string $login): void {
         $groupSegment = new GroupSegment();
         $groupSegment->removeAllSharesByDeletedUser($login);
+    }
+
+    /**
+     * @see GroupSegment::removeAllSharesByMissingUsers
+     */
+    public function removeAllSegmentSharesByMissingUsers(): void {
+        $groupSegment = new GroupSegment();
+        $groupSegment->removeAllSharesByMissingUsers();
     }
 
     // GroupExternal

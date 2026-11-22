@@ -18,7 +18,9 @@ New features (requires a database update):
 Security:
   - `getAllGroups` and `getGroupWithId` require admin access (previously any user could read groups, members and permissions). Thanks to [ipankwave88](https://github.com/ipankwave88) for reporting this
   - The anonymous user can no longer be added to groups, and group permissions never apply to it
-  - Group access to websites that no longer exist (e.g. deleted while the plugin was deactivated) is ignored, and a new user never inherits the group memberships of a deleted user with the same login
+  - Group access to websites that no longer exist (e.g. deleted while the plugin was deactivated) is ignored, and a new user never inherits the group memberships of a deleted user with the same login: activating the plugin removes the memberships and segment shares of users deleted while it was deactivated
+  - Directory sync: a mapped distinguished name only matches that DN, never a plain group name (e.g. one sent by an identity provider where users can name their own groups); plain names still match DNs with that first value
+  - OpenID Connect group sync: every OIDC login marks its ID token as used, also while the sync is disabled, so a token left in the session is never applied to a later login
 
 Fixes:
   - Members of groups with write/admin access can use their token_auth for tracking requests that need one (e.g. log imports)

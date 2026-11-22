@@ -770,9 +770,9 @@ class API extends \Piwik\Plugin\API {
      * next sync.
      *
      * @param int $idGroup
-     * @param string $externalGroup Name or distinguished name of the external group, case-insensitive. A DN like
-     *                              `CN=Matomo Admins,OU=Groups,DC=example,DC=com` can also be matched by
-     *                              its first value (`Matomo Admins`)
+     * @param string $externalGroup Name or distinguished name of the external group, case-insensitive. A plain
+     *                              name like `Matomo Admins` also matches DNs with this first value (e.g.
+     *                              `CN=Matomo Admins,OU=Groups,DC=example,DC=com`), a DN only matches that DN
      */
     public function addExternalGroupMapping(int $idGroup, string $externalGroup): void {
         Piwik::checkUserHasSuperUserAccess();

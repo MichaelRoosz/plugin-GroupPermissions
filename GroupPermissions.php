@@ -58,6 +58,35 @@ class GroupPermissions extends Plugin {
     }
 
     /**
+     * Removes the memberships and segment shares of users deleted while this plugin was deactivated (the
+     * `UsersManager.deleteUser` event was not handled then), so a user created later with the same login never
+     * inherits them, however the user is created (e.g. by a login plugin without Matomo's user API).
+     */
+    public function activate(): void {
+        $model = new Model();
+        $steps = [
+            'group memberships' => [$model, 'removeMembershipsOfMissingUsers'],
+            // the table is missing while the database update of this plugin is still pending
+            'segment shares' => [$model, 'removeAllSegmentSharesByMissingUsers'],
+        ];
+
+        foreach ($steps as $data => $step) {
+            try {
+                $step();
+            } catch (\Throwable $e) {
+                // never break activating the plugin
+                $logger = StaticContainer::get(LoggerInterface::class);
+                if ($logger instanceof LoggerInterface) {
+                    $logger->warning(
+                        'GroupPermissions: could not remove the {data} of deleted users: {message}',
+                        ['data' => $data, 'message' => $e->getMessage()]
+                    );
+                }
+            }
+        }
+    }
+
+    /**
      * @see Piwik\Plugin::registerEvents
      *
      * @return array<string, string|array{function: string, after?: bool, before?: bool}>
@@ -521,7 +550,8 @@ class GroupPermissions extends Plugin {
 
     /**
      * A new user never inherits the group memberships or segment shares of a deleted user with the same login: they
-     * are left behind when the user was deleted while this plugin was deactivated.
+     * are left behind when the user was deleted while this plugin was deactivated. Usually activate() already removed
+     * them, this also covers a failed cleanup there.
      *
      * @param mixed $login
      */

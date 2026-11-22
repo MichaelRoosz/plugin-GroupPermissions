@@ -22,9 +22,10 @@ use Piwik\Request;
  * Neither plugin provides an event with the claims of the user. Both store the ID token they got from the token
  * endpoint in the session (`loginoidc_idtoken`) right before they start the Matomo session, which posts
  * `Login.authenticate.successful`. The token is only read while handling the callback request of these plugins,
- * and only if it has an expiry (`exp`, required by OpenID Connect) that has not passed and was not used for an
- * earlier sync in the session, so a token left in the session by an earlier login is never used for a different
- * login.
+ * and only if it has an expiry (`exp`, required by OpenID Connect) that has not passed and was not seen by an
+ * earlier login in the session: every OIDC login marks its token as seen, also while the sync is disabled, so a
+ * token left in the session by an earlier login (e.g. by a plugin version that keeps it when the provider returns
+ * none) is never used for a different login.
  *
  * The signature of the token is not checked: the plugins received it directly from the token endpoint of the
  * provider over the back channel (authorization code flow), where TLS server validation authenticates the
@@ -36,7 +37,7 @@ class OidcGroupSync {
 
     private const SESSION_KEY_ID_TOKEN = 'loginoidc_idtoken';
 
-    /** Hash of the last ID token the groups were synchronized from, see syncUserAfterLogin */
+    /** Hash of the ID token of the last OIDC login in the session, see syncUserAfterLogin */
     private const SESSION_KEY_SYNCED_TOKEN = 'grouppermissions_oidc_synced_token';
 
     /** Seconds of clock difference to the provider tolerated when checking the expiry of the ID token */
@@ -86,15 +87,23 @@ class OidcGroupSync {
      * never break the login; memberships are not changed when the token has no groups claim.
      */
     public function syncUserAfterLogin(string $login): void {
-        if (!$this->isEnabled() || !self::isCallbackRequest() || $login === '' || $login === 'anonymous') {
+        if (!self::isCallbackRequest() || $login === '' || $login === 'anonymous') {
             return;
         }
 
-        $claim = $this->settings->getOidcGroupsClaim();
-
         try {
             $idToken = $_SESSION[self::SESSION_KEY_ID_TOKEN] ?? null;
-            if (!is_string($idToken) || $idToken === '') {
+            $idToken = is_string($idToken) && $idToken !== '' ? $idToken : null;
+
+            // a token is used for one login only, also when the sync is disabled at the time of that login: it
+            // must never be applied to a later login (possibly of another user) in the same session
+            $isNewToken = $idToken !== null && self::markTokenSeen($idToken);
+
+            if (!$this->isEnabled()) {
+                return;
+            }
+
+            if ($idToken === null) {
                 $this->getLogger()->info(
                     'GroupPermissions: the OpenID Connect provider returned no ID token for {login}, groups are not synchronized',
                     ['login' => $login]
@@ -113,11 +122,8 @@ class OidcGroupSync {
                 return;
             }
 
-            // the plugins keep the previous token in the session when the provider returns none, which must not
-            // be applied to this login (possibly of another user): a token is used only once and while it is valid
-            // (tokens without expiry are never used)
-            $tokenHash = hash('sha256', $idToken);
-            if (($_SESSION[self::SESSION_KEY_SYNCED_TOKEN] ?? null) === $tokenHash || self::isExpired($claims, time())) {
+            // tokens without expiry are never used
+            if (!$isNewToken || self::isExpired($claims, time())) {
                 $this->getLogger()->info(
                     'GroupPermissions: the ID token in the session was already used, has expired or has no expiry, groups of {login} are not synchronized',
                     ['login' => $login]
@@ -125,8 +131,8 @@ class OidcGroupSync {
 
                 return;
             }
-            $_SESSION[self::SESSION_KEY_SYNCED_TOKEN] = $tokenHash;
 
+            $claim = $this->settings->getOidcGroupsClaim();
             $externalGroups = self::getGroupsFromClaims($claims, $claim);
             if ($externalGroups === null) {
                 $this->getLogger()->info(
@@ -225,6 +231,21 @@ class OidcGroupSync {
         }
 
         return $groups;
+    }
+
+    /**
+     * Records the token as the one of the current login in the session
+     *
+     * @return bool false if an earlier login in the session already had this token
+     */
+    private static function markTokenSeen(string $idToken): bool {
+        $tokenHash = hash('sha256', $idToken);
+        if (($_SESSION[self::SESSION_KEY_SYNCED_TOKEN] ?? null) === $tokenHash) {
+            return false;
+        }
+        $_SESSION[self::SESSION_KEY_SYNCED_TOKEN] = $tokenHash;
+
+        return true;
     }
 
     private function getLogger(): LoggerInterface {

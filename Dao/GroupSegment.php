@@ -136,6 +136,20 @@ class GroupSegment {
     }
 
     /**
+     * Removes the shares made by users that no longer exist, see GroupUser::removeMembershipsOfMissingUsers
+     */
+    public function removeAllSharesByMissingUsers(): void {
+        $table = $this->tablePrefixed;
+
+        foreach ((new GroupUser())->getStoredLoginsOfMissingUsers($table, 'shared_by') as $storedLogin) {
+            Db::query(
+                "DELETE FROM `$table` WHERE shared_by = ? AND CAST(shared_by AS BINARY) = CAST(? AS BINARY)",
+                [$storedLogin, $storedLogin]
+            );
+        }
+    }
+
+    /**
      * Removes the shares made by a user Matomo has just deleted, see GroupUser::removeMembershipsOfDeletedUser
      */
     public function removeAllSharesByDeletedUser(string $login): void {
