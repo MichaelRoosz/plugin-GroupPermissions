@@ -24,7 +24,12 @@ services:
       - "${MAILPIT_PORT:-8025}:8025"
 
   matomo:
-    image: matomo:${MATOMO_VERSION:-5.1.2}-apache
+    # no official image for Matomo 6 yet, see docker/Dockerfile
+    build:
+      context: ./docker
+      args:
+        MATOMO_VERSION: ${MATOMO_VERSION:-6.0.0-rc2}
+    image: grouppermissions-e2e-matomo:${MATOMO_VERSION:-6.0.0-rc2}
     depends_on:
       db:
         condition: service_healthy

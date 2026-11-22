@@ -223,8 +223,10 @@ test.describe('Group capabilities', () => {
 
       // add a capability via the expandable select
       await cell.locator('.addCapability .select-wrapper').click();
-      await cell.locator('.expandableListCategory', { hasText: 'Tag Manager' }).click();
-      await cell.locator('.expandableListItem', { hasText: 'Publish Live Container' }).click();
+      // Matomo 6 renders the option list of the expandable select at the end of <body>, not inside the field
+      const list = page.locator('.expandableSelector__list').filter({ visible: true });
+      await list.locator('.expandableListCategory', { hasText: 'Tag Manager' }).click();
+      await list.locator('.expandableListItem', { hasText: 'Publish Live Container' }).click();
       await waitForIdle(page);
       await expect(toast(page, `The group '${group.name}' now has the capability 'Publish Live Container'`)).toBeVisible();
       await expect(cell.locator(`.chip[data-capability="${PUBLISH}"]`)).toBeVisible();
@@ -269,8 +271,10 @@ test.describe('Group capabilities', () => {
       await screenshot(row, 'manage-access-capabilities');
 
       await cell.locator('.addCapability .select-wrapper').click();
-      await cell.locator('.expandableListCategory', { hasText: 'Tag Manager' }).click();
-      await cell.locator('.expandableListItem', { hasText: 'Write' }).first().click();
+      // Matomo 6 renders the option list of the expandable select at the end of <body>, not inside the field
+      const list = page.locator('.expandableSelector__list').filter({ visible: true });
+      await list.locator('.expandableListCategory', { hasText: 'Tag Manager' }).click();
+      await list.locator('.expandableListItem', { hasText: 'Write' }).first().click();
       await waitForIdle(page);
       await expect(cell.locator(`.chip[data-capability="${WRITE}"]`)).toBeVisible();
       expect((await groupSite(group.idGroup, idSite)).capabilities.sort()).toEqual([PUBLISH, WRITE]);

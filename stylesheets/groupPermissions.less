@@ -1,10 +1,6 @@
 // Group Permissions admin page, styled after Matomo's own admin screens (Users, Goals)
 
 .groupPermissions {
-  .custom_select_all {
-    font-weight: 700;
-  }
-
   // tabs below the headline (server side links)
   .groupPermissionsTabs {
     display: flex;
@@ -174,11 +170,6 @@
         input.select-dropdown {
           box-sizing: border-box;
           width: 100%;
-        }
-
-        // core places the caret right of the (content-box) input, keep it inside the pill
-        .caret {
-          right: 6px;
         }
       }
 
@@ -373,30 +364,55 @@
     }
   }
 
-  // vue-multiselect, aligned with Matomo's text fields
+  // vue-multiselect, aligned with Matomo's select fields (bordered box, see CorePluginsAdmin's FieldSelect.less)
   .multiselect {
-    min-height: 40px;
+    min-height: 38px;
     color: @theme-color-text;
 
     .multiselect__tags {
-      min-height: 40px;
-      padding: 8px 40px 0 0;
-      border: 0;
-      border-bottom: 1px solid #9e9e9e;
-      border-radius: 0;
-      background: transparent;
+      box-sizing: border-box;
+      min-height: 38px;
+      padding: 8px 40px 0 16px;
+      border: 1px solid @theme-color-border;
+      border-radius: 8px;
+      background: @theme-color-background-contrast;
     }
 
+    &:hover .multiselect__tags,
     &.multiselect--active .multiselect__tags {
-      border-bottom: 2px solid @theme-color-link;
+      border-color: @theme-color-link;
+    }
+
+    // keep the corners of the box while the list is open (vue-multiselect squares them off)
+    &.multiselect--active .multiselect__tags {
+      border-radius: 8px;
+    }
+
+    .multiselect__select {
+      height: 36px;
+
+      // a chevron like the other selects instead of vue-multiselect's triangle
+      &::before {
+        display: inline-block;
+        top: 40%;
+        margin: 0;
+        width: 7px;
+        height: 7px;
+        border-style: solid;
+        border-color: @theme-color-text;
+        border-width: 0 2px 2px 0;
+        transform: translateY(-50%) rotate(45deg);
+      }
     }
 
     .multiselect__input,
     .multiselect__single,
     .multiselect__placeholder {
       padding-left: 0;
+      margin-bottom: 8px;
       background: transparent;
       font-size: 14px;
+      line-height: 20px;
     }
 
     .multiselect__placeholder {
@@ -418,7 +434,24 @@
 
     .multiselect__content-wrapper {
       z-index: 999;
+      margin-top: 4px;
+      border: 1px solid @theme-color-border;
+      border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    }
+
+    .multiselect--above .multiselect__content-wrapper,
+    &.multiselect--above .multiselect__content-wrapper {
+      margin: 0 0 4px;
+    }
+
+    .multiselect__option {
+      min-height: 0;
+      padding: 10px 16px;
+      font-size: 14px;
+      line-height: 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }

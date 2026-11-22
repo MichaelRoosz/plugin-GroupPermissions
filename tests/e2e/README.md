@@ -1,6 +1,6 @@
 # End-to-end tests
 
-Playwright tests that run against a real Matomo 5 instance in Docker. Each test asserts behaviour
+Playwright tests that run against a real Matomo 6 instance in Docker. Each test asserts behaviour
 through the UI and/or the HTTP API, and the UI tests save screenshots to `screenshots/` so you can
 review them.
 
@@ -40,7 +40,8 @@ tests/e2e/bin/teardown.sh       # stop and discard everything
 
 The plugin is copied into the container on every `start.sh` / `setup.sh`, so run it again after
 changing PHP, template, JS or `vue/dist` files. Ports can be changed with `MATOMO_PORT` and
-`MAILPIT_PORT`, and the Matomo version with `MATOMO_VERSION` (Docker image tag, e.g. `5.1.2`).
+`MAILPIT_PORT`, and the Matomo version with `MATOMO_VERSION` (a release of builds.matomo.org, e.g. `6.0.0-rc2`: there is no
+official Docker image for Matomo 6 yet, `docker/Dockerfile` puts that release into the latest Matomo 5 image).
 The database lives on tmpfs, so `teardown.sh` discards all data.
 
 ## Layout
@@ -48,6 +49,7 @@ The database lives on tmpfs, so `teardown.sh` discards all data.
 | Path | Purpose |
 | --- | --- |
 | `docker-compose.yml` | MariaDB, Matomo (apache), Mailpit, Playwright runner |
+| `docker/Dockerfile` | Matomo image for `MATOMO_VERSION` |
 | `bin/setup.sh` | starts the containers, copies the plugin, installs Matomo, activates the plugin |
 | `bin/lifecycle-test.sh` | deactivate / activate / uninstall / reinstall checks (run by `run.sh` after a full run) |
 | `bin/integration-test.sh` | group sync with the login plugins LoginLdap, LoginOIDC, RebelOIDC and LoginSaml (run by `run.sh` after a full run, skip with `INTEGRATIONS=0`): starts OpenLDAP, a mock OpenID Connect provider and SimpleSAMLphp (profile `integrations`), installs the pinned plugin releases, runs `specs-integrations/` and removes the plugins again. LoginSaml is paid and cannot be downloaded: its specs only run with a licensed copy for Matomo 5 in `LOGINSAML_DIR` (default `tmp/5.5.11/LoginSaml`, git-ignored, never commit it) |

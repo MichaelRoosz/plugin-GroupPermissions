@@ -1,5 +1,11 @@
 
 # Changelog
+## 6.0.0
+  - Compatible with Matomo 6 (for Matomo 5, use version 5.3.0)
+  - Includes all features and fixes of 5.3.0
+  - Tracking with the token_auth of a group member only accepts tokens that may track, like Matomo 6 does for direct access (not tokens limited to view access)
+  - Adapted to Matomo 6's new look: the user picker in the group editor matches Matomo's other select fields
+
 ## 5.3.0
 Requires a database update.
 

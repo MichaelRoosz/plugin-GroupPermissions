@@ -52,9 +52,9 @@ test.describe('Group Permissions admin page', () => {
     await switchEditorTab(page, 'access');
     const form = page.locator('.groupPermissionsGiveAccess');
     await form.locator('.siteSelector .title').click();
-    const search = form.locator('.siteSelector input.websiteSearch');
+    const search = form.locator('.siteSelector input.mtm-searchInput__input');
     if (await search.isVisible()) await search.fill(siteName);
-    await form.locator('.siteSelector .custom_select_ul_list li a', { hasText: siteName }).first().click();
+    await form.locator('.siteSelector .mtm-dropdownPanel__menu a.mtm-dropdownPanel__menuLink', { hasText: siteName }).first().click();
     await saveButton(form, 'groupPermissionsGiveAccessButton').click();
     await expect(websiteRow(page, siteName)).toBeVisible();
     expect((await su.groupAccess(idSite))[name]).toBe('view');

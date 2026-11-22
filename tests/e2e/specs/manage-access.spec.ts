@@ -179,9 +179,9 @@ test.describe('Manage Access tab', () => {
     const selector = page.locator('.siteSelector').first();
     for (const idSite of [slowSite, fastSite]) {
       await selector.locator('.title').click();
-      const search = selector.locator('input.websiteSearch');
+      const search = selector.locator('input.mtm-searchInput__input');
       if (await search.isVisible()) await search.fill(siteNames.get(idSite)!);
-      await selector.locator('.custom_select_ul_list li a', { hasText: siteNames.get(idSite)! }).first().click();
+      await selector.locator('.mtm-dropdownPanel__menu a.mtm-dropdownPanel__menuLink', { hasText: siteNames.get(idSite)! }).first().click();
     }
     await expectAccess(accessRow(page, group.name), 'view');
     await page.waitForTimeout(3500); // the slow response arrives
@@ -286,10 +286,10 @@ test.describe('Manage Access tab', () => {
       const selector = page.locator('.siteSelector').first();
       await selector.locator('.title').click();
       // innerText is upper-cased by CSS
-      const options = (await selector.locator('.custom_select_ul_list li a').allInnerTexts()).map((t) => t.trim().toUpperCase());
+      const options = (await selector.locator('.mtm-dropdownPanel__menu a.mtm-dropdownPanel__menuLink').allInnerTexts()).map((t) => t.trim().toUpperCase());
       expect(options.sort()).toEqual([siteNames.get(adminSite1)!, siteNames.get(adminSite2)!].map((n) => n.toUpperCase()).sort());
       await expect(selector.getByText('Apply to all websites')).toHaveCount(0);
-      await selector.locator('.custom_select_ul_list li a', { hasText: siteNames.get(adminSite2)! }).click();
+      await selector.locator('.mtm-dropdownPanel__menu a.mtm-dropdownPanel__menuLink', { hasText: siteNames.get(adminSite2)! }).click();
       await waitForIdle(page);
 
       const row = accessRow(page, group.name);

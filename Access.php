@@ -12,7 +12,6 @@ namespace Piwik\Plugins\GroupPermissions;
 
 use Piwik\Access\RolesProvider;
 use Piwik\Container\StaticContainer;
-use Piwik\Db;
 use Piwik\Log\LoggerInterface;
 use Piwik\Plugins\GroupPermissions\Dao\Rows;
 
@@ -26,22 +25,27 @@ class Access extends \Piwik\Access {
      * }>
      */
     public function getRawSitesWithSomeViewAccess($login) {
-        $sql = self::getSqlAccessSite('access, t2.idsite');
+        // Matomo's own rows; empty for logins without a user row (e.g. a deleted user)
         $userRights = array_map(static function (array $row): array {
             return [
                 'idsite' => Rows::int($row, 'idsite'),
                 'access' => Rows::string($row, 'access'),
             ];
-        }, Rows::list(Db::fetchAll($sql, [$login])));
+        }, Rows::list(parent::getRawSitesWithSomeViewAccess($login)));
 
         // groups never grant access to the anonymous user (core only allows "view" for anonymous, a group could
         // grant "admin" to every visitor)
-        if ($login === 'anonymous') {
+        if (strcasecmp((string) $login, 'anonymous') === 0) {
             return $userRights;
         }
 
         try {
             $model = new Model();
+            // like Matomo, nothing for logins without a user row: memberships left behind by a deleted user never
+            // grant access (only checked when there are no direct rows, which already imply an existing user)
+            if (!$userRights && $model->getUserLogin((string) $login) === null) {
+                return [];
+            }
             $groupRights = $model->getPermissionsOfUser($login);
             if (!$groupRights) {
                 return $userRights;

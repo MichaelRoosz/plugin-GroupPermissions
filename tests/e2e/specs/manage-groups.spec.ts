@@ -304,9 +304,9 @@ test.describe('Manage Groups tab', () => {
     const button = saveButton(form, 'groupPermissionsGiveAccessButton');
     const selector = form.locator('.siteSelector');
     await selector.locator('.title').click();
-    const search = selector.locator('input.websiteSearch');
+    const search = selector.locator('input.mtm-searchInput__input');
     if (await search.isVisible()) await search.fill(addedName);
-    await selector.locator('.custom_select_ul_list li a', { hasText: addedName }).first().click();
+    await selector.locator('.mtm-dropdownPanel__menu a.mtm-dropdownPanel__menuLink', { hasText: addedName }).first().click();
     await chooseOption(form.locator('.groupPermissionsRoleField'), 'Admin');
     await button.click();
     await expect(toast(page, `The group '${group.name}' now has the role 'Admin' for '${addedName}'.`).first()).toBeVisible();

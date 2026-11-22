@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 
 # pinned releases of the login plugins
 LOGINLDAP_REPO=matomo-org/plugin-LoginLdap
-LOGINLDAP_TAG=${LOGINLDAP_TAG:-5.2.9}
+LOGINLDAP_TAG=${LOGINLDAP_TAG:-6.0.6}
 LOGINOIDC_REPO=dominik-th/matomo-plugin-LoginOIDC
 LOGINOIDC_TAG=${LOGINOIDC_TAG:-5.0.0}
 REBELOIDC_REPO=Digitalist-Open-Cloud/Matomo-Plugin-RebelOIDC
@@ -64,6 +64,9 @@ install() {
 install LoginLdap "$1" "$2"
 install LoginOIDC "$3" "$4"
 install RebelOIDC "$5" "$6"
+# neither OIDC plugin has a release for Matomo 6 yet: allow their Matomo 5 releases, the tests only need their login
+# flow (callback action and ID token in the session), which this plugin integrates with
+sed -i 's/<6\.0\.0-b1/<7.0.0-b1/' /var/www/html/plugins/LoginOIDC/plugin.json /var/www/html/plugins/RebelOIDC/plugin.json
 INSTALL
 trap remove_plugins EXIT
 

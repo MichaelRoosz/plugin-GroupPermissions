@@ -133,7 +133,7 @@ class Model {
 
         $user = (new UsersModel())->getUser($login);
 
-        return is_array($user) && is_string($user['login'] ?? null) && $user['login'] !== '' ? $user['login'] : null;
+        return is_string($user['login'] ?? null) && $user['login'] !== '' ? $user['login'] : null;
     }
 
     public function addUserToGroup(int $idGroup, string $login, bool $synced = false): void {

@@ -22,7 +22,7 @@
         :maxlength="maxlength"
         :autocomplete="autocomplete"
         :autofocus="autofocus"
-        @input="$emit('update:modelValue', $event.target.value)"
+        @input="onInput"
         @focus="hasFocus = true"
         @blur="hasFocus = false"
       />
@@ -73,6 +73,11 @@ export default defineComponent({
     if (this.autofocus) {
       (this.$el.querySelector('input') as HTMLInputElement).focus();
     }
+  },
+  methods: {
+    onInput(event: Event) {
+      this.$emit('update:modelValue', (event.target as HTMLInputElement).value);
+    },
   },
 });
 </script>

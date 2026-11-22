@@ -502,7 +502,8 @@ class GroupPermissions extends Plugin {
                 }
             }
 
-            $hashedTokens = (new UsersModel())->getAllHashedTokensForLogins($logins);
+            // like Matomo's own handler: only tokens that may track (view-scoped tokens may not)
+            $hashedTokens = (new UsersModel())->getAllHashedTokensForTrackerCacheForLogins($logins);
             foreach (is_array($hashedTokens) ? $hashedTokens : [] as $tokenAuth) {
                 $hash = is_string($tokenAuth) ? UsersManager::hashTrackingToken($tokenAuth, (int) $idSite) : null;
                 if (is_string($hash)) {

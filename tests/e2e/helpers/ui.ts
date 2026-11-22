@@ -66,11 +66,11 @@ export async function selectSite(page: Page, siteName: string): Promise<void> {
   const selector = page.locator('.siteSelector').first();
   await selector.locator('.title').click();
   // the search box is only shown when there are many websites
-  const search = selector.locator('input.websiteSearch');
+  const search = selector.locator('input.mtm-searchInput__input');
   if (await search.isVisible()) {
     await search.fill(siteName);
   }
-  await selector.locator('.custom_select_ul_list li a', { hasText: siteName }).first().click();
+  await selector.locator('.mtm-dropdownPanel__menu a.mtm-dropdownPanel__menuLink', { hasText: siteName }).first().click();
   await expect(selector.locator('.title')).toContainText(siteName);
   await waitForIdle(page);
 }

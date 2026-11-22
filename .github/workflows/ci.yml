@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ['5.x']
+    branches: ['6.x']
   pull_request:
   workflow_dispatch:
 
@@ -56,8 +56,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # oldest version the plugin is developed against + latest 5.x
-        matomo: ['5.1.2', '5']
+        # Matomo release builds (no official Docker image for Matomo 6 yet, see tests/e2e/docker/Dockerfile)
+        matomo: ['6.0.0-rc2']
     env:
       MATOMO_VERSION: ${{ matrix.matomo }}
       CI: 'true'

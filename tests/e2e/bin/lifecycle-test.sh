@@ -175,7 +175,7 @@ check "automatic access table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\
 check "segment table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_segment'" | wc -l)"
 check "external group table is created" "1" "$(sql "SHOW TABLES LIKE 'matomo\\_gpermissions\\_external'" | wc -l)"
 check "existing memberships are not marked as synced" "0" "$(sql "SELECT synced FROM matomo_gpermissions_user WHERE login = '$member'")"
-check "plugin version is updated" "5.3.0" "$(sql "SELECT option_value FROM matomo_option WHERE option_name = 'version_GroupPermissions'")"
+check "plugin version is updated" "$(sed -nE 's/.*"version": "([^"]+)".*/\1/p' ../../plugin.json)" "$(sql "SELECT option_value FROM matomo_option WHERE option_name = 'version_GroupPermissions'")"
 check "group access still applies after the update" "$id_site" "$(member_sites)"
 
 echo "==> Uninstalling the plugin"

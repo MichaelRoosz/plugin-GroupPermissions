@@ -3,8 +3,8 @@
     "type": "project",
 
     "require": {
-        "php": "^7.3 | ^8.0",
-        "matomo/matomo": "=5.1.2"
+        "php": ">=8.1",
+        "matomo/matomo": "=6.0.0-rc2"
     },
 
     "require-dev": {

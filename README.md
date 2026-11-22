@@ -43,7 +43,7 @@ Manage user permissions using groups in Matomo. This plugin adds a dedicated adm
 
 ## Compatibility
 
-- Matomo: >= 5.0.0 (see `plugins/GroupPermissions/plugin.json`)
+- Matomo: >= 6.0.0 (see `plugins/GroupPermissions/plugin.json`; use version 5.x of the plugin for Matomo 5)
 - PHP: as required by your Matomo version
 
 ## Installation
