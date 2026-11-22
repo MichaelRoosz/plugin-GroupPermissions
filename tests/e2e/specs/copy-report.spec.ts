@@ -112,9 +112,9 @@ test.describe('Copy scheduled reports to a group', () => {
       expect(await reportsOf(login, description)).toEqual([]);
     }
 
-    // copying again gives another copy
-    expect(await copy(api[owner], idReport, group.idGroup)).toEqual([member]);
-    expect(await reportsOf(member, description)).toHaveLength(2);
+    // copying again does not give members a second copy
+    expect(await copy(api[owner], idReport, group.idGroup)).toEqual([]);
+    expect(await reportsOf(member, description)).toHaveLength(1);
   });
 
   test('a copy is independent of the original and managed by its member', async () => {

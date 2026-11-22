@@ -375,7 +375,20 @@ class API extends \Piwik\Plugin\API {
         $initialIdSite = $this->getInitialIdSiteForGroups($idGroups);
 
         $usersManagerApi = UsersManagerAPI::getInstance();
-        $usersManagerApi->inviteUser($userLogin, $email, $initialIdSite, $expiryInDays, $passwordConfirmation);
+        $userExisted = $this->model->getUserLogin($userLogin) !== null;
+
+        try {
+            $usersManagerApi->inviteUser($userLogin, $email, $initialIdSite, $expiryInDays, $passwordConfirmation);
+        } catch (\Throwable $e) {
+            // Matomo creates the user (with access to the initial website) before it sends the invitation email: if a
+            // later step fails, e.g. sending the email, do not leave that user behind
+            if (!$userExisted && $this->model->getUserLogin($userLogin) !== null) {
+                $this->rollBackInvite($userLogin, $passwordConfirmation);
+                GroupAccessUpdater::reloadAccess();
+            }
+
+            throw $e;
+        }
 
         try {
             foreach ($idGroups as $idGroup) {
@@ -864,7 +877,8 @@ class API extends \Piwik\Plugin\API {
      *
      * Like Dashboard.copyDashboardToUser, the dashboard is only copied to users the current user is allowed to
      * see (super users see everyone, admins see the users with access to their websites, including access through
-     * groups). The current user and the anonymous user are skipped.
+     * groups). The current user, the anonymous user and members who already have a dashboard with the same name and
+     * layout (e.g. from an earlier copy) are skipped.
      *
      * @param int $idDashboard Id of the current user's dashboard that should be copied
      * @param int $idGroup Group whose members receive a copy
@@ -900,6 +914,11 @@ class API extends \Piwik\Plugin\API {
 
         $copiedTo = [];
         foreach ($this->getMembersVisibleToCurrentUser($group['idgroup']) as $login) {
+            // copying again (e.g. a double click, or after adding members) does not give members a second copy
+            if ($this->hasDashboard($dashboardModel, $login, $dashboardName, $layout)) {
+                continue;
+            }
+
             $dashboardModel->createNewDashboardForUser($login, $dashboardName, $layout);
             $copiedTo[] = $login;
         }
@@ -1054,8 +1073,9 @@ class API extends \Piwik\Plugin\API {
      *
      * Like copyDashboardToGroup, the report is only copied to members the current user is allowed to see. Members
      * without view access to the website of the report, invited users that did not accept yet, the owner of the
-     * report, the current user and the anonymous user are skipped. Super users can copy any email report, users with admin access to at least
-     * one website their own reports. Reports using a segment must use one shared with all users (Matomo does not
+     * report, members who already have an identical copy (e.g. from an earlier copy), the current user and the anonymous
+     * user are skipped. Super users can copy any email report, users with admin access to at least one website their
+     * own reports. Reports using a segment must use one shared with all users (Matomo does not
      * let members use private segments of other users).
      *
      * @return array<string> Logins of the users the report was copied to
@@ -1100,6 +1120,30 @@ class API extends \Piwik\Plugin\API {
         Piwik::checkUserHasSomeAdminAccess();
 
         return (new ReportCopy())->getCopyableReports();
+    }
+
+    /**
+     * Whether the user already has a dashboard with this name and layout
+     *
+     * @param mixed $layout
+     */
+    private function hasDashboard(DashboardModel $dashboardModel, string $login, string $name, $layout): bool {
+        if (!is_string($layout)) {
+            return false;
+        }
+
+        $dashboards = $dashboardModel->getAllDashboardsForUser($login);
+        foreach (is_array($dashboards) ? $dashboards : [] as $dashboard) {
+            if (
+                is_array($dashboard)
+                && ($dashboard['name'] ?? '') === $name
+                && ($dashboard['layout'] ?? null) === $layout
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function deleteGroupData(int $idGroup): void {

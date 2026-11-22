@@ -74,7 +74,14 @@ test.describe('Group management API', () => {
     expect(overview.find((g) => g.idGroup === idle.idGroup)).toEqual({ idGroup: idle.idGroup, name: idle.name, memberCount: 0, siteCount: 0 });
 
     const names = overview.map((g) => g.name);
-    expect(names).toEqual([...names].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())));
+    // like PHP's strcasecmp: ASCII letters case-insensitive, otherwise by bytes (so `Café` sorts after every `Cafe …`;
+    // the UI re-sorts with localeCompare)
+    const asciiLower = (v: string) => v.replace(/[A-Z]/g, (c) => c.toLowerCase());
+    const byteOrder = (a: string, b: string) => {
+      const [x, y] = [Buffer.from(asciiLower(a)), Buffer.from(asciiLower(b))];
+      return Buffer.compare(x, y);
+    };
+    expect(names).toEqual([...names].sort(byteOrder));
     expect(overview).toHaveLength((await su.call('GroupPermissions.getAllGroups', { filter_limit: -1 })).length);
   });
 

@@ -178,7 +178,9 @@ export default defineComponent({
       }, {
         errorElement: '#ajaxErrorManageGroups',
       }).then((groups) => {
-        this.groups = groups;
+        // sorted like the other lists (e.g. Manage Access): the server sorts by bytes, which puts
+        // `Café` after every `Cafe …`
+        this.groups = [...groups].sort((a, b) => a.name.localeCompare(b.name));
       }).finally(() => {
         this.isLoadingGroups = false;
         this.hasLoadedGroups = true;

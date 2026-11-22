@@ -38,6 +38,10 @@ Fixes:
   - Saving the website form only changes the group roles changed in the form, roles changed by others while it was open are kept
   - Group sync from OpenID Connect ignores ID tokens without expiry (`exp`), like expired ones
   - Members are listed and counted when the tables of the plugin and of Matomo have different collations (e.g. after a MySQL upgrade)
+  - Copying a dashboard or scheduled report to a group again skips members who already have an identical copy
+  - Deleting a user removes all their memberships and segment shares also when they are stored with several spellings of the login
+  - If inviting a user into groups fails after Matomo created the user, the user is removed again
+  - The group list and the invite form sort groups like the other pages (e.g. `Café` next to `Cafe`, not after every `Cafe …`)
   - `removeExternalGroupMapping` and `removeAutoAccessRule` fail for mappings and rules that do not exist, `getMembersOfGroup` for groups that do not exist
   - `getSitesAccessFromGroup` loads the website names with one query
   - Manage Access with "Apply to all websites" can remove the access of a group from all websites ("No access") and apply the same role again

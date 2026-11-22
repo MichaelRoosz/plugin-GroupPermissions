@@ -147,6 +147,17 @@ test.describe('Copy dashboard to group', () => {
       }
     });
 
+    test('copying again skips members who already have the dashboard', async () => {
+      const name = `Copied twice ${RUN_ID}`;
+      const first = await su.call('GroupPermissions.copyDashboardToGroup', { idDashboard, idGroup: team.idGroup, dashboardName: name });
+      expect([...first].sort()).toEqual([...members].sort());
+      expect(await su.call('GroupPermissions.copyDashboardToGroup', { idDashboard, idGroup: team.idGroup, dashboardName: name }))
+        .toEqual([]);
+      for (const login of members) {
+        expect((await dashboardNames(su, login)).filter((n) => n === name)).toHaveLength(1);
+      }
+    });
+
     test('without a dashboard name the copies are created with the default name', async () => {
       const before = await Promise.all(members.map((login) => dashboardNames(su, login)));
       const copiedTo = await su.call('GroupPermissions.copyDashboardToGroup', { idDashboard, idGroup: team.idGroup });

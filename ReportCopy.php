@@ -168,9 +168,16 @@ class ReportCopy {
             $copy['ts_last_sent'] = null;
         }
 
+        // copying again (e.g. a double click, or after adding members) does not give members a second copy
+        $haveCopy = $this->getLoginsWithIdenticalReport($copy, $logins);
+
         $scheduledReportsModel = new ScheduledReportsModel();
         $copiedTo = [];
         foreach ($logins as $login) {
+            if (isset($haveCopy[$login])) {
+                continue;
+            }
+
             $copy['login'] = $login;
             $scheduledReportsModel->createReport($copy);
             $copiedTo[] = $login;
@@ -224,6 +231,65 @@ class ReportCopy {
         return array_values(array_filter($logins, static function (string $login) use ($receivers): bool {
             return isset($receivers[$login]);
         }));
+    }
+
+    /**
+     * The users who already have a report (not deleted) equal to the copy in every column except its id, owner and
+     * timestamps, e.g. a copy made earlier. The parameters are compared decoded, independent of key order.
+     *
+     * @param array<mixed> $copy the copy to create, see copyToUsers
+     * @param array<string> $logins
+     *
+     * @return array<string, true> by login
+     */
+    private function getLoginsWithIdenticalReport(array $copy, array $logins): array {
+        if (!$logins) {
+            return [];
+        }
+
+        $ignored = ['idreport' => true, 'login' => true, 'ts_created' => true, 'ts_last_sent' => true, 'deleted' => true];
+        $copyParameters = json_decode(Rows::string($copy, 'parameters'), true);
+
+        // compared exactly: the logins are the ones of Matomo's user table, which reports are stored with
+        $wanted = array_flip($logins);
+
+        $result = [];
+        $rows = Rows::list(Db::fetchAll(
+            'SELECT * FROM `' . Common::prefixTable('report') . '`
+                WHERE deleted = 0 AND idsite = ? AND login IN (' . Common::getSqlStringFieldsArray($logins) . ')',
+            array_merge([Rows::int($copy, 'idsite')], array_values($logins))
+        ));
+        foreach ($rows as $row) {
+            $login = is_string($row['login'] ?? null) ? $row['login'] : null;
+            if ($login === null || !isset($wanted[$login]) || isset($result[$login])) {
+                continue;
+            }
+
+            $identical = true;
+            foreach ($copy as $column => $value) {
+                if (isset($ignored[$column])) {
+                    continue;
+                }
+                $stored = $row[$column] ?? null;
+                if ($column === 'parameters') {
+                    $identical = is_string($stored) && json_decode($stored, true) == $copyParameters;
+                } else {
+                    // the database returns numbers as strings
+                    $identical = ($value === null || $stored === null)
+                        ? $value === $stored
+                        : (is_scalar($value) && is_scalar($stored) && (string) $value === (string) $stored);
+                }
+                if (!$identical) {
+                    break;
+                }
+            }
+
+            if ($identical) {
+                $result[$login] = true;
+            }
+        }
+
+        return $result;
     }
 
     /**
