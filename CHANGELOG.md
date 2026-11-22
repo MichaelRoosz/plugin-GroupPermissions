@@ -1,57 +1,39 @@
 
 # Changelog
 ## 5.3.0
-New features (requires a database update):
-  - New admin UI in Matomo's style: group list with search, group editor with sections for members, website access, capabilities, automatic access, segments, scheduled reports and directory sync; deep links to groups
-  - Capabilities per group (e.g. Tag Manager `tagmanager_write`, `tagmanager_publish_live_container`)
-  - Automatic access: give groups a role on new websites matching a Matomo website group or URL pattern (e.g. `*.example.com`), optionally applied to existing websites
+Requires a database update.
+
+New features:
+  - Redesigned admin UI in Matomo's style: searchable group list and a group editor for members, website access, capabilities and everything below
+  - Capabilities per group, e.g. Tag Manager `tagmanager_write`
+  - Automatic access: give groups a role on new websites by Matomo website group or URL pattern (e.g. `*.example.com`), optionally also on existing websites
   - "Group access" field in Matomo's website create/edit form
-  - Share stored segments with groups (a share applies while the user who shared the segment may still share it)
-  - Copy scheduled email reports to all members of a group: every member with access to the website gets a copy of their own, sent to them only
-  - Group sync from LDAP, OIDC and SAML: map external directory groups to groups, memberships are synchronized on login (LoginLdap, LoginOIDC / RebelOIDC, LoginSaml; event `GroupPermissions.syncUserGroups` for other login plugins)
+  - Group sync from LDAP, OpenID Connect and SAML: map directory groups to groups, memberships are updated on login (LoginLdap, LoginOIDC / RebelOIDC, LoginSaml; other login plugins can post the `GroupPermissions.syncUserGroups` event)
+  - Share segments with groups
+  - Copy dashboards and scheduled email reports to all members of a group
   - Invite new users directly into groups
-  - Copy dashboards to all members of a group
-  - New API methods for all of the above
-  - `[GroupPermissions] enable_groups_admin = 0` in the config disables changing groups (including the segments shared with them), like `enable_users_admin` for users
-  - `setGroupAccessById` sets the role of a group by its ID (the UI uses it, so groups with the same name from older versions are no longer mixed up)
+  - `[GroupPermissions] enable_groups_admin = 0` disables changing groups, like `enable_users_admin` for users
+  - API methods for all of the above; new `setGroupAccessById` (preferred over `setGroupAccess`, which can mix up groups with the same name from older versions); `getGroupAccessFromSite` is deprecated in favour of `getGroupPermissionsFromSite`
 
 Security:
-  - `getAllGroups` and `getGroupWithId` require admin access (previously any user could read groups, members and permissions). Thanks to [ipankwave88](https://github.com/ipankwave88) for reporting this
-  - The anonymous user can no longer be added to groups, and group permissions never apply to it
-  - Group access to websites that no longer exist (e.g. deleted while the plugin was deactivated) is ignored, and a new user never inherits the group memberships of a deleted user with the same login: activating the plugin removes the memberships and segment shares of users deleted while it was deactivated
-  - Directory sync: a mapped distinguished name only matches that DN, never a plain group name (e.g. one sent by an identity provider where users can name their own groups); plain names still match DNs with that first value
-  - OpenID Connect group sync: every OIDC login marks its ID token as used, also while the sync is disabled, so a token left in the session is never applied to a later login
+  - `getAllGroups` and `getGroupWithId` require admin access, before any user could read groups. Thanks to [ipankwave88](https://github.com/ipankwave88) for reporting this
+  - Groups never grant access to the anonymous user, who can no longer be added to groups
+  - A new user never inherits the group memberships of a deleted user with the same login, also if the user was deleted while the plugin was deactivated
+  - Group access to deleted websites is ignored
 
 Fixes:
-  - Members of groups with write/admin access can use their token_auth for tracking requests that need one (e.g. log imports)
-  - `SitesManager.getSitesIdFromSiteUrl` (used e.g. by the log importer to find websites by URL) also returns websites the user can access through a group
-  - While the database update of the plugin is pending, group members keep their own access instead of getting database errors
-  - Capabilities given directly to a user were lost when the user was also in a group with website access
-  - Group names with `&`, quotes or `<`/`>` could not be managed on Manage Access; names are trimmed, empty or overlong names are rejected, case-only renames work
-  - Group names must be unique (case-insensitive), also when groups are created or renamed at the same time; names are no longer matched accent-insensitively depending on the database collation
-  - Adding a member that the directory sync added makes the membership a manual one, which the sync keeps
-  - Users deleted while the plugin was deactivated are no longer listed as members (they were shown as active and removing them failed); their memberships can still be removed via the API
-  - Users losing all access to a website through a group change trigger `UsersManager.removeSiteAccess` like direct access changes, so e.g. their scheduled reports for the website are deleted
-  - Automatic access URL patterns with a port (e.g. `example.com:8080`) match websites with that port; URLs without a port have the default port of their scheme (`example.com:443` matches `https://example.com`)
-  - Removing the direct access of a user no longer deletes their scheduled reports for websites they can still access through a group, also when other plugins remove the access directly
-  - Members are stored with the login of the user (adding `BOB` adds the user `bob`), so dashboards and reports copied to a group no longer skip them; the database update converts existing memberships with a different spelling (with a case-sensitive collation they never granted access)
-  - `removeUserFromGroup` fails for users that are not in the group
-  - Changing the role of a group no longer removes its access for a moment
-  - Saving the website form only changes the group roles changed in the form, roles changed by others while it was open are kept
-  - Group sync from OpenID Connect ignores ID tokens without expiry (`exp`), like expired ones
-  - Members are listed and counted when the tables of the plugin and of Matomo have different collations (e.g. after a MySQL upgrade)
-  - Copying a dashboard or scheduled report to a group again skips members who already have an identical copy
-  - Deleting a user removes all their memberships and segment shares also when they are stored with several spellings of the login
-  - If inviting a user into groups fails after Matomo created the user, the user is removed again
-  - The group list and the invite form sort groups like the other pages (e.g. `Café` next to `Cafe`, not after every `Cafe …`)
-  - `removeExternalGroupMapping` and `removeAutoAccessRule` fail for mappings and rules that do not exist, `getMembersOfGroup` for groups that do not exist
-  - `getSitesAccessFromGroup` loads the website names with one query
-  - Manage Access with "Apply to all websites" can remove the access of a group from all websites ("No access") and apply the same role again
-  - Deleting a group is all or nothing
-  - Deleting a user with another spelling of the login (e.g. `BOB` for `bob`) removes their memberships and segment shares, and never those of another user the database considers equal
-  - Inviting a user into groups without website access shows a warning: Matomo's invitation email then names another website
-  - Website IDs that do not exist are rejected; better error messages for invalid access values
+  - Group members with write or admin access can use their token_auth for tracking requests that need one (e.g. log imports), and the log importer finds websites they can access through a group
+  - Removing a user's direct access no longer deletes their scheduled reports for websites they can still access through a group; users losing all access through a group change are cleaned up like with direct access changes
+  - Capabilities given directly to a user are no longer lost when the user is also in a group
+  - Group names with `&`, quotes or `<`/`>` work everywhere; names must be unique (case-insensitive) and are trimmed
+  - Logins with different spelling (e.g. `BOB` for `bob`) are handled correctly when adding, removing and deleting users; existing memberships are converted by the database update
+  - Users deleted while the plugin was deactivated are no longer listed as members
+  - Changing the role of a group never removes its access for a moment, and deleting a group is all or nothing
+  - "Apply to all websites" on Manage Access can also remove access from all websites
   - Manage Access opens with the website from the URL
+  - Group members keep their own access while the plugin's database update is pending
+  - Works when the plugin's tables and Matomo's have different collations (e.g. after a MySQL upgrade)
+  - Clearer errors for unknown websites, groups, members and access values
   - Updated translations
 
 ## 5.2.1
