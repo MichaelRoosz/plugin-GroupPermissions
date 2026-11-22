@@ -228,7 +228,10 @@ class GroupUser {
 
         $folded = mb_strtolower($login);
         $candidates = [];
-        $rows = Rows::list(Db::fetchAll("SELECT DISTINCT `$column` AS login, `$column` = ? AS equal FROM $table", [$login]));
+        // not `SELECT DISTINCT`: it compares with the collation of the column, so with a case-insensitive one it would
+        // return only one of several spellings (e.g. `bob` in one group and `BOB` in another), and the exact deletes
+        // of the callers would leave the others behind
+        $rows = Rows::list(Db::fetchAll("SELECT `$column` AS login, `$column` = ? AS equal FROM $table", [$login]));
         foreach ($rows as $row) {
             $storedLogin = Rows::string($row, 'login');
             $equal = is_numeric($row['equal'] ?? null) && (int) $row['equal'] === 1;
