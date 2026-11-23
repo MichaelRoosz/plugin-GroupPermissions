@@ -79,8 +79,11 @@ if [ "$saml" = 1 ]; then
 fi
 
 echo "==> Adding LDAP users and groups"
+# osixia/openldap answers on ldap:/// already during its first-start bootstrap, before the memberOf overlay is
+# configured (entries added then get no memberOf) and before that temporary slapd is restarted: wait for its marker
 for _ in $(seq 1 60); do
-    if compose exec -T ldap ldapsearch -x -H ldap://localhost -b dc=example,dc=org -D cn=admin,dc=example,dc=org -w admin \
+    if compose exec -T ldap test -e /container/run/state/slapd-first-start-done &&
+        compose exec -T ldap ldapsearch -x -H ldap://localhost -b dc=example,dc=org -D cn=admin,dc=example,dc=org -w admin \
         -s base >/dev/null 2>&1; then break; fi
     sleep 1
 done
@@ -120,6 +123,12 @@ cn: Matomo Editors
 uniqueMember: uid=ldapalice,ou=people,dc=example,dc=org
 uniqueMember: uid=ldapbob,ou=people,dc=example,dc=org
 LDIF
+alice=$(compose exec -T ldap ldapsearch -x -H ldap://localhost -b uid=ldapalice,ou=people,dc=example,dc=org \
+    -D cn=admin,dc=example,dc=org -w admin -LLL memberOf)
+if [[ "$alice" != *"memberOf: "* ]]; then
+    echo "The LDAP users have no memberOf attribute (memberOf overlay not active)" >&2
+    exit 1
+fi
 
 echo "==> Configuring the plugins"
 for plugin in LoginLdap LoginOIDC RebelOIDC; do
