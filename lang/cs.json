@@ -88,6 +88,7 @@
         "InviteUserButton": "Pozvat uživatele",
         "InviteUserDescription": "Pozvěte nového uživatele e-mailem a přidejte jej přímo do vybraných skupin. Uživatel získá přístup k webům pouze prostřednictvím těchto skupin.",
         "InviteUserIntoGroup": "Pozvat nového uživatele do této skupiny",
+        "InviteUserNoWebsiteWarning": "Žádná z vybraných skupin zatím nemá přístup k žádnému webu. Matomo pro pozvánku vyžaduje web, proto bude v e-mailové pozvánce uveden jiný web, ke kterému uživatel nebude mít přístup.",
         "InviteUserSuccess": "Uživatel ‚%s‘ byl pozván a přidán do vybraných skupin.",
         "ManageAccess": "Správa přístupu",
         "ManageGroup": "Správa skupiny",
